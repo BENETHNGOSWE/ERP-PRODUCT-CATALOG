@@ -1,18 +1,17 @@
 /**
  * ODOO 18 POS INTEGRATION MODULE
- * Host: postest.kodatechnologies.co.tz
- * DB: KODADEMOS
- * User: developerbeneth@gmail.com
+ * Reads connection settings from Environment Variables (.env)
  */
 
+require('dotenv').config();
 const xmlrpc = require('xmlrpc');
 
 const ODOO_CONFIG = {
-  host: 'postest.kodatechnologies.co.tz',
-  port: 443,
-  db: 'KODADEMOS',
-  username: 'developerbeneth@gmail.com',
-  password: 'POSIntergration@2026'
+  host: process.env.ODOO_HOST || 'postest.kodatechnologies.co.tz',
+  port: parseInt(process.env.ODOO_PORT || '443', 10),
+  db: process.env.ODOO_DB || 'KODADEMOS',
+  username: process.env.ODOO_USERNAME || process.env.ODOO_USER || 'developerbeneth@gmail.com',
+  password: process.env.ODOO_PASSWORD || 'POSIntergration@2026'
 };
 
 // In-memory cache for sub-millisecond response times
@@ -206,7 +205,6 @@ async function fetchOdooProducts(forceRefresh = false) {
 
 // Deduct Stock Directly in Odoo
 async function deductStock(items, defaultLocationId = 28) {
-  // items: [{ id: 167, qty: 2 }, ...]
   const results = [];
 
   for (const item of items) {
@@ -214,7 +212,6 @@ async function deductStock(items, defaultLocationId = 28) {
     const qtyToDeduct = Number(item.qty || 1);
 
     try {
-      // Find quant in internal locations
       const quants = await callModel('stock.quant', 'search_read', [
         [['product_id', '=', prodId], ['location_id.usage', '=', 'internal']]
       ], {
@@ -228,7 +225,6 @@ async function deductStock(items, defaultLocationId = 28) {
         updatedQty = Math.max(0, currentQty - qtyToDeduct);
         await callModel('stock.quant', 'write', [[qid], { quantity: updatedQty }]);
       } else {
-        // Quant creation if not existing
         await callModel('stock.quant', 'create', [{
           product_id: prodId,
           location_id: defaultLocationId,
@@ -237,7 +233,6 @@ async function deductStock(items, defaultLocationId = 28) {
         updatedQty = Math.max(0, 50 - qtyToDeduct);
       }
 
-      // Update in-memory cache immediately
       const cached = cachedProducts.find(p => p.id === prodId);
       if (cached) {
         cached.qty_available = updatedQty;
@@ -260,7 +255,6 @@ async function deductStock(items, defaultLocationId = 28) {
     }
   }
 
-  // Background refresh to sync exact figures
   setTimeout(() => fetchOdooProducts(true).catch(() => {}), 100);
 
   return results;
@@ -268,14 +262,11 @@ async function deductStock(items, defaultLocationId = 28) {
 
 // Create Full Confirmed POS Order in Odoo
 async function createOdooPosOrder(orderData) {
-  // orderData: { customerPhone, totalAmount, items: [{ id: 167, name: 'Coca-Cola', price: 1000, qty: 2 }] }
   const ref = 'WEB-' + (orderData.orderId || ('NM-' + Math.floor(1000 + Math.random() * 9000)));
   const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
-  // 1. Deduct Stock quants
   const stockResults = await deductStock(orderData.items);
 
-  // 2. Format lines for Odoo POS Order
   const lines = orderData.items.map(item => {
     const unitPrice = Number(item.price);
     const qty = Number(item.qty);
@@ -293,7 +284,6 @@ async function createOdooPosOrder(orderData) {
 
   const total = Number(orderData.totalAmount || orderData.totalPaid || 0);
 
-  // POS Order payload for session 58 / active session
   const posPayload = {
     name: `Order ${ref}`,
     pos_reference: ref,
@@ -306,11 +296,11 @@ async function createOdooPosOrder(orderData) {
       [0, 0, {
         name: dateStr,
         amount: total,
-        payment_method_id: 6, // Card / Electronic
+        payment_method_id: 6,
         payment_date: dateStr
       }]
     ],
-    pos_session_id: 58, // Active 'Website Orders' session
+    pos_session_id: 58,
     user_id: 8,
     partner_id: false,
     uid: ref,
