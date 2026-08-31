@@ -1,36 +1,20 @@
-# NOVA MART — Odoo POS Live Product Catalog
+# NOVA MART — Online Store
 
-An ultra-fast, modern e-commerce product catalog with live Odoo 18 Point of Sale (POS) real-time inventory tracking and automatic stock deduction.
+An ultra-fast, modern e-commerce product catalog with real-time inventory tracking and seamless checkout.
 
 ---
 
 ## 🌟 Key Features
 
 - **⚡ Sub-Millisecond Speed:** Native HTML5, modern CSS3, and ES6+ JavaScript.
-- **🔄 Live Odoo POS Integration:**
-  - Connects securely to Odoo 18 POS via XML-RPC.
+- **🔄 Live Inventory Tracking:**
   - Real-time stock display on every product (`In Stock`, `Low Stock`, `Out of Stock`).
-  - Automatic background sync.
+  - Automatic stock synchronization.
 - **🛍️ 3-Page Flow:**
-  1. **Products Catalog (`/` or `index.html`):** Fluid grid, dynamic categories, instant search.
+  1. **Products Catalog (`/` or `index.html`):** Fluid grid, dynamic categories, instant search, click-to-add on images.
   2. **Your Cart (`/cart` or `cart.html`):** Real-time stock verification, instant discounts, mobile number checkout.
   3. **Order Confirmation (`/confirmation` or `confirmation.html`):** Order status tracking, printable receipt with barcode.
-- **📦 Atomic Stock Deduction:** When a customer orders, quantities deduct in real time from Odoo inventory.
-
----
-
-## ⚙️ Environment Variables (`.env`)
-
-Create a `.env` file in the root directory (see `.env.example`):
-
-```env
-ODOO_HOST=postest.kodatechnologies.co.tz
-ODOO_PORT=443
-ODOO_DB=KODADEMOS
-ODOO_USERNAME=your_odoo_user@example.com
-ODOO_PASSWORD=your_odoo_password
-PORT=3000
-```
+- **📦 Stock Management:** Automatic real-time inventory updates on checkout.
 
 ---
 
@@ -43,13 +27,7 @@ cd ERP-PRODUCT-CATALOG
 npm install
 ```
 
-### 2. Configure Environment
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-### 3. Start Server
+### 2. Start Server
 ```bash
 npm start
 # or with PM2:
@@ -63,7 +41,7 @@ Open `http://localhost:3000` in your browser.
 ## 📂 Project Structure
 
 ```
-├── odoo.js                  # Odoo 18 XML-RPC client & live sync engine
+├── odoo.js                  # XML-RPC client & live sync engine
 ├── server.js                # Express web server & REST API
 ├── Dockerfile               # Production Docker container
 ├── package.json             # Node dependencies
@@ -79,4 +57,4 @@ Open `http://localhost:3000` in your browser.
 ---
 
 ## 📄 License
-MIT License. Created for NOVA MART / Koda Technologies.
+MIT License. Created for NOVA MART.

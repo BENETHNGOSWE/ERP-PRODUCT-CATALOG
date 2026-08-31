@@ -250,7 +250,7 @@
           html += `
             <article class="product-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
               <span class="stock-badge-tag ${stockClass}">${stockText}</span>
-              <div class="product-card-img-wrap">
+              <div class="product-card-img-wrap" title="Click to add to cart">
                 <img src="${p.image}" alt="${p.name}" class="product-card-img" loading="lazy">
               </div>
               <h3 class="product-card-title" title="${p.name}">${p.name}</h3>
@@ -268,8 +268,9 @@
         NOVA.updateHeaderCartBadge();
       }
 
-      // Steppers event delegation
+      // Click to add: Steppers + Image Click
       document.addEventListener('click', (e) => {
+        // 1. Plus Button
         const plus = e.target.closest('.btn-plus');
         if (plus) {
           const id = plus.getAttribute('data-id');
@@ -281,12 +282,41 @@
           return;
         }
 
+        // 2. Minus Button
         const minus = e.target.closest('.btn-minus');
         if (minus) {
           const id = minus.getAttribute('data-id');
           NOVA.updateItemQty(id, -1);
           renderCatalog();
           return;
+        }
+
+        // 3. Click directly on Product Image to Add to Cart
+        const imgWrap = e.target.closest('.product-card-img-wrap') || e.target.closest('.product-card-title');
+        if (imgWrap) {
+          const card = imgWrap.closest('.product-card');
+          if (card) {
+            const id = card.getAttribute('data-id');
+            const products = NOVA.getProducts();
+            const p = products.find(x => String(x.id) === String(id));
+            const cart = NOVA.getCart();
+            const currentQty = cart[String(id)] || 0;
+            const stock = p && typeof p.qty_available === 'number' ? p.qty_available : 50;
+
+            if (stock <= 0) {
+              NOVA.showToast('⚠️ Item is currently out of stock', 'danger');
+              return;
+            }
+            if (currentQty >= stock) {
+              NOVA.showToast(`⚠️ Only ${stock} units available in stock!`, 'danger');
+              return;
+            }
+
+            NOVA.updateItemQty(id, 1);
+            if (p) NOVA.showToast(`Added ${p.name} to cart`);
+            renderCatalog();
+            return;
+          }
         }
       });
 
