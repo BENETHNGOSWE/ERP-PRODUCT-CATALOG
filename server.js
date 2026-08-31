@@ -156,11 +156,21 @@ app.get(['/confirmation', '/confirmation.html', '/order-success'], (req, res) =>
   res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
 });
 
+// Route: Admin Dashboard
+app.get(['/dashboard', '/dashboard.html', '/admin'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// Route: Odoo ERP Integration Preview
+app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
+});
+
 // Fallback to index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`NOVA MART ultra-fast multi-page server running on http://0.0.0.0:${PORT}`);
+  console.log(`NOVA MART server running on http://0.0.0.0:${PORT}`);
 });

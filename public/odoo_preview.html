@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo 18 ERP — NOVA DASH Integration Preview</title>
+  <link rel="icon" type="image/png" href="assets/products/logo.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    /* Odoo Top Navbar */
+    .odoo-top-navbar {
+      height: 44px;
+      background: #0f172a;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .odoo-top-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .odoo-app-switcher {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+
+    .odoo-app-switcher:hover {
+      color: #ffffff;
+    }
+
+    .odoo-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .odoo-breadcrumb-item {
+      color: #94a3b8;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .odoo-breadcrumb-item:hover {
+      color: #ffffff;
+    }
+
+    .odoo-breadcrumb-item.active {
+      color: #ffffff;
+    }
+
+    .odoo-top-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .odoo-icon-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #94a3b8;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .odoo-badge {
+      background: #0047bb;
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 8px;
+    }
+
+    .odoo-company-pill {
+      background: #1e293b;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .odoo-user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Odoo Workspace Container */
+    .odoo-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    /* Odoo Left Sidebar */
+    .odoo-sidebar {
+      width: 220px;
+      background: #091322;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid #1e293b;
+      overflow-y: auto;
+      padding: 10px 0;
+    }
+
+    .odoo-nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+      padding: 10px 16px 4px;
+    }
+
+    .odoo-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      color: #94a3b8;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .odoo-menu-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .odoo-menu-item.active {
+      background: #0047bb;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .odoo-sub-menu {
+      display: flex;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .odoo-sub-item {
+      padding: 7px 16px 7px 36px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .odoo-sub-item:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .odoo-sub-item.active-nova {
+      background: #0047bb;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: inset 3px 0 0 #93c5fd;
+    }
+
+    .nova-star-badge {
+      background: #22c55e;
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+
+    /* Embedded Dashboard View */
+    .odoo-content-frame {
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Odoo 18 App Bar (Matching image-2.png) -->
+  <header class="odoo-top-navbar">
+    <div class="odoo-top-left">
+      <!-- App Switcher Grid Icon -->
+      <div class="odoo-app-switcher" title="Apps Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+
+      <!-- Breadcrumbs -->
+      <nav class="odoo-breadcrumb">
+        <span class="odoo-breadcrumb-item">Dashboards</span>
+        <span style="color: #475569;">/</span>
+        <span class="odoo-breadcrumb-item active">NOVA DASH</span>
+        <span style="color: #475569;">/</span>
+        <span class="odoo-breadcrumb-item">My Dashboard</span>
+        <span style="color: #475569;">/</span>
+        <span class="odoo-breadcrumb-item">Configuration</span>
+      </nav>
+    </div>
+
+    <div class="odoo-top-right">
+      <div class="odoo-icon-badge" title="Messages">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="odoo-badge">4</span>
+      </div>
+
+      <div class="odoo-icon-badge" title="Activities">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="odoo-badge">2</span>
+      </div>
+
+      <div class="odoo-company-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 9h6"/></svg>
+        <span>TZ Company</span>
+      </div>
+
+      <div class="odoo-user-avatar" title="developerbeneth@gmail.com">
+        B
+      </div>
+    </div>
+  </header>
+
+  <!-- Odoo Workspace with Sidebar + NOVA Dashboard -->
+  <div class="odoo-workspace">
+    
+    <!-- Odoo Navigation Sidebar (Matching image-2.png) -->
+    <aside class="odoo-sidebar">
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Discuss</span>
+      </a>
+
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Sales</span>
+      </a>
+
+      <a href="#" class="odoo-menu-item active" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboards</span>
+      </a>
+
+      <!-- Sub-items under Dashboards -->
+      <div class="odoo-sub-menu">
+        <a href="#" class="odoo-sub-item active-nova" onclick="event.preventDefault();">
+          <span>⚡ NOVA DASH</span>
+          <span class="nova-star-badge">LIVE</span>
+        </a>
+        <a href="#" class="odoo-sub-item" onclick="event.preventDefault();">
+          <span>Sales</span>
+        </a>
+        <a href="#" class="odoo-sub-item" onclick="event.preventDefault();">
+          <span>Product</span>
+        </a>
+        <a href="#" class="odoo-sub-item" onclick="event.preventDefault();">
+          <span>Point of Sale</span>
+        </a>
+        <a href="#" class="odoo-sub-item" onclick="event.preventDefault();">
+          <span>POS - Restaurant</span>
+        </a>
+      </div>
+
+      <div class="odoo-nav-group-title">FINANCE</div>
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>Invoicing</span>
+      </a>
+
+      <div class="odoo-nav-group-title">LOGISTICS</div>
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <span>Inventory</span>
+      </a>
+
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Manufacturing</span>
+      </a>
+
+      <div class="odoo-nav-group-title">APPS</div>
+      <a href="#" class="odoo-menu-item" onclick="event.preventDefault();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Apps</span>
+      </a>
+    </aside>
+
+    <!-- Embedded Live NOVA DASH inside Odoo -->
+    <iframe src="dashboard.html" class="odoo-content-frame" title="NOVA DASH Admin View"></iframe>
+
+  </div>
+
+</body>
+</html>
