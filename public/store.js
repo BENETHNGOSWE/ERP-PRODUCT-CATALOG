@@ -93,14 +93,12 @@ const NOVA = (function () {
     itemCount: 0,
     phone: '+255 7XX XXX XXX',
     items: [],
-    status: 'Order Received',
-    odooStatus: 'Confirmed in Odoo POS',
+    status: 'Order Placed',
     date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   };
 
   let liveProducts = [...DEFAULT_PRODUCTS];
   let liveCategories = ['All', 'Drinks', 'Food', 'Cosmetics', 'Electronics', 'Household'];
-  let isLiveConnected = false;
 
   // LocalStorage Cart
   function getCart() {
@@ -194,34 +192,12 @@ const NOVA = (function () {
         if (data.categories && data.categories.length > 0) {
           liveCategories = data.categories;
         }
-        isLiveConnected = true;
-        updateOdooStatusIndicator(true);
         return { products: liveProducts, categories: liveCategories };
       }
     } catch (err) {
       console.warn('[Odoo Live Fetch Note]: Using cached products', err.message);
-      updateOdooStatusIndicator(false);
     }
     return { products: liveProducts, categories: liveCategories };
-  }
-
-  function updateOdooStatusIndicator(connected) {
-    const badge = document.getElementById('odooLiveStatusBadge');
-    if (badge) {
-      if (connected) {
-        badge.innerHTML = `
-          <span class="fast-dot"></span>
-          <span>Odoo POS Live Connected &bull; Real-time Stock</span>
-        `;
-        badge.className = 'fast-tag odoo-connected';
-      } else {
-        badge.innerHTML = `
-          <span class="fast-dot" style="background:#f59e0b;"></span>
-          <span>Odoo POS Syncing...</span>
-        `;
-        badge.className = 'fast-tag';
-      }
-    }
   }
 
   // Update Cart Quantity
@@ -267,21 +243,11 @@ const NOVA = (function () {
   function updateHeaderCartBadge() {
     const totals = calculateTotals();
     const badgeCountEl = document.getElementById('headerCartBadge');
-    const labelEl = document.getElementById('headerCartLabel');
     const floatBadgeEl = document.getElementById('mobileFloatBadge');
-    const floatLabelEl = document.getElementById('mobileFloatLabel');
     const mobileFloatingCart = document.getElementById('mobileFloatingCart');
 
-    const countText = totals.itemCount === 1 ? '1 Item' : `${totals.itemCount} Items`;
-
     if (badgeCountEl) badgeCountEl.textContent = totals.itemCount;
-    if (labelEl) {
-      labelEl.innerHTML = `${countText} &bull; ${formatTZS(totals.subtotal)}`;
-    }
     if (floatBadgeEl) floatBadgeEl.textContent = totals.itemCount;
-    if (floatLabelEl) {
-      floatLabelEl.innerHTML = `${countText} &bull; ${formatTZS(totals.subtotal)}`;
-    }
 
     // On mobile, show floating cart pill only when at least 1 item is selected
     if (mobileFloatingCart) {

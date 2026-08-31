@@ -3,5 +3,5 @@ node_modules/
 .DS_Store
 *.log
 uploads/
-assets/
+/assets/
 nova-mart-pos-catalog.zip

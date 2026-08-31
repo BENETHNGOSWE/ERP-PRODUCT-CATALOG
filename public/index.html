@@ -3,29 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NOVA MART — Odoo POS Live Product Catalog</title>
-  <meta name="description" content="Shop live products with real-time stock tracking from Odoo POS in Dar es Salaam.">
+  <title>NOVA MART — Online Store</title>
+  <meta name="description" content="Shop quality products with fast delivery in Dar es Salaam.">
   <link rel="icon" type="image/png" href="assets/products/logo.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Top Workflow Stepper Navigation & Odoo Live Status -->
-  <nav class="top-workflow-bar" aria-label="Workflow Navigation">
-    <div class="workflow-container">
-      <div class="workflow-steps">
-        <a href="index.html" class="step-link active">01 &mdash; Products</a>
-        <span class="step-arrow">&rarr;</span>
-        <a href="cart.html" class="step-link">02 &mdash; Cart</a>
-        <span class="step-arrow">&rarr;</span>
-        <a href="confirmation.html" class="step-link">03 &mdash; Confirmation</a>
-      </div>
-      <div class="fast-tag odoo-connected" id="odooLiveStatusBadge">
-        <span class="fast-dot"></span>
-        <span>Odoo POS Live Connected &bull; Real-time Stock</span>
-      </div>
-    </div>
-  </nav>
 
   <!-- Main Store Header -->
   <header class="main-header">
@@ -34,15 +17,11 @@
       <!-- Brand Logo & Location -->
       <a href="index.html" class="brand-block" title="NOVA MART Home">
         <div class="brand-logo-circle">
-          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="9" cy="21" r="1"/>
             <circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
-          <div class="logo-text-inner">
-            <span class="logo-nova">NOVA</span>
-            <span class="logo-mart">MART</span>
-          </div>
         </div>
         <div class="brand-info">
           <h1 class="brand-name">NOVA MART</h1>
@@ -60,7 +39,6 @@
 
       <!-- Desktop Navigation -->
       <nav class="desktop-nav" aria-label="Main Navigation">
-        <a href="index.html" class="nav-link">Home</a>
         <a href="index.html" class="nav-link active">Shop</a>
         <a href="#about" class="nav-link" onclick="event.preventDefault(); openShopModal();">About Us</a>
         <a href="#contact" class="nav-link" onclick="event.preventDefault(); openShopModal();">Contact</a>
@@ -68,47 +46,41 @@
 
       <!-- Header Actions -->
       <div class="header-actions">
-        <button class="btn-sync-odoo" id="btnSyncOdoo" title="Refresh Live Stock from Odoo POS">
+        <!-- Sync Stock Button -->
+        <button class="btn-sync-odoo" id="btnSyncOdoo" title="Refresh Stock">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="23 4 23 10 17 10"></polyline>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
-          <span>Sync Stock</span>
+          <span class="sync-text">Sync Stock</span>
         </button>
 
-        <button class="btn-visit-shop" onclick="openShopModal()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-          <span>Visit Shop</span>
-        </button>
-
-        <button class="mobile-bell-btn" onclick="NOVA.showToast('🔔 Real-time Odoo POS inventory tracking active!')" title="Notifications">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Notification Button -->
+        <button class="btn-icon-header" onclick="NOVA.showToast('🔔 Store is open and accepting orders!')" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
         </button>
 
-        <!-- Cart Button (Starts at 0 Items • TZS 0) -->
-        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="View Shopping Cart">
+        <!-- Cart Button -->
+        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="View Cart">
           <div class="cart-icon-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <circle cx="9" cy="21" r="1"/>
               <circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            <span class="cart-badge-count" id="headerCartBadge">0</span>
           </div>
-          <span class="cart-label" id="headerCartLabel">0 Items &bull; TZS 0</span>
+          <span class="cart-btn-text">Cart</span>
+          <span class="cart-badge-count" id="headerCartBadge">0</span>
         </a>
       </div>
 
     </div>
   </header>
 
-  <!-- Page 1 Content: Catalog -->
+  <!-- Page Content: Catalog -->
   <main class="shop-main">
     <div class="shop-container">
 
@@ -119,7 +91,7 @@
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search products in Odoo catalog..." autocomplete="off">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search products..." autocomplete="off">
           <button class="search-clear-btn" id="searchClearBtn" style="display:none;" title="Clear search">&times;</button>
         </div>
       </div>
@@ -163,7 +135,7 @@
     </div>
   </main>
 
-  <!-- Mobile Floating Cart Bar (Hidden initially when 0 items) -->
+  <!-- Mobile Floating Cart Bar (Shown when items > 0) -->
   <a href="cart.html" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
     <div class="float-cart-info">
       <div class="float-cart-icon-wrap">
@@ -174,7 +146,7 @@
         </svg>
         <span class="float-badge" id="mobileFloatBadge">0</span>
       </div>
-      <span class="float-cart-text" id="mobileFloatLabel">0 Items &bull; TZS 0</span>
+      <span class="float-cart-text">Cart</span>
     </div>
     <div class="float-view-cart-btn">
       <span>View Cart &rarr;</span>
@@ -187,19 +159,19 @@
       <div class="modal-header">
         <div class="modal-title-group">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <h3>NOVA MART &mdash; Odoo POS Live Store</h3>
+          <h3>NOVA MART</h3>
         </div>
         <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="store-info-box">
           <div class="store-badge-open">
-            <span class="status-dot"></span> Live Odoo POS Connected &bull; Database: KODADEMOS
+            <span class="status-dot"></span> Store Open &bull; Mikocheni, Dar es Salaam
           </div>
-          <p class="store-address"><strong>📍 POS Backend:</strong> <code>https://postest.kodatechnologies.co.tz</code></p>
-          <p class="store-address"><strong>👤 User:</strong> <code>developerbeneth@gmail.com</code></p>
-          <p class="store-service"><strong>⚡ Real-Time Stock Tracking:</strong> Direct deduction from Odoo inventory stock quants on every order.</p>
-          <p class="store-service"><strong>🛍️ POS Session:</strong> Active POS session <code>POS/00036 (Website Orders)</code>.</p>
+          <p class="store-address"><strong>📍 Location:</strong> Mikocheni B, Dar es Salaam, Tanzania</p>
+          <p class="store-address"><strong>📞 Contact:</strong> +255 712 345 678 / +255 784 123 456</p>
+          <p class="store-service"><strong>🕒 Opening Hours:</strong> Monday – Sunday: 8:00 AM – 10:00 PM</p>
+          <p class="store-service"><strong>🚚 Delivery:</strong> Fast direct delivery across Dar es Salaam region.</p>
         </div>
       </div>
       <div class="modal-footer">
@@ -214,11 +186,11 @@
   <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <p>&copy; 2026 <strong>NOVA MART</strong> &bull; Synced Live with Odoo POS (KODADEMOS).</p>
+      <p>&copy; 2026 <strong>NOVA MART</strong>. All rights reserved.</p>
       <div class="footer-links">
         <a href="index.html">Shop</a>
         <a href="cart.html">Your Cart</a>
-        <a href="#" onclick="event.preventDefault(); openShopModal();">Odoo POS Status</a>
+        <a href="#" onclick="event.preventDefault(); openShopModal();">About Store</a>
       </div>
     </div>
   </footer>
@@ -296,7 +268,7 @@
         NOVA.updateHeaderCartBadge();
       }
 
-      // Event delegation for steppers
+      // Steppers event delegation
       document.addEventListener('click', (e) => {
         const plus = e.target.closest('.btn-plus');
         if (plus) {
@@ -359,24 +331,18 @@
         });
       }
 
-      // Sync Odoo button
+      // Sync Stock Button
       const syncBtn = document.getElementById('btnSyncOdoo');
       if (syncBtn) {
         syncBtn.addEventListener('click', async () => {
           syncBtn.disabled = true;
-          syncBtn.innerHTML = `<span>Syncing...</span>`;
-          NOVA.showToast('🔄 Syncing real-time stock with Odoo POS...');
+          syncBtn.querySelector('.sync-text').textContent = 'Syncing...';
+          NOVA.showToast('🔄 Updating stock...');
           await NOVA.loadOdooProducts(true);
           renderCatalog();
           syncBtn.disabled = false;
-          syncBtn.innerHTML = `
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-            </svg>
-            <span>Sync Stock</span>
-          `;
-          NOVA.showToast('✅ Odoo POS stock updated in real time!');
+          syncBtn.querySelector('.sync-text').textContent = 'Sync Stock';
+          NOVA.showToast('✅ Stock updated successfully!');
         });
       }
 
@@ -388,7 +354,7 @@
         document.getElementById(id).classList.remove('active');
       };
 
-      // Initial Render & Odoo Sync
+      // Initial Render & Stock fetch
       renderCatalog();
       NOVA.loadOdooProducts().then(() => {
         renderCatalog();

@@ -4,28 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Your Cart — NOVA MART</title>
-  <meta name="description" content="Review your cart with real-time stock deduction in Odoo POS.">
+  <meta name="description" content="Review your cart and place your order.">
   <link rel="icon" type="image/png" href="assets/products/logo.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Top Workflow Stepper Navigation -->
-  <nav class="top-workflow-bar" aria-label="Workflow Navigation">
-    <div class="workflow-container">
-      <div class="workflow-steps">
-        <a href="index.html" class="step-link">01 &mdash; Products</a>
-        <span class="step-arrow">&rarr;</span>
-        <a href="cart.html" class="step-link active">02 &mdash; Cart</a>
-        <span class="step-arrow">&rarr;</span>
-        <a href="confirmation.html" class="step-link">03 &mdash; Confirmation</a>
-      </div>
-      <div class="fast-tag odoo-connected">
-        <span class="fast-dot"></span>
-        <span>Odoo POS Live Checkout</span>
-      </div>
-    </div>
-  </nav>
 
   <!-- Main Store Header -->
   <header class="main-header">
@@ -34,15 +17,11 @@
       <!-- Brand Logo & Location -->
       <a href="index.html" class="brand-block" title="NOVA MART Home">
         <div class="brand-logo-circle">
-          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="9" cy="21" r="1"/>
             <circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
-          <div class="logo-text-inner">
-            <span class="logo-nova">NOVA</span>
-            <span class="logo-mart">MART</span>
-          </div>
         </div>
         <div class="brand-info">
           <h1 class="brand-name">NOVA MART</h1>
@@ -60,7 +39,6 @@
 
       <!-- Desktop Nav -->
       <nav class="desktop-nav" aria-label="Main Navigation">
-        <a href="index.html" class="nav-link">Home</a>
         <a href="index.html" class="nav-link">Shop</a>
         <a href="#about" class="nav-link" onclick="event.preventDefault(); openShopModal();">About Us</a>
         <a href="#contact" class="nav-link" onclick="event.preventDefault(); openShopModal();">Contact</a>
@@ -68,31 +46,38 @@
 
       <!-- Header Actions -->
       <div class="header-actions">
-        <button class="btn-visit-shop" onclick="openShopModal()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
+        <button class="btn-sync-odoo" id="btnSyncOdoo" title="Refresh Stock">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
-          <span>Visit Shop</span>
+          <span class="sync-text">Sync Stock</span>
         </button>
 
-        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="Cart">
+        <button class="btn-icon-header" onclick="NOVA.showToast('🔔 Store is open and accepting orders!')" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+
+        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="View Cart">
           <div class="cart-icon-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <circle cx="9" cy="21" r="1"/>
               <circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            <span class="cart-badge-count" id="headerCartBadge">0</span>
           </div>
-          <span class="cart-label" id="headerCartLabel">0 Items &bull; TZS 0</span>
+          <span class="cart-btn-text">Cart</span>
+          <span class="cart-badge-count" id="headerCartBadge">0</span>
         </a>
       </div>
 
     </div>
   </header>
 
-  <!-- Page 2 Content: Cart -->
+  <!-- Page Content: Cart -->
   <main class="cart-page-main">
     <div class="cart-page-container">
 
@@ -176,7 +161,7 @@
               </svg>
               <input type="tel" id="customerPhone" class="phone-input" placeholder="+255 7XX XXX XXX" value="+255 712 345 678" autocomplete="tel">
             </div>
-            <p class="phone-hint">Enter phone number to receive order communication.<br>Directly connected to Odoo POS inventory tracking.</p>
+            <p class="phone-hint">Enter your phone number to receive order updates via SMS/WhatsApp.</p>
           </div>
 
           <!-- Place Order Button -->
@@ -196,17 +181,18 @@
       <div class="modal-header">
         <div class="modal-title-group">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <h3>NOVA MART &mdash; Odoo POS Live Store</h3>
+          <h3>NOVA MART</h3>
         </div>
         <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="store-info-box">
           <div class="store-badge-open">
-            <span class="status-dot"></span> Live Odoo POS Connected &bull; Database: KODADEMOS
+            <span class="status-dot"></span> Store Open &bull; Mikocheni, Dar es Salaam
           </div>
-          <p class="store-address"><strong>📍 POS Backend:</strong> <code>https://postest.kodatechnologies.co.tz</code></p>
-          <p class="store-service"><strong>⚡ Real-Time Stock Tracking:</strong> Direct deduction from Odoo inventory quants on order confirmation.</p>
+          <p class="store-address"><strong>📍 Location:</strong> Mikocheni B, Dar es Salaam, Tanzania</p>
+          <p class="store-address"><strong>📞 Contact:</strong> +255 712 345 678</p>
+          <p class="store-service"><strong>🚚 Delivery:</strong> Fast direct delivery across Dar es Salaam region.</p>
         </div>
       </div>
       <div class="modal-footer">
@@ -221,11 +207,11 @@
   <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <p>&copy; 2026 <strong>NOVA MART</strong> &bull; Synced Live with Odoo POS (KODADEMOS).</p>
+      <p>&copy; 2026 <strong>NOVA MART</strong>. All rights reserved.</p>
       <div class="footer-links">
         <a href="index.html">Shop</a>
         <a href="cart.html">Your Cart</a>
-        <a href="#" onclick="event.preventDefault(); openShopModal();">Odoo POS Status</a>
+        <a href="#" onclick="event.preventDefault(); openShopModal();">About Store</a>
       </div>
     </div>
   </footer>
@@ -328,7 +314,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                   <div>
                     <h4 style="font-size:0.9rem; font-weight:600; color:#081735;">${p.name}</h4>
-                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a;">${stock} in stock</span></span>
+                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} each</span>
                   </div>
                   <button class="cart-delete-btn" data-id="${p.id}" title="Remove">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -388,7 +374,7 @@
         });
       }
 
-      // Checkout Button -> Calls Odoo API to create order & deduct stock in real time
+      // Checkout Button -> Processing Order
       if (btnPlaceOrder) {
         btnPlaceOrder.addEventListener('click', async () => {
           const totals = NOVA.calculateTotals();
@@ -398,7 +384,10 @@
           }
 
           btnPlaceOrder.disabled = true;
-          btnPlaceOrder.innerHTML = `<span>Deducting Stock in Odoo...</span>`;
+          btnPlaceOrder.innerHTML = `
+            <span class="loading-spinner"></span>
+            <span>Processing Order...</span>
+          `;
 
           const phoneVal = phoneInput?.value.trim() || '+255 712 345 678';
           NOVA.savePhone(phoneVal);
@@ -424,9 +413,10 @@
 
           const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
 
-          // Submit directly to Odoo POS
-          NOVA.showToast('⚡ Communicating with Odoo POS...');
-          const odooResponse = await NOVA.submitOrderToOdoo({
+          NOVA.showToast('Processing your order...');
+          
+          // Submit silently to backend Odoo POS
+          await NOVA.submitOrderToOdoo({
             orderId: orderId,
             customerPhone: phoneVal,
             items: orderItems,
@@ -435,22 +425,20 @@
 
           const confirmedOrder = {
             orderId: orderId,
-            odooOrderId: odooResponse.order?.odooOrderId || null,
             totalPaid: totals.total,
             subtotal: totals.subtotal,
             discount: totals.discount,
             itemCount: totals.itemCount,
             phone: phoneVal,
             items: orderItems,
-            status: 'Order Received',
-            odooStatus: 'Confirmed & Stock Deducted in Odoo POS',
+            status: 'Order Placed',
             date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
           };
 
           NOVA.saveLatestOrder(confirmedOrder);
           NOVA.resetCart();
 
-          // Instant navigation to Page 3
+          // Instant navigation to confirmation page
           window.location.href = 'confirmation.html';
         });
       }
@@ -463,7 +451,7 @@
         document.getElementById(id).classList.remove('active');
       };
 
-      // Initial Render & Odoo Sync
+      // Initial Render
       renderCart();
       NOVA.loadOdooProducts().then(() => {
         renderCart();
