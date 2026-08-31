@@ -1,0 +1,7 @@
+node_modules/
+.npm/
+.DS_Store
+*.log
+uploads/
+assets/
+nova-mart-pos-catalog.zip

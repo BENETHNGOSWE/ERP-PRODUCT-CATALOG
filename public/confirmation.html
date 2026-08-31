@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Order Confirmed — NOVA MART</title>
+  <meta name="description" content="Your NOVA MART order has been processed and stock deducted in Odoo POS.">
+  <link rel="icon" type="image/png" href="assets/products/logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Workflow Stepper Navigation -->
+  <nav class="top-workflow-bar" aria-label="Workflow Navigation">
+    <div class="workflow-container">
+      <div class="workflow-steps">
+        <a href="index.html" class="step-link">01 &mdash; Products</a>
+        <span class="step-arrow">&rarr;</span>
+        <a href="cart.html" class="step-link">02 &mdash; Cart</a>
+        <span class="step-arrow">&rarr;</span>
+        <a href="confirmation.html" class="step-link active">03 &mdash; Confirmation</a>
+      </div>
+      <div class="fast-tag odoo-connected">
+        <span class="fast-dot"></span>
+        <span>Odoo POS Order Confirmed &bull; Stock Deducted</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Store Header -->
+  <header class="main-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo & Location -->
+      <a href="index.html" class="brand-block" title="NOVA MART Home">
+        <div class="brand-logo-circle">
+          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <div class="logo-text-inner">
+            <span class="logo-nova">NOVA</span>
+            <span class="logo-mart">MART</span>
+          </div>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-name">NOVA MART</h1>
+          <div class="brand-location">
+            <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Dar es Salaam</span>
+            <span class="status-dot"></span>
+            <span class="status-text">Open</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="index.html" class="nav-link">Shop</a>
+        <a href="#about" class="nav-link" onclick="event.preventDefault(); openShopModal();">About Us</a>
+        <a href="#contact" class="nav-link" onclick="event.preventDefault(); openShopModal();">Contact</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="btn-visit-shop" onclick="openShopModal()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Visit Shop</span>
+        </button>
+
+        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="Cart">
+          <div class="cart-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span class="cart-badge-count" id="headerCartBadge">0</span>
+          </div>
+          <span class="cart-label" id="headerCartLabel">0 Items &bull; TZS 0</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Page 3 Content: Confirmation -->
+  <main class="confirmation-main">
+    <div class="confirmation-card-wrapper">
+
+      <!-- Celebratory Confetti & Green Checkmark -->
+      <div class="confetti-badge-wrapper">
+        <div class="confetti-dots">
+          <span class="c-dot c1"></span><span class="c-dot c2"></span><span class="c-dot c3"></span>
+          <span class="c-dot c4"></span><span class="c-dot c5"></span><span class="c-dot c6"></span>
+          <span class="c-dot c7"></span><span class="c-dot c8"></span>
+        </div>
+        <div class="success-check-circle">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="order-received-title">Order Received!</h1>
+      <p class="order-received-sub">Thank you for your order.<br>We have received your request and deducted stock in Odoo POS.</p>
+
+      <!-- Order Details Summary Box -->
+      <div class="order-info-list">
+        <div class="info-row">
+          <div class="info-label-group">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Order #</span>
+          </div>
+          <strong class="info-val" id="orderIdVal">NM-1048</strong>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label-group">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Total Paid</span>
+          </div>
+          <strong class="info-val" id="totalPaidVal">TZS 14,000</strong>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label-group">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span>Items</span>
+          </div>
+          <strong class="info-val" id="itemCountVal">3 items</strong>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label-group">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>Communication Number</span>
+          </div>
+          <strong class="info-val" id="phoneVal">+255 7XX XXX XXX</strong>
+        </div>
+      </div>
+
+      <!-- Order Status Timeline Stepper -->
+      <div class="order-status-block">
+        <h3 class="status-block-heading">Order Status</h3>
+        
+        <div class="timeline-stepper">
+          <!-- Step 1: Order Received -->
+          <div class="timeline-step completed">
+            <div class="step-indicator">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="step-content">
+              <span class="step-title">Order Received</span>
+              <span class="step-desc">We have received your order and synced with Odoo POS.</span>
+            </div>
+          </div>
+
+          <!-- Line -->
+          <div class="step-line active"></div>
+
+          <!-- Step 2: Processing -->
+          <div class="timeline-step active">
+            <div class="step-indicator pulse-indicator">
+              <span class="inner-dot"></span>
+            </div>
+            <div class="step-content">
+              <span class="step-title">Processing</span>
+              <span class="step-desc">Your order is being prepared from Mikocheni Store.</span>
+            </div>
+          </div>
+
+          <!-- Line -->
+          <div class="step-line"></div>
+
+          <!-- Step 3: Ready for Collection -->
+          <div class="timeline-step pending">
+            <div class="step-indicator">
+              <span class="grey-dot"></span>
+            </div>
+            <div class="step-content">
+              <span class="step-title">Ready for Collection</span>
+              <span class="step-desc">We will notify you via SMS/WhatsApp when ready.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="confirm-actions">
+        <button class="btn-view-order" id="btnViewOrder">
+          VIEW ORDER
+        </button>
+        <a href="index.html" class="btn-confirm-continue">
+          CONTINUE SHOPPING
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Printable Order Receipt Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <h3 id="receiptModalTitle">Order Receipt #NM-1048</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('receiptModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="receiptModalBody">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary-modal" onclick="window.print()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Receipt
+        </button>
+        <button class="btn-primary-modal" onclick="closeModal('receiptModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store Info Modal -->
+  <div class="modal-overlay" id="shopModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <h3>NOVA MART &mdash; Odoo POS Live Store</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="store-info-box">
+          <div class="store-badge-open">
+            <span class="status-dot"></span> Live Odoo POS Connected &bull; Database: KODADEMOS
+          </div>
+          <p class="store-address"><strong>📍 POS Backend:</strong> <code>https://postest.kodatechnologies.co.tz</code></p>
+          <p class="store-address"><strong>👤 User:</strong> <code>developerbeneth@gmail.com</code></p>
+          <p class="store-service"><strong>⚡ Real-Time Stock Tracking:</strong> Direct deduction from Odoo inventory stock quants on every order.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary-modal" onclick="closeModal('shopModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 <strong>NOVA MART</strong> &bull; Synced Live with Odoo POS (KODADEMOS).</p>
+      <div class="footer-links">
+        <a href="index.html">Shop</a>
+        <a href="cart.html">Your Cart</a>
+        <a href="#" onclick="event.preventDefault(); openShopModal();">Odoo POS Status</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="store.js"></script>
+  <script>
+    (function() {
+      const order = NOVA.getLatestOrder();
+
+      const orderIdEl = document.getElementById('orderIdVal');
+      const totalPaidEl = document.getElementById('totalPaidVal');
+      const itemCountEl = document.getElementById('itemCountVal');
+      const phoneEl = document.getElementById('phoneVal');
+      const btnViewOrder = document.getElementById('btnViewOrder');
+
+      if (orderIdEl) orderIdEl.textContent = order.orderId || 'NM-1048';
+      if (totalPaidEl) totalPaidEl.textContent = NOVA.formatTZS(order.totalPaid || 14000);
+      if (itemCountEl) itemCountEl.textContent = `${order.itemCount || 3} items`;
+      if (phoneEl) phoneEl.textContent = order.phone || '+255 7XX XXX XXX';
+
+      NOVA.updateHeaderCartBadge();
+
+      // View Order Modal
+      if (btnViewOrder) {
+        btnViewOrder.addEventListener('click', () => {
+          const modal = document.getElementById('receiptModal');
+          const title = document.getElementById('receiptModalTitle');
+          const body = document.getElementById('receiptModalBody');
+
+          if (title) title.textContent = `Order Receipt #${order.orderId}`;
+          if (body) {
+            let itemsHtml = '';
+            if (order.items && order.items.length > 0) {
+              order.items.forEach(it => {
+                itemsHtml += `
+                  <tr>
+                    <td>${it.name} &times; ${it.qty}</td>
+                    <td style="text-align:right;">${NOVA.formatTZS(it.subtotal || it.price * it.qty)}</td>
+                  </tr>
+                `;
+              });
+            } else {
+              itemsHtml = `
+                <tr><td>Coca-Cola 500ml &times; 2</td><td style="text-align:right;">TZS 2,000</td></tr>
+                <tr><td>Azam Juice 500ml &times; 1</td><td style="text-align:right;">TZS 1,500</td></tr>
+                <tr><td>Nivea Body Lotion &times; 1</td><td style="text-align:right;">TZS 12,000</td></tr>
+              `;
+            }
+
+            body.innerHTML = `
+              <div style="font-size:0.88rem; line-height: 1.5;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:10px;">
+                  <div>
+                    <strong>NOVA MART DAR ES SALAAM</strong><br>
+                    <span style="color:#64748b;">Mikocheni Store &bull; Dar es Salaam</span>
+                  </div>
+                  <div style="text-align:right;">
+                    <strong>${order.orderId}</strong><br>
+                    <span style="color:#64748b;">${order.date || new Date().toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <table class="receipt-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th style="text-align:right;">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                  </tbody>
+                </table>
+
+                <div class="receipt-totals">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#64748b;">Subtotal:</span>
+                    <strong>${NOVA.formatTZS(order.subtotal || 15500)}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; color:#16a34a;">
+                    <span>Discount Applied:</span>
+                    <strong>- ${NOVA.formatTZS(order.discount || 1500)}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid #cbd5e1; padding-top:6px; margin-top:4px;">
+                    <span>Total Paid:</span>
+                    <strong style="color:#0047bb;">${NOVA.formatTZS(order.totalPaid || 14000)}</strong>
+                  </div>
+                </div>
+
+                <div style="margin-top:14px; padding:10px; background:#eff6ff; border-radius:8px; font-size:0.82rem; color:#1e40af;">
+                  📞 <strong>Communication Number:</strong> ${order.phone || '+255 7XX XXX XXX'}<br>
+                  🔄 <strong>Odoo Status:</strong> Confirmed in Odoo POS &bull; Inventory Deducted
+                </div>
+
+                <div class="receipt-barcode">
+                  ||| | |||| || | ||||| |||| | |||
+                </div>
+              </div>
+            `;
+          }
+
+          if (modal) modal.classList.add('active');
+        });
+      }
+
+      // Modal helpers
+      window.openShopModal = function() {
+        document.getElementById('shopModal').classList.add('active');
+      };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+      };
+    })();
+  </script>
+</body>
+</html>

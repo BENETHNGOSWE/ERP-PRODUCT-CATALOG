@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Your Cart — NOVA MART</title>
+  <meta name="description" content="Review your cart with real-time stock deduction in Odoo POS.">
+  <link rel="icon" type="image/png" href="assets/products/logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Workflow Stepper Navigation -->
+  <nav class="top-workflow-bar" aria-label="Workflow Navigation">
+    <div class="workflow-container">
+      <div class="workflow-steps">
+        <a href="index.html" class="step-link">01 &mdash; Products</a>
+        <span class="step-arrow">&rarr;</span>
+        <a href="cart.html" class="step-link active">02 &mdash; Cart</a>
+        <span class="step-arrow">&rarr;</span>
+        <a href="confirmation.html" class="step-link">03 &mdash; Confirmation</a>
+      </div>
+      <div class="fast-tag odoo-connected">
+        <span class="fast-dot"></span>
+        <span>Odoo POS Live Checkout</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Store Header -->
+  <header class="main-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo & Location -->
+      <a href="index.html" class="brand-block" title="NOVA MART Home">
+        <div class="brand-logo-circle">
+          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <div class="logo-text-inner">
+            <span class="logo-nova">NOVA</span>
+            <span class="logo-mart">MART</span>
+          </div>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-name">NOVA MART</h1>
+          <div class="brand-location">
+            <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Dar es Salaam</span>
+            <span class="status-dot"></span>
+            <span class="status-text">Open</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="index.html" class="nav-link">Shop</a>
+        <a href="#about" class="nav-link" onclick="event.preventDefault(); openShopModal();">About Us</a>
+        <a href="#contact" class="nav-link" onclick="event.preventDefault(); openShopModal();">Contact</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="btn-visit-shop" onclick="openShopModal()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Visit Shop</span>
+        </button>
+
+        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="Cart">
+          <div class="cart-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span class="cart-badge-count" id="headerCartBadge">0</span>
+          </div>
+          <span class="cart-label" id="headerCartLabel">0 Items &bull; TZS 0</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Page 2 Content: Cart -->
+  <main class="cart-page-main">
+    <div class="cart-page-container">
+
+      <!-- Cart Header Bar -->
+      <div class="cart-page-header">
+        <a href="index.html" class="cart-heading-link">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>Your Cart</span>
+        </a>
+
+        <button class="btn-clear-cart" id="btnClearCart" title="Clear All Items">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <span>Clear Cart</span>
+        </button>
+      </div>
+
+      <div class="cart-grid-layout">
+        
+        <!-- Left Side: Table & Continue Shopping -->
+        <div class="cart-card-box cart-items-side">
+          
+          <!-- Desktop Table Layout -->
+          <div class="cart-table-wrapper">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th class="th-product">Product</th>
+                  <th class="th-price">Price</th>
+                  <th class="th-qty">Quantity</th>
+                  <th class="th-subtotal">Subtotal</th>
+                  <th class="th-action"></th>
+                </tr>
+              </thead>
+              <tbody id="cartTableBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards Layout -->
+          <div class="mobile-cart-list" id="mobileCartList">
+            <!-- Dynamically populated cards -->
+          </div>
+
+          <!-- Bottom Action -->
+          <div class="cart-bottom-actions">
+            <a href="index.html" class="btn-outline-continue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              <span>Continue Shopping</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Order Summary & Place Order -->
+        <div class="cart-card-box cart-summary-side">
+          <h2 class="summary-heading">Order Summary</h2>
+
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span class="summary-label">Subtotal</span>
+              <span class="summary-val" id="summarySubtotal">TZS 0</span>
+            </div>
+            <div class="summary-row discount-row">
+              <span class="summary-label">Discount</span>
+              <span class="summary-val discount-val" id="summaryDiscount">TZS 0</span>
+            </div>
+            <div class="summary-row total-row">
+              <span class="summary-label">Total</span>
+              <span class="summary-val total-val" id="summaryTotal">TZS 0</span>
+            </div>
+          </div>
+
+          <!-- Mobile Number Section -->
+          <div class="mobile-number-box">
+            <label for="customerPhone" class="input-label">Mobile Number</label>
+            <div class="phone-input-wrapper">
+              <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+              <input type="tel" id="customerPhone" class="phone-input" placeholder="+255 7XX XXX XXX" value="+255 712 345 678" autocomplete="tel">
+            </div>
+            <p class="phone-hint">Enter phone number to receive order communication.<br>Directly connected to Odoo POS inventory tracking.</p>
+          </div>
+
+          <!-- Place Order Button -->
+          <button class="btn-place-order" id="btnPlaceOrder">
+            PLACE ORDER
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Store Info Modal -->
+  <div class="modal-overlay" id="shopModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <h3>NOVA MART &mdash; Odoo POS Live Store</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="store-info-box">
+          <div class="store-badge-open">
+            <span class="status-dot"></span> Live Odoo POS Connected &bull; Database: KODADEMOS
+          </div>
+          <p class="store-address"><strong>📍 POS Backend:</strong> <code>https://postest.kodatechnologies.co.tz</code></p>
+          <p class="store-service"><strong>⚡ Real-Time Stock Tracking:</strong> Direct deduction from Odoo inventory quants on order confirmation.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary-modal" onclick="closeModal('shopModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 <strong>NOVA MART</strong> &bull; Synced Live with Odoo POS (KODADEMOS).</p>
+      <div class="footer-links">
+        <a href="index.html">Shop</a>
+        <a href="cart.html">Your Cart</a>
+        <a href="#" onclick="event.preventDefault(); openShopModal();">Odoo POS Status</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="store.js"></script>
+  <script>
+    (function() {
+      const tbody = document.getElementById('cartTableBody');
+      const mobileList = document.getElementById('mobileCartList');
+      const subtotalEl = document.getElementById('summarySubtotal');
+      const discountEl = document.getElementById('summaryDiscount');
+      const totalEl = document.getElementById('summaryTotal');
+      const phoneInput = document.getElementById('customerPhone');
+      const btnPlaceOrder = document.getElementById('btnPlaceOrder');
+      const btnClearCart = document.getElementById('btnClearCart');
+
+      const savedPhone = NOVA.getPhone();
+      if (savedPhone && phoneInput) phoneInput.value = savedPhone;
+
+      function renderCart() {
+        const cart = NOVA.getCart();
+        const totals = NOVA.calculateTotals(cart);
+        const products = NOVA.getProducts();
+        NOVA.updateHeaderCartBadge();
+
+        if (subtotalEl) subtotalEl.textContent = NOVA.formatTZS(totals.subtotal);
+        if (discountEl) discountEl.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
+        if (totalEl) totalEl.textContent = NOVA.formatTZS(totals.total);
+
+        const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
+
+        if (items.length === 0) {
+          const emptyHtml = `
+            <div style="text-align:center; padding: 40px 20px; color: #64748b;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin: 0 auto 12px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 6px;">Your cart is empty</h3>
+              <p style="font-size: 0.9rem; margin-bottom: 16px;">Looks like you haven't selected any products yet.</p>
+              <a href="index.html" class="btn-outline-continue" style="display:inline-flex;">&larr; Browse Catalog &amp; Select Products</a>
+            </div>
+          `;
+          if (tbody) tbody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
+          if (mobileList) mobileList.innerHTML = emptyHtml;
+          if (btnPlaceOrder) btnPlaceOrder.disabled = true;
+          return;
+        }
+
+        if (btnPlaceOrder) btnPlaceOrder.disabled = false;
+
+        // Render Desktop Rows
+        let tableHtml = '';
+        items.forEach(([id, qty]) => {
+          const p = products.find(prod => String(prod.id) === String(id));
+          if (!p) return;
+          const rowSubtotal = p.price * qty;
+          const stock = p.qty_available !== undefined ? p.qty_available : 50;
+
+          tableHtml += `
+            <tr data-id="${p.id}">
+              <td class="cart-product-cell">
+                <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb">
+                <div class="cart-item-meta">
+                  <span class="cart-item-name">${p.name}</span>
+                  <span class="cart-item-unit-price">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a; font-weight:600;">${stock} in stock</span></span>
+                </div>
+              </td>
+              <td class="cart-price-cell">${NOVA.formatTZS(p.price)}</td>
+              <td class="cart-qty-cell">
+                <div class="stepper-control">
+                  <button class="stepper-btn btn-minus" data-id="${p.id}" aria-label="Decrease">&minus;</button>
+                  <span class="stepper-val">${qty}</span>
+                  <button class="stepper-btn btn-plus" data-id="${p.id}" ${qty >= stock ? 'disabled' : ''} aria-label="Increase">&#43;</button>
+                </div>
+              </td>
+              <td class="cart-subtotal-cell">${NOVA.formatTZS(rowSubtotal)}</td>
+              <td style="text-align: right;">
+                <button class="cart-delete-btn" data-id="${p.id}" title="Remove item">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+        if (tbody) tbody.innerHTML = tableHtml;
+
+        // Render Mobile Cards
+        let mobileHtml = '';
+        items.forEach(([id, qty]) => {
+          const p = products.find(prod => String(prod.id) === String(id));
+          if (!p) return;
+          const rowSubtotal = p.price * qty;
+          const stock = p.qty_available !== undefined ? p.qty_available : 50;
+
+          mobileHtml += `
+            <div class="m-cart-card" data-id="${p.id}">
+              <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb">
+              <div style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div>
+                    <h4 style="font-size:0.9rem; font-weight:600; color:#081735;">${p.name}</h4>
+                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a;">${stock} in stock</span></span>
+                  </div>
+                  <button class="cart-delete-btn" data-id="${p.id}" title="Remove">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <div class="stepper-control" style="padding:2px 4px;">
+                    <button class="stepper-btn btn-minus" data-id="${p.id}" style="width:22px;height:22px;">&minus;</button>
+                    <span class="stepper-val" style="font-size:0.85rem;">${qty}</span>
+                    <button class="stepper-btn btn-plus" data-id="${p.id}" ${qty >= stock ? 'disabled' : ''} style="width:22px;height:22px;">&#43;</button>
+                  </div>
+                  <strong style="color:#081735; font-size:0.92rem;">${NOVA.formatTZS(rowSubtotal)}</strong>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        if (mobileList) mobileList.innerHTML = mobileHtml;
+      }
+
+      // Event Delegation
+      document.addEventListener('click', (e) => {
+        const plus = e.target.closest('.btn-plus');
+        if (plus) {
+          const id = plus.getAttribute('data-id');
+          NOVA.updateItemQty(id, 1);
+          renderCart();
+          return;
+        }
+
+        const minus = e.target.closest('.btn-minus');
+        if (minus) {
+          const id = minus.getAttribute('data-id');
+          NOVA.updateItemQty(id, -1);
+          renderCart();
+          return;
+        }
+
+        const del = e.target.closest('.cart-delete-btn');
+        if (del) {
+          const id = del.getAttribute('data-id');
+          const products = NOVA.getProducts();
+          const p = products.find(x => String(x.id) === String(id));
+          NOVA.removeItem(id);
+          if (p) NOVA.showToast(`Removed ${p.name}`, 'danger');
+          renderCart();
+          return;
+        }
+      });
+
+      // Clear Cart
+      if (btnClearCart) {
+        btnClearCart.addEventListener('click', () => {
+          NOVA.resetCart();
+          NOVA.showToast('Cart cleared', 'info');
+          renderCart();
+        });
+      }
+
+      // Checkout Button -> Calls Odoo API to create order & deduct stock in real time
+      if (btnPlaceOrder) {
+        btnPlaceOrder.addEventListener('click', async () => {
+          const totals = NOVA.calculateTotals();
+          if (totals.itemCount === 0) {
+            NOVA.showToast('⚠️ Your cart is empty. Add products first!', 'danger');
+            return;
+          }
+
+          btnPlaceOrder.disabled = true;
+          btnPlaceOrder.innerHTML = `<span>Deducting Stock in Odoo...</span>`;
+
+          const phoneVal = phoneInput?.value.trim() || '+255 712 345 678';
+          NOVA.savePhone(phoneVal);
+
+          const cart = NOVA.getCart();
+          const products = NOVA.getProducts();
+          const orderItems = [];
+
+          for (const [id, qty] of Object.entries(cart)) {
+            if (qty > 0) {
+              const p = products.find(item => String(item.id) === String(id));
+              if (p) {
+                orderItems.push({
+                  id: p.id,
+                  name: p.name,
+                  price: p.price,
+                  qty: qty,
+                  subtotal: p.price * qty
+                });
+              }
+            }
+          }
+
+          const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
+
+          // Submit directly to Odoo POS
+          NOVA.showToast('⚡ Communicating with Odoo POS...');
+          const odooResponse = await NOVA.submitOrderToOdoo({
+            orderId: orderId,
+            customerPhone: phoneVal,
+            items: orderItems,
+            totalAmount: totals.total
+          });
+
+          const confirmedOrder = {
+            orderId: orderId,
+            odooOrderId: odooResponse.order?.odooOrderId || null,
+            totalPaid: totals.total,
+            subtotal: totals.subtotal,
+            discount: totals.discount,
+            itemCount: totals.itemCount,
+            phone: phoneVal,
+            items: orderItems,
+            status: 'Order Received',
+            odooStatus: 'Confirmed & Stock Deducted in Odoo POS',
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          };
+
+          NOVA.saveLatestOrder(confirmedOrder);
+          NOVA.resetCart();
+
+          // Instant navigation to Page 3
+          window.location.href = 'confirmation.html';
+        });
+      }
+
+      // Modal helpers
+      window.openShopModal = function() {
+        document.getElementById('shopModal').classList.add('active');
+      };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+      };
+
+      // Initial Render & Odoo Sync
+      renderCart();
+      NOVA.loadOdooProducts().then(() => {
+        renderCart();
+      });
+    })();
+  </script>
+</body>
+</html>
