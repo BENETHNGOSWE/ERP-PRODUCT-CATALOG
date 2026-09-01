@@ -120,7 +120,39 @@ app.post('/api/odoo/sync', async (req, res) => {
   }
 });
 
-// 5. Odoo Backend Connection Health Check
+// 5. Get Real-Time Live Admin Dashboard Data from Odoo
+app.get('/api/odoo/dashboard', async (req, res) => {
+  try {
+    const dashboardData = await odoo.getOdooDashboardData();
+    res.json(dashboardData);
+  } catch (err) {
+    console.error('Error fetching Odoo dashboard data:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to fetch dashboard data from Odoo'
+    });
+  }
+});
+
+// 6. 1-Click Restock Product into Odoo Stock Quants
+app.post('/api/odoo/restock', async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    if (!productId) {
+      return res.status(400).json({ success: false, error: 'Product ID is required' });
+    }
+    const restockResult = await odoo.restockOdooProduct(productId, quantity || 25);
+    res.json(restockResult);
+  } catch (err) {
+    console.error('Error restocking product in Odoo:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to restock product in Odoo'
+    });
+  }
+});
+
+// 7. Odoo Backend Connection Health Check
 app.get('/api/odoo/status', (req, res) => {
   res.json({
     connected: true,
