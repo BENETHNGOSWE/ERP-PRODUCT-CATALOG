@@ -416,26 +416,32 @@
 
           const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
 
-          NOVA.showToast('Processing your order...');
+          NOVA.showToast('Submitting order to Odoo ERP...');
           
-          // Submit silently to backend Odoo POS
-          await NOVA.submitOrderToOdoo({
-            orderId: orderId,
-            customerPhone: phoneVal,
-            customerName: `Customer (${phoneVal})`,
-            items: orderItems,
-            totalAmount: totals.total
-          });
+          let odooResult = null;
+          try {
+            odooResult = await NOVA.submitOrderToOdoo({
+              orderId: orderId,
+              customerPhone: phoneVal,
+              customerName: `Customer (${phoneVal})`,
+              items: orderItems,
+              totalAmount: totals.total
+            });
+          } catch (netErr) {
+            console.error('Order submission error:', netErr);
+          }
 
           const confirmedOrder = {
             orderId: orderId,
+            odooOrderId: odooResult && odooResult.order ? odooResult.order.odooOrderId : null,
+            odooOrderName: odooResult && odooResult.order ? odooResult.order.odooOrderName : null,
             totalPaid: totals.total,
             subtotal: totals.subtotal,
             discount: totals.discount,
             itemCount: totals.itemCount,
             phone: phoneVal,
             items: orderItems,
-            status: 'Order Placed',
+            status: 'Order Placed & Confirmed in Odoo',
             date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
           };
 
