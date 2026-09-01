@@ -2,25 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOVA MART — Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NOVA MART — Executive Admin Dashboard</title>
   <link rel="icon" type="image/png" href="assets/products/logo.png">
-  <link rel="stylesheet" href="style.css">
   <style>
-    /* Dashboard specific layout */
-    body {
-      background-color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* ==========================================================================
+       RESET & ROOT VARIABLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      display: flex;
-      height: 100vh;
+    }
+
+    :root {
+      --primary: #0047bb;
+      --primary-hover: #00368f;
+      --navy-dark: #081735;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      font-family: var(--font-family);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
     }
 
-    /* Sidebar */
+    /* ==========================================================================
+       DASHBOARD WRAPPER: SIDEBAR + MAIN HORIZONTAL FLEX
+       ========================================================================== */
+    .dashboard-app-wrapper {
+      display: flex !important;
+      flex-direction: row !important;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    /* ==========================================================================
+       SIDEBAR
+       ========================================================================== */
     .dash-sidebar {
       width: 250px;
+      min-width: 250px;
+      max-width: 250px;
+      height: 100vh;
       background: #ffffff;
       border-right: 1px solid #e2e8f0;
       display: flex;
@@ -29,6 +70,7 @@
       padding: 20px 16px;
       box-sizing: border-box;
       overflow-y: auto;
+      z-index: 10;
     }
 
     .sidebar-brand {
@@ -37,18 +79,51 @@
       gap: 10px;
       margin-bottom: 24px;
       text-decoration: none;
+      user-select: none;
     }
 
     .brand-logo-dash {
-      width: 42px;
-      height: 42px;
-      background: #081735;
+      width: 40px;
+      height: 40px;
+      background: var(--navy-dark);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(8, 23, 53, 0.2);
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--navy-dark);
+      line-height: 1.1;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .status-dot-green {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
     }
 
     .dash-nav {
@@ -63,17 +138,18 @@
       align-items: center;
       justify-content: space-between;
       padding: 9px 12px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       color: #475569;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       text-decoration: none;
       transition: all 0.15s ease;
+      cursor: pointer;
     }
 
     .dash-nav-item:hover {
       background: #f1f5f9;
-      color: #081735;
+      color: var(--navy-dark);
     }
 
     .dash-nav-item.active {
@@ -88,20 +164,21 @@
       gap: 10px;
     }
 
-    .nav-badge {
+    .nav-badge-red {
       background: #ef4444;
       color: #ffffff;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 12px;
+      line-height: 1;
     }
 
     .sidebar-bottom {
       margin-top: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       padding-top: 16px;
       border-top: 1px solid #f1f5f9;
     }
@@ -113,9 +190,9 @@
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.85rem;
-      color: #081735;
+      padding: 9px 12px;
+      font-size: 0.84rem;
+      color: var(--navy-dark);
       text-decoration: none;
       transition: all 0.15s ease;
     }
@@ -130,19 +207,20 @@
       align-items: center;
       gap: 10px;
       padding: 8px 10px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       background: #f8fafc;
     }
 
     .admin-avatar {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: #cbd5e1;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #475569;
+      font-size: 0.8rem;
     }
 
     .admin-info {
@@ -153,14 +231,14 @@
     }
 
     .admin-name {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
-      color: #081735;
+      color: var(--navy-dark);
     }
 
     .admin-email {
       font-size: 0.72rem;
-      color: #64748b;
+      color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -171,25 +249,31 @@
       align-items: center;
       gap: 8px;
       color: #64748b;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 500;
       padding: 6px 10px;
       cursor: pointer;
+      text-decoration: none;
     }
 
     .btn-logout:hover {
       color: #ef4444;
     }
 
-    /* Main Dashboard Area */
+    /* ==========================================================================
+       MAIN DASHBOARD CONTENT AREA
+       ========================================================================== */
     .dash-main {
-      flex: 1;
+      flex: 1 1 auto;
+      height: 100vh;
       overflow-y: auto;
-      padding: 24px 28px;
+      overflow-x: hidden;
+      padding: 24px 30px 40px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 20px;
+      min-width: 0;
     }
 
     /* Top Bar */
@@ -199,13 +283,14 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 14px;
+      width: 100%;
     }
 
     .dash-page-title {
       font-size: 1.5rem;
       font-weight: 800;
-      color: #081735;
-      margin: 0;
+      color: var(--navy-dark);
+      letter-spacing: -0.2px;
     }
 
     .dash-topbar-actions {
@@ -220,11 +305,12 @@
       gap: 8px;
       padding: 8px 14px;
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
       font-size: 0.85rem;
       font-weight: 500;
       color: #334155;
+      cursor: pointer;
     }
 
     .btn-export-report {
@@ -234,10 +320,13 @@
       padding: 8px 16px;
       background: #0047bb;
       color: #ffffff;
-      border-radius: 8px;
+      border: none;
+      border-radius: var(--radius-sm);
       font-size: 0.85rem;
       font-weight: 600;
       box-shadow: 0 2px 6px rgba(0, 71, 187, 0.25);
+      cursor: pointer;
+      transition: background 0.15s ease;
     }
 
     .btn-export-report:hover {
@@ -249,25 +338,25 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 18px;
+      width: 100%;
     }
 
     @media (max-width: 1200px) {
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 600px) {
+    @media (max-width: 680px) {
       .kpi-grid { grid-template-columns: 1fr; }
     }
 
     .kpi-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
       padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-      position: relative;
     }
 
     .kpi-top {
@@ -277,12 +366,13 @@
     }
 
     .kpi-icon-box {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .kpi-icon-box.green { background: #dcfce7; color: #16a34a; }
@@ -291,9 +381,9 @@
     .kpi-icon-box.red { background: #fee2e2; color: #ef4444; }
 
     .kpi-label {
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      color: #64748b;
+      color: var(--text-muted);
     }
 
     .kpi-middle {
@@ -305,13 +395,13 @@
     .kpi-val {
       font-size: 1.55rem;
       font-weight: 800;
-      color: #081735;
+      color: var(--navy-dark);
       line-height: 1.1;
     }
 
     .kpi-sparkline {
-      width: 90px;
-      height: 32px;
+      width: 86px;
+      height: 30px;
     }
 
     .kpi-bottom {
@@ -330,14 +420,15 @@
     .trend-badge.red { color: #ef4444; }
 
     .trend-sub {
-      color: #94a3b8;
+      color: var(--text-light);
     }
 
     /* Middle Row Grid */
     .middle-grid {
       display: grid;
-      grid-template-columns: 2fr 1.3fr 1.3fr;
+      grid-template-columns: 2fr 1.25fr 1.25fr;
       gap: 18px;
+      width: 100%;
     }
 
     @media (max-width: 1280px) {
@@ -346,8 +437,8 @@
 
     .dash-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
       padding: 20px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
       display: flex;
@@ -358,24 +449,25 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .card-title {
-      font-size: 1rem;
+      font-size: 0.98rem;
       font-weight: 700;
-      color: #081735;
-      margin: 0;
+      color: var(--navy-dark);
     }
 
     .select-period {
-      padding: 4px 10px;
-      border: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 0.8rem;
       font-weight: 600;
       color: #475569;
       background: #ffffff;
+      outline: none;
+      cursor: pointer;
     }
 
     /* Top Products List */
@@ -383,6 +475,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-top: 4px;
     }
 
     .top-product-item {
@@ -408,9 +501,9 @@
     }
 
     .top-product-name {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
-      color: #081735;
+      color: var(--navy-dark);
     }
 
     .top-product-sold {
@@ -422,8 +515,9 @@
     /* Bottom Row Grid */
     .bottom-grid {
       display: grid;
-      grid-template-columns: 2fr 1.2fr;
+      grid-template-columns: 2fr 1.25fr;
       gap: 18px;
+      width: 100%;
     }
 
     @media (max-width: 1100px) {
@@ -443,6 +537,7 @@
       font-weight: 600;
       padding: 8px 10px;
       border-bottom: 1px solid #e2e8f0;
+      font-size: 0.8rem;
     }
 
     .dash-table td {
@@ -472,18 +567,19 @@
 
     .table-prod-name {
       font-weight: 600;
-      color: #081735;
+      color: var(--navy-dark);
+      font-size: 0.85rem;
     }
 
     .table-prod-sku {
       font-size: 0.72rem;
-      color: #94a3b8;
+      color: var(--text-light);
     }
 
     .cat-badge {
       padding: 3px 8px;
       border-radius: 12px;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
     }
 
@@ -498,11 +594,13 @@
       border-radius: 6px;
       font-size: 0.76rem;
       font-weight: 600;
-      color: #081735;
+      color: var(--navy-dark);
       background: #ffffff;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .btn-restock:hover {
@@ -514,11 +612,12 @@
     .card-footer-link {
       margin-top: 14px;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: #0047bb;
       text-decoration: none;
       display: block;
+      cursor: pointer;
     }
 
     .card-footer-link:hover {
@@ -530,6 +629,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-top: 4px;
     }
 
     .recent-order-item {
@@ -547,19 +647,19 @@
 
     .order-item-id {
       font-weight: 700;
-      color: #081735;
+      color: var(--navy-dark);
       font-size: 0.88rem;
     }
 
     .order-item-date {
       font-size: 0.74rem;
-      color: #94a3b8;
+      color: var(--text-light);
     }
 
     .status-pill {
       padding: 3px 8px;
       border-radius: 12px;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
     }
 
@@ -568,626 +668,683 @@
 
     .order-item-amount {
       font-weight: 700;
-      color: #081735;
+      color: var(--navy-dark);
       font-size: 0.88rem;
     }
 
+    /* Toast */
+    .dash-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy-dark);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.86rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      z-index: 9999;
+      display: none;
+      animation: toastIn 0.2s ease;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 900px) {
-      body { flex-direction: column; height: auto; overflow: auto; }
-      .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+      .dashboard-app-wrapper {
+        flex-direction: column !important;
+        height: auto;
+        overflow: auto;
+      }
+      .dash-sidebar {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .dash-main {
+        height: auto;
+        padding: 16px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Left Sidebar -->
-  <aside class="dash-sidebar">
-    <a href="dashboard.html" class="sidebar-brand">
-      <div class="brand-logo-dash">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2">
-          <circle cx="9" cy="21" r="1"/>
-          <circle cx="20" cy="21" r="1"/>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-        </svg>
-      </div>
-      <div style="display: flex; flex-direction: column;">
-        <span style="font-weight: 800; font-size: 1.05rem; color: #081735; line-height: 1.1;">NOVA MART</span>
-        <span style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Dar es Salaam &bull; <span style="color:#16a34a; font-weight:600;">Open</span>
-        </span>
-      </div>
-    </a>
+  <!-- Full Flex App Wrapper -->
+  <div class="dashboard-app-wrapper">
 
-    <!-- Navigation -->
-    <nav class="dash-nav">
-      <a href="dashboard.html" class="dash-nav-item active">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Dashboard</span>
+    <!-- Left Sidebar -->
+    <aside class="dash-sidebar">
+      <a href="dashboard.html" class="sidebar-brand">
+        <div class="brand-logo-dash">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-title">NOVA MART</span>
+          <span class="brand-sub">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Dar es Salaam &bull; <span class="status-dot-green"></span> <span style="color:#16a34a; font-weight:600;">Open</span>
+          </span>
         </div>
       </a>
 
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span>Orders</span>
-        </div>
-        <span class="nav-badge">12</span>
-      </a>
-
-      <a href="index.html" class="dash-nav-item">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-          <span>Products</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Customers</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          <span>Inventory</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-          <span>Categories</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          <span>Reports</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-          <span>Discounts</span>
-        </div>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span>Notifications</span>
-        </div>
-        <span class="nav-badge">5</span>
-      </a>
-
-      <a href="#" class="dash-nav-item" onclick="event.preventDefault();">
-        <div class="dash-nav-left">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>Settings</span>
-        </div>
-      </a>
-    </nav>
-
-    <!-- Sidebar Bottom -->
-    <div class="sidebar-bottom">
-      <a href="index.html" class="btn-sidebar-shop">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div>
-            <strong style="display:block; font-size:0.84rem;">Visit Shop</strong>
-            <span style="font-size:0.72rem; color:#64748b;">View shop location</span>
+      <!-- Navigation Menu -->
+      <nav class="dash-nav">
+        <a href="dashboard.html" class="dash-nav-item active">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
           </div>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </a>
+        </a>
 
-      <div class="admin-profile-card">
-        <div class="admin-avatar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Orders List...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Orders</span>
+          </div>
+          <span class="nav-badge-red">12</span>
+        </a>
+
+        <a href="index.html" class="dash-nav-item">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>Products</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Customers...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Customers</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Inventory...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span>Inventory</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Categories...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+            <span>Categories</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Reports...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Reports</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Discounts...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+            <span>Discounts</span>
+          </div>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('5 new order notifications'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Notifications</span>
+          </div>
+          <span class="nav-badge-red">5</span>
+        </a>
+
+        <a href="#" class="dash-nav-item" onclick="showDashToast('Opening Settings...'); return false;">
+          <div class="dash-nav-left">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </div>
+        </a>
+      </nav>
+
+      <!-- Sidebar Bottom -->
+      <div class="sidebar-bottom">
+        <a href="index.html" class="btn-sidebar-shop">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div>
+              <strong style="display:block; font-size:0.84rem; color:#081735;">Visit Shop</strong>
+              <span style="font-size:0.72rem; color:#64748b;">View shop location</span>
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
+        <div class="admin-profile-card">
+          <div class="admin-avatar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="admin-info">
+            <span class="admin-name">Admin User</span>
+            <span class="admin-email">admin@novamart.co.tz</span>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="admin-info">
-          <span class="admin-name">Admin User</span>
-          <span class="admin-email">admin@novamart.co.tz</span>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+
+        <a href="index.html" class="btn-logout" onclick="showDashToast('Logged out');">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Logout</span>
+        </a>
       </div>
+    </aside>
 
-      <div class="btn-logout" onclick="NOVA.showToast('Logged out');">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span>Logout</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Dashboard Content -->
-  <main class="dash-main">
-    
-    <!-- Top Bar -->
-    <div class="dash-topbar">
-      <h1 class="dash-page-title">Dashboard</h1>
+    <!-- Main Dashboard Content -->
+    <main class="dash-main">
       
-      <div class="dash-topbar-actions">
-        <div class="date-range-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span id="dateRangeText">May 14, 2024 - May 21, 2024</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        <button class="btn-export-report" onclick="window.print()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Export Report</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 4 KPI Cards -->
-    <section class="kpi-grid">
-      <!-- 1. Order Completed -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-icon-box green">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <!-- Top Bar -->
+      <div class="dash-topbar">
+        <h1 class="dash-page-title">Dashboard</h1>
+        
+        <div class="dash-topbar-actions">
+          <div class="date-range-btn" onclick="showDashToast('Date range: May 14, 2024 - May 21, 2024')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="dateRangeText">May 14, 2024 - May 21, 2024</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-          <span class="kpi-label">Order Completed</span>
-        </div>
-        <div class="kpi-middle">
-          <span class="kpi-val" id="kpiCompleted">128</span>
-          <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
-            <path d="M2 28 Q 20 20, 35 24 T 65 14 T 88 4" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="kpi-bottom">
-          <span class="trend-badge green">+18.7%</span>
-          <span class="trend-sub">vs last 7 days</span>
+
+          <button class="btn-export-report" onclick="window.print()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export Report</span>
+          </button>
         </div>
       </div>
 
-      <!-- 2. Order On Progress -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-icon-box blue">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <!-- 4 KPI Cards -->
+      <section class="kpi-grid">
+        <!-- 1. Order Completed -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon-box green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <span class="kpi-label">Order Completed</span>
           </div>
-          <span class="kpi-label">Order On Progress</span>
-        </div>
-        <div class="kpi-middle">
-          <span class="kpi-val" id="kpiProgress">35</span>
-          <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
-            <path d="M2 22 Q 22 18, 42 24 T 68 12 T 88 10" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="kpi-bottom">
-          <span class="trend-badge blue">+5.4%</span>
-          <span class="trend-sub">vs last 7 days</span>
-        </div>
-      </div>
-
-      <!-- 3. Total Sales -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-icon-box purple">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          </div>
-          <span class="kpi-label">Total Sales</span>
-        </div>
-        <div class="kpi-middle">
-          <span class="kpi-val" id="kpiSales">TZS 2,458,000</span>
-          <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
-            <path d="M2 26 Q 24 22, 44 26 T 68 16 T 88 6" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="kpi-bottom">
-          <span class="trend-badge green">+22.3%</span>
-          <span class="trend-sub">vs last 7 days</span>
-        </div>
-      </div>
-
-      <!-- 4. Products Out of Stock -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <div class="kpi-icon-box red">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          </div>
-          <span class="kpi-label">Products Out of Stock</span>
-        </div>
-        <div class="kpi-middle">
-          <span class="kpi-val" id="kpiOutStock">24</span>
-          <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
-            <path d="M2 24 Q 22 24, 42 16 T 68 10 T 88 12" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="kpi-bottom">
-          <span class="trend-badge red">+9</span>
-          <span class="trend-sub">vs last 7 days</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Middle Row: Sales Overview + Orders Summary + Top Selling -->
-    <section class="middle-grid">
-      
-      <!-- Card 1: Sales Overview Area Chart -->
-      <div class="dash-card">
-        <div class="card-header-row">
-          <h2 class="card-title">Sales Overview</h2>
-          <select class="select-period" aria-label="Period">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
-
-        <div style="position: relative; width: 100%; height: 230px; margin-top: 10px;">
-          <!-- SVG Area Chart -->
-          <svg viewBox="0 0 540 220" style="width: 100%; height: 100%; overflow: visible;">
-            <defs>
-              <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
-                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Grid Lines -->
-            <line x1="40" y1="30" x2="520" y2="30" stroke="#f1f5f9" stroke-dasharray="3,3"/>
-            <line x1="40" y1="75" x2="520" y2="75" stroke="#f1f5f9" stroke-dasharray="3,3"/>
-            <line x1="40" y1="120" x2="520" y2="120" stroke="#f1f5f9" stroke-dasharray="3,3"/>
-            <line x1="40" y1="165" x2="520" y2="165" stroke="#f1f5f9" stroke-dasharray="3,3"/>
-
-            <!-- Y Axis Labels -->
-            <text x="5" y="34" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 600K</text>
-            <text x="5" y="79" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 450K</text>
-            <text x="5" y="124" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 300K</text>
-            <text x="5" y="169" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 150K</text>
-            <text x="25" y="200" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 0</text>
-
-            <!-- Gradient Area -->
-            <path d="M 50 140 L 110 130 L 170 120 L 230 80 L 290 140 L 350 115 L 410 80 L 480 90 L 480 200 L 50 200 Z" fill="url(#salesGrad)"/>
-
-            <!-- Chart Line -->
-            <path d="M 50 140 L 110 130 L 170 120 L 230 80 L 290 140 L 350 115 L 410 80 L 480 90" fill="none" stroke="#0047bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-            <!-- Data Dots -->
-            <circle cx="50" cy="140" r="4" fill="#0047bb"/>
-            <circle cx="110" cy="130" r="4" fill="#0047bb"/>
-            <circle cx="170" cy="120" r="4" fill="#0047bb"/>
-            <circle cx="230" cy="80" r="5" fill="#0047bb" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="290" cy="140" r="4" fill="#0047bb"/>
-            <circle cx="350" cy="115" r="4" fill="#0047bb"/>
-            <circle cx="410" cy="80" r="4" fill="#0047bb"/>
-            <circle cx="480" cy="90" r="4" fill="#0047bb"/>
-
-            <!-- Tooltip on Peak -->
-            <g transform="translate(180, 28)">
-              <rect width="100" height="36" rx="6" fill="#ffffff" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))" stroke="#e2e8f0"/>
-              <text x="50" y="15" text-anchor="middle" font-size="8" fill="#64748b" font-family="sans-serif">May 17, 2024</text>
-              <text x="50" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#081735" font-family="sans-serif">TZS 420,000</text>
-            </g>
-
-            <!-- X Axis Labels -->
-            <text x="50" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 14</text>
-            <text x="110" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 15</text>
-            <text x="170" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 16</text>
-            <text x="230" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 17</text>
-            <text x="290" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 18</text>
-            <text x="350" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 19</text>
-            <text x="410" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 20</text>
-            <text x="480" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 21</text>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Card 2: Orders Summary Donut Chart -->
-      <div class="dash-card">
-        <div class="card-header-row">
-          <h2 class="card-title">Orders Summary</h2>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;">
-          <!-- Donut SVG -->
-          <div style="position: relative; width: 130px; height: 130px;">
-            <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
-              <!-- Background -->
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#f1f5f9" stroke-width="3.8"/>
-              <!-- Green (78.5%) -->
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#16a34a" stroke-width="3.8" stroke-dasharray="78.5 21.5" stroke-dashoffset="0"/>
-              <!-- Blue (21.5%) -->
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#0047bb" stroke-width="3.8" stroke-dasharray="21.5 78.5" stroke-dashoffset="-78.5"/>
+          <div class="kpi-middle">
+            <span class="kpi-val" id="kpiCompleted">128</span>
+            <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
+              <path d="M2 28 Q 20 20, 35 24 T 65 14 T 88 4" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
-            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-              <strong style="font-size: 1.3rem; color: #081735; line-height: 1;">163</strong>
-              <span style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">Total Orders</span>
+          </div>
+          <div class="kpi-bottom">
+            <span class="trend-badge green">+18.7%</span>
+            <span class="trend-sub">vs last 7 days</span>
+          </div>
+        </div>
+
+        <!-- 2. Order On Progress -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon-box blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
+            <span class="kpi-label">Order On Progress</span>
+          </div>
+          <div class="kpi-middle">
+            <span class="kpi-val" id="kpiProgress">35</span>
+            <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
+              <path d="M2 22 Q 22 18, 42 24 T 68 12 T 88 10" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="trend-badge blue">+5.4%</span>
+            <span class="trend-sub">vs last 7 days</span>
+          </div>
+        </div>
+
+        <!-- 3. Total Sales -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon-box purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <span class="kpi-label">Total Sales</span>
+          </div>
+          <div class="kpi-middle">
+            <span class="kpi-val" id="kpiSales">TZS 2,458,000</span>
+            <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
+              <path d="M2 26 Q 24 22, 44 26 T 68 16 T 88 6" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="trend-badge green">+22.3%</span>
+            <span class="trend-sub">vs last 7 days</span>
+          </div>
+        </div>
+
+        <!-- 4. Products Out of Stock -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon-box red">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <span class="kpi-label">Products Out of Stock</span>
+          </div>
+          <div class="kpi-middle">
+            <span class="kpi-val" id="kpiOutStock">24</span>
+            <svg class="kpi-sparkline" viewBox="0 0 90 32" fill="none">
+              <path d="M2 24 Q 22 24, 42 16 T 68 10 T 88 12" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="trend-badge red">+9</span>
+            <span class="trend-sub">vs last 7 days</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Row: Sales Overview + Orders Summary + Top Selling -->
+      <section class="middle-grid">
+        
+        <!-- Card 1: Sales Overview Area Chart -->
+        <div class="dash-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Sales Overview</h2>
+            <select class="select-period" aria-label="Period">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
           </div>
 
-          <!-- Legend -->
-          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem;">
-            <div style="display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
-                <strong style="color: #081735;">Completed</strong>
+          <div style="position: relative; width: 100%; height: 230px; margin-top: 6px;">
+            <!-- SVG Area Chart -->
+            <svg viewBox="0 0 540 220" style="width: 100%; height: 100%; overflow: visible;">
+              <defs>
+                <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Grid Lines -->
+              <line x1="40" y1="30" x2="520" y2="30" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+              <line x1="40" y1="75" x2="520" y2="75" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+              <line x1="40" y1="120" x2="520" y2="120" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+              <line x1="40" y1="165" x2="520" y2="165" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+
+              <!-- Y Axis Labels -->
+              <text x="5" y="34" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 600K</text>
+              <text x="5" y="79" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 450K</text>
+              <text x="5" y="124" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 300K</text>
+              <text x="5" y="169" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 150K</text>
+              <text x="25" y="200" font-size="9" fill="#94a3b8" font-family="sans-serif">TZS 0</text>
+
+              <!-- Gradient Area -->
+              <path d="M 50 140 L 110 130 L 170 120 L 230 80 L 290 140 L 350 115 L 410 80 L 480 90 L 480 200 L 50 200 Z" fill="url(#salesGrad)"/>
+
+              <!-- Chart Line -->
+              <path d="M 50 140 L 110 130 L 170 120 L 230 80 L 290 140 L 350 115 L 410 80 L 480 90" fill="none" stroke="#0047bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- Data Dots -->
+              <circle cx="50" cy="140" r="4" fill="#0047bb"/>
+              <circle cx="110" cy="130" r="4" fill="#0047bb"/>
+              <circle cx="170" cy="120" r="4" fill="#0047bb"/>
+              <circle cx="230" cy="80" r="5" fill="#0047bb" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="290" cy="140" r="4" fill="#0047bb"/>
+              <circle cx="350" cy="115" r="4" fill="#0047bb"/>
+              <circle cx="410" cy="80" r="4" fill="#0047bb"/>
+              <circle cx="480" cy="90" r="4" fill="#0047bb"/>
+
+              <!-- Tooltip on Peak -->
+              <g transform="translate(180, 28)">
+                <rect width="100" height="36" rx="6" fill="#ffffff" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))" stroke="#e2e8f0"/>
+                <text x="50" y="15" text-anchor="middle" font-size="8" fill="#64748b" font-family="sans-serif">May 17, 2024</text>
+                <text x="50" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#081735" font-family="sans-serif">TZS 420,000</text>
+              </g>
+
+              <!-- X Axis Labels -->
+              <text x="50" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 14</text>
+              <text x="110" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 15</text>
+              <text x="170" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 16</text>
+              <text x="230" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 17</text>
+              <text x="290" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 18</text>
+              <text x="350" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 19</text>
+              <text x="410" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 20</text>
+              <text x="480" y="215" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">May 21</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Orders Summary Donut Chart -->
+        <div class="dash-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Orders Summary</h2>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;">
+            <!-- Donut SVG -->
+            <div style="position: relative; width: 125px; height: 125px;">
+              <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                <!-- Background -->
+                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#f1f5f9" stroke-width="3.8"/>
+                <!-- Green (78.5%) -->
+                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#16a34a" stroke-width="3.8" stroke-dasharray="78.5 21.5" stroke-dashoffset="0"/>
+                <!-- Blue (21.5%) -->
+                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#0047bb" stroke-width="3.8" stroke-dasharray="21.5 78.5" stroke-dashoffset="-78.5"/>
+              </svg>
+              <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <strong style="font-size: 1.25rem; color: #081735; line-height: 1;">163</strong>
+                <span style="font-size: 0.65rem; color: #64748b; margin-top: 2px;">Total Orders</span>
               </div>
-              <span style="color: #64748b; margin-left: 14px; font-size: 0.76rem;">128 (78.5%)</span>
             </div>
 
-            <div style="display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #0047bb;"></span>
-                <strong style="color: #081735;">On Progress</strong>
+            <!-- Legend -->
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem;">
+              <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
+                  <strong style="color: #081735;">Completed</strong>
+                </div>
+                <span style="color: #64748b; margin-left: 14px; font-size: 0.74rem;">128 (78.5%)</span>
               </div>
-              <span style="color: #64748b; margin-left: 14px; font-size: 0.76rem;">35 (21.5%)</span>
-            </div>
 
-            <div style="display: flex; flex-direction: column;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span>
-                <strong style="color: #081735;">Cancelled</strong>
+              <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #0047bb;"></span>
+                  <strong style="color: #081735;">On Progress</strong>
+                </div>
+                <span style="color: #64748b; margin-left: 14px; font-size: 0.74rem;">35 (21.5%)</span>
               </div>
-              <span style="color: #64748b; margin-left: 14px; font-size: 0.76rem;">0 (0%)</span>
+
+              <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span>
+                  <strong style="color: #081735;">Cancelled</strong>
+                </div>
+                <span style="color: #64748b; margin-left: 14px; font-size: 0.74rem;">0 (0%)</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Card 3: Top Selling Products -->
-      <div class="dash-card">
-        <div class="card-header-row">
-          <h2 class="card-title">Top Selling Products</h2>
+        <!-- Card 3: Top Selling Products -->
+        <div class="dash-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Top Selling Products</h2>
+          </div>
+
+          <div class="top-products-list">
+            <div class="top-product-item">
+              <div class="top-product-left">
+                <img src="assets/products/coca_cola.png" alt="Coca-Cola" class="top-product-img">
+                <span class="top-product-name">Coca-Cola 500ml</span>
+              </div>
+              <span class="top-product-sold">256 sold</span>
+            </div>
+
+            <div class="top-product-item">
+              <div class="top-product-left">
+                <img src="assets/products/azam_juice.png" alt="Azam Juice" class="top-product-img">
+                <span class="top-product-name">Azam Juice 500ml</span>
+              </div>
+              <span class="top-product-sold">189 sold</span>
+            </div>
+
+            <div class="top-product-item">
+              <div class="top-product-left">
+                <img src="assets/products/mineral_water.png" alt="Mineral Water" class="top-product-img">
+                <span class="top-product-name">Mineral Water 500ml</span>
+              </div>
+              <span class="top-product-sold">176 sold</span>
+            </div>
+
+            <div class="top-product-item">
+              <div class="top-product-left">
+                <img src="assets/products/nivea_lotion.png" alt="Nivea" class="top-product-img">
+                <span class="top-product-name">Nivea Body Lotion</span>
+              </div>
+              <span class="top-product-sold">142 sold</span>
+            </div>
+
+            <div class="top-product-item">
+              <div class="top-product-left">
+                <img src="assets/products/samsung_charger.png" alt="Samsung Charger" class="top-product-img">
+                <span class="top-product-name">Samsung Charger</span>
+              </div>
+              <span class="top-product-sold">98 sold</span>
+            </div>
+          </div>
         </div>
 
-        <div class="top-products-list">
-          <div class="top-product-item">
-            <div class="top-product-left">
-              <img src="assets/products/coca_cola.png" alt="Coca-Cola" class="top-product-img">
-              <span class="top-product-name">Coca-Cola 500ml</span>
-            </div>
-            <span class="top-product-sold">256 sold</span>
+      </section>
+
+      <!-- Bottom Row: Out of Stock Table + Recent Orders -->
+      <section class="bottom-grid">
+        
+        <!-- Out of Stock Products Table -->
+        <div class="dash-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Out of Stock Products</h2>
           </div>
 
-          <div class="top-product-item">
-            <div class="top-product-left">
-              <img src="assets/products/azam_juice.png" alt="Azam Juice" class="top-product-img">
-              <span class="top-product-name">Azam Juice 500ml</span>
-            </div>
-            <span class="top-product-sold">189 sold</span>
-          </div>
-
-          <div class="top-product-item">
-            <div class="top-product-left">
-              <img src="assets/products/mineral_water.png" alt="Mineral Water" class="top-product-img">
-              <span class="top-product-name">Mineral Water 500ml</span>
-            </div>
-            <span class="top-product-sold">176 sold</span>
-          </div>
-
-          <div class="top-product-item">
-            <div class="top-product-left">
-              <img src="assets/products/nivea_lotion.png" alt="Nivea" class="top-product-img">
-              <span class="top-product-name">Nivea Body Lotion</span>
-            </div>
-            <span class="top-product-sold">142 sold</span>
-          </div>
-
-          <div class="top-product-item">
-            <div class="top-product-left">
-              <img src="assets/products/samsung_charger.png" alt="Samsung Charger" class="top-product-img">
-              <span class="top-product-name">Samsung Charger</span>
-            </div>
-            <span class="top-product-sold">98 sold</span>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Bottom Row: Out of Stock Table + Recent Orders -->
-    <section class="bottom-grid">
-      
-      <!-- Out of Stock Products Table -->
-      <div class="dash-card">
-        <div class="card-header-row">
-          <h2 class="card-title">Out of Stock Products</h2>
-        </div>
-
-        <div style="overflow-x: auto;">
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th style="width: 30px;">#</th>
-                <th>Product</th>
-                <th>Category</th>
-                <th style="text-align: center;">Stock Status</th>
-                <th>Last Updated</th>
-                <th style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>
-                  <div class="table-prod-cell">
-                    <img src="assets/products/coca_cola.png" alt="" class="table-prod-img">
-                    <div class="table-prod-info">
-                      <span class="table-prod-name">Coca-Cola 500ml</span>
-                      <span class="table-prod-sku">SKU: DRK-001</span>
+          <div style="overflow-x: auto;">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 25px;">#</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th style="text-align: center;">Stock Status</th>
+                  <th>Last Updated</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <div class="table-prod-cell">
+                      <img src="assets/products/coca_cola.png" alt="" class="table-prod-img">
+                      <div class="table-prod-info">
+                        <span class="table-prod-name">Coca-Cola 500ml</span>
+                        <span class="table-prod-sku">SKU: DRK-001</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="cat-badge drinks">Drinks</span></td>
-                <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-                <td style="color: #64748b;">May 21, 2024 08:30 AM</td>
-                <td style="text-align: right;">
-                  <button class="btn-restock" onclick="NOVA.showToast('Restock initiated in Odoo')">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    <span>Restock</span>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td><span class="cat-badge drinks">Drinks</span></td>
+                  <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
+                  <td style="color: #64748b; font-size: 0.78rem;">May 21, 2024 08:30 AM</td>
+                  <td style="text-align: right;">
+                    <button class="btn-restock" onclick="showDashToast('Restock initiated for Coca-Cola 500ml')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                      <span>Restock</span>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr>
-                <td>2</td>
-                <td>
-                  <div class="table-prod-cell">
-                    <img src="assets/products/azam_juice.png" alt="" class="table-prod-img">
-                    <div class="table-prod-info">
-                      <span class="table-prod-name">Azam Juice 500ml</span>
-                      <span class="table-prod-sku">SKU: DRK-002</span>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    <div class="table-prod-cell">
+                      <img src="assets/products/azam_juice.png" alt="" class="table-prod-img">
+                      <div class="table-prod-info">
+                        <span class="table-prod-name">Azam Juice 500ml</span>
+                        <span class="table-prod-sku">SKU: DRK-002</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="cat-badge drinks">Drinks</span></td>
-                <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-                <td style="color: #64748b;">May 21, 2024 07:45 AM</td>
-                <td style="text-align: right;">
-                  <button class="btn-restock" onclick="NOVA.showToast('Restock initiated in Odoo')">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    <span>Restock</span>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td><span class="cat-badge drinks">Drinks</span></td>
+                  <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
+                  <td style="color: #64748b; font-size: 0.78rem;">May 21, 2024 07:45 AM</td>
+                  <td style="text-align: right;">
+                    <button class="btn-restock" onclick="showDashToast('Restock initiated for Azam Juice 500ml')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                      <span>Restock</span>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr>
-                <td>3</td>
-                <td>
-                  <div class="table-prod-cell">
-                    <img src="assets/products/nivea_lotion.png" alt="" class="table-prod-img">
-                    <div class="table-prod-info">
-                      <span class="table-prod-name">Nivea Body Lotion</span>
-                      <span class="table-prod-sku">SKU: COS-001</span>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    <div class="table-prod-cell">
+                      <img src="assets/products/nivea_lotion.png" alt="" class="table-prod-img">
+                      <div class="table-prod-info">
+                        <span class="table-prod-name">Nivea Body Lotion</span>
+                        <span class="table-prod-sku">SKU: COS-001</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="cat-badge cosmetics">Cosmetics</span></td>
-                <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-                <td style="color: #64748b;">May 20, 2024 09:15 PM</td>
-                <td style="text-align: right;">
-                  <button class="btn-restock" onclick="NOVA.showToast('Restock initiated in Odoo')">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    <span>Restock</span>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td><span class="cat-badge cosmetics">Cosmetics</span></td>
+                  <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
+                  <td style="color: #64748b; font-size: 0.78rem;">May 20, 2024 09:15 PM</td>
+                  <td style="text-align: right;">
+                    <button class="btn-restock" onclick="showDashToast('Restock initiated for Nivea Lotion')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                      <span>Restock</span>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr>
-                <td>4</td>
-                <td>
-                  <div class="table-prod-cell">
-                    <img src="assets/products/samsung_charger.png" alt="" class="table-prod-img">
-                    <div class="table-prod-info">
-                      <span class="table-prod-name">Samsung Charger</span>
-                      <span class="table-prod-sku">SKU: ELE-001</span>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    <div class="table-prod-cell">
+                      <img src="assets/products/samsung_charger.png" alt="" class="table-prod-img">
+                      <div class="table-prod-info">
+                        <span class="table-prod-name">Samsung Charger</span>
+                        <span class="table-prod-sku">SKU: ELE-001</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="cat-badge electronics">Electronics</span></td>
-                <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-                <td style="color: #64748b;">May 20, 2024 06:40 PM</td>
-                <td style="text-align: right;">
-                  <button class="btn-restock" onclick="NOVA.showToast('Restock initiated in Odoo')">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    <span>Restock</span>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td><span class="cat-badge electronics">Electronics</span></td>
+                  <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
+                  <td style="color: #64748b; font-size: 0.78rem;">May 20, 2024 06:40 PM</td>
+                  <td style="text-align: right;">
+                    <button class="btn-restock" onclick="showDashToast('Restock initiated for Samsung Charger')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                      <span>Restock</span>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr>
-                <td>5</td>
-                <td>
-                  <div class="table-prod-cell">
-                    <img src="assets/products/sunlight_detergent.png" alt="" class="table-prod-img">
-                    <div class="table-prod-info">
-                      <span class="table-prod-name">Sunlight Washing Soap 1kg</span>
-                      <span class="table-prod-sku">SKU: HSH-001</span>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    <div class="table-prod-cell">
+                      <img src="assets/products/sunlight_detergent.png" alt="" class="table-prod-img">
+                      <div class="table-prod-info">
+                        <span class="table-prod-name">Sunlight Washing Soap 1kg</span>
+                        <span class="table-prod-sku">SKU: HSH-001</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="cat-badge household">Household</span></td>
-                <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-                <td style="color: #64748b;">May 20, 2024 05:20 PM</td>
-                <td style="text-align: right;">
-                  <button class="btn-restock" onclick="NOVA.showToast('Restock initiated in Odoo')">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    <span>Restock</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td><span class="cat-badge household">Household</span></td>
+                  <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
+                  <td style="color: #64748b; font-size: 0.78rem;">May 20, 2024 05:20 PM</td>
+                  <td style="text-align: right;">
+                    <button class="btn-restock" onclick="showDashToast('Restock initiated for Sunlight Soap')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                      <span>Restock</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <a href="#" class="card-footer-link" onclick="showDashToast('Loading all 24 out of stock products...'); return false;">
+            View All Out of Stock Products &rarr;
+          </a>
         </div>
 
-        <a href="#" class="card-footer-link" onclick="event.preventDefault(); NOVA.showToast('Loading full out of stock list from Odoo...');">
-          View All Out of Stock Products &rarr;
-        </a>
-      </div>
+        <!-- Recent Orders List -->
+        <div class="dash-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Recent Orders</h2>
+            <a href="#" style="font-size: 0.8rem; font-weight: 600; color: #0047bb; text-decoration: none;" onclick="showDashToast('Viewing all orders...'); return false;">View All</a>
+          </div>
 
-      <!-- Recent Orders List -->
-      <div class="dash-card">
-        <div class="card-header-row">
-          <h2 class="card-title">Recent Orders</h2>
-          <a href="#" style="font-size: 0.8rem; font-weight: 600; color: #0047bb; text-decoration: none;" onclick="event.preventDefault();">View All</a>
+          <div class="recent-orders-list">
+            <div class="recent-order-item">
+              <div class="order-item-left">
+                <span class="order-item-id">#NM-1048</span>
+                <span class="order-item-date">May 21, 2024 10:30 AM</span>
+              </div>
+              <span class="status-pill completed">Completed</span>
+              <span class="order-item-amount">TZS 13,000</span>
+            </div>
+
+            <div class="recent-order-item">
+              <div class="order-item-left">
+                <span class="order-item-id">#NM-1047</span>
+                <span class="order-item-date">May 21, 2024 10:15 AM</span>
+              </div>
+              <span class="status-pill progress">On Progress</span>
+              <span class="order-item-amount">TZS 25,500</span>
+            </div>
+
+            <div class="recent-order-item">
+              <div class="order-item-left">
+                <span class="order-item-id">#NM-1046</span>
+                <span class="order-item-date">May 21, 2024 09:50 AM</span>
+              </div>
+              <span class="status-pill completed">Completed</span>
+              <span class="order-item-amount">TZS 7,000</span>
+            </div>
+
+            <div class="recent-order-item">
+              <div class="order-item-left">
+                <span class="order-item-id">#NM-1045</span>
+                <span class="order-item-date">May 21, 2024 09:20 AM</span>
+              </div>
+              <span class="status-pill progress">On Progress</span>
+              <span class="order-item-amount">TZS 18,000</span>
+            </div>
+
+            <div class="recent-order-item">
+              <div class="order-item-left">
+                <span class="order-item-id">#NM-1044</span>
+                <span class="order-item-date">May 21, 2024 08:40 AM</span>
+              </div>
+              <span class="status-pill completed">Completed</span>
+              <span class="order-item-amount">TZS 6,500</span>
+            </div>
+          </div>
+
+          <a href="#" class="card-footer-link" onclick="showDashToast('Opening Odoo POS order history...'); return false;">
+            View All Orders &rarr;
+          </a>
         </div>
 
-        <div class="recent-orders-list">
-          <div class="recent-order-item">
-            <div class="order-item-left">
-              <span class="order-item-id">#NM-1048</span>
-              <span class="order-item-date">May 21, 2024 10:30 AM</span>
-            </div>
-            <span class="status-pill completed">Completed</span>
-            <span class="order-item-amount">TZS 13,000</span>
-          </div>
+      </section>
 
-          <div class="recent-order-item">
-            <div class="order-item-left">
-              <span class="order-item-id">#NM-1047</span>
-              <span class="order-item-date">May 21, 2024 10:15 AM</span>
-            </div>
-            <span class="status-pill progress">On Progress</span>
-            <span class="order-item-amount">TZS 25,500</span>
-          </div>
+    </main>
 
-          <div class="recent-order-item">
-            <div class="order-item-left">
-              <span class="order-item-id">#NM-1046</span>
-              <span class="order-item-date">May 21, 2024 09:50 AM</span>
-            </div>
-            <span class="status-pill completed">Completed</span>
-            <span class="order-item-amount">TZS 7,000</span>
-          </div>
+  </div>
 
-          <div class="recent-order-item">
-            <div class="order-item-left">
-              <span class="order-item-id">#NM-1045</span>
-              <span class="order-item-date">May 21, 2024 09:20 AM</span>
-            </div>
-            <span class="status-pill progress">On Progress</span>
-            <span class="order-item-amount">TZS 18,000</span>
-          </div>
+  <!-- Toast Notification -->
+  <div id="dashToast" class="dash-toast"></div>
 
-          <div class="recent-order-item">
-            <div class="order-item-left">
-              <span class="order-item-id">#NM-1044</span>
-              <span class="order-item-date">May 21, 2024 08:40 AM</span>
-            </div>
-            <span class="status-pill completed">Completed</span>
-            <span class="order-item-amount">TZS 6,500</span>
-          </div>
-        </div>
-
-        <a href="#" class="card-footer-link" onclick="event.preventDefault(); NOVA.showToast('Opening Odoo POS orders...');">
-          View All Orders &rarr;
-        </a>
-      </div>
-
-    </section>
-
-  </main>
-
-  <script src="store.js"></script>
+  <script>
+    function showDashToast(msg) {
+      const toast = document.getElementById('dashToast');
+      if (toast) {
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 2200);
+      }
+    }
+  </script>
 </body>
 </html>
