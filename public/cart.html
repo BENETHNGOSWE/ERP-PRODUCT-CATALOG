@@ -431,6 +431,13 @@
             console.error('Order submission error:', netErr);
           }
 
+          if (!odooResult || !odooResult.success) {
+            NOVA.showToast('⚠️ Failed to place order in Odoo POS: ' + (odooResult && odooResult.error ? odooResult.error : 'Connection error. Please try again.'), 'danger');
+            btnPlaceOrder.disabled = false;
+            btnPlaceOrder.innerHTML = 'PLACE ORDER';
+            return;
+          }
+
           const confirmedOrder = {
             orderId: orderId,
             odooOrderId: odooResult && odooResult.order ? odooResult.order.odooOrderId : null,

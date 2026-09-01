@@ -610,9 +610,17 @@
         totalAmount: totals.total
       })
     }).then(res => res.json()).then(res => {
-      console.log('[Odoo Live Order Synced]:', res);
+      if (res && res.success) {
+        state.currentOrder.odooOrderId = res.order.odooOrderId;
+        state.currentOrder.odooOrderName = res.order.odooOrderName;
+        renderConfirmationDetails();
+        showToast(`🎉 Order #${randId} (${res.order.odooOrderName}) confirmed in Odoo!`);
+      } else {
+        showToast(`⚠️ Odoo POS Error: ${res.error || 'Check server connection'}`, 'danger');
+      }
     }).catch(err => {
       console.warn('[Odoo Order Sync Error]:', err);
+      showToast('⚠️ Could not connect to Odoo server', 'danger');
     });
 
     renderConfirmationDetails();
