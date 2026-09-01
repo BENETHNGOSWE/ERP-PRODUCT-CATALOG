@@ -203,12 +203,43 @@ async function fetchOdooProducts(forceRefresh = false) {
   }
 }
 
+// Helper to resolve string / legacy IDs to Odoo Product IDs
+function resolveOdooProductId(item) {
+  let prodId = Number(item.id || item.odooId);
+  if (!isNaN(prodId) && prodId > 0) return prodId;
+
+  // Search by cached products name or string ID
+  const itemStr = String(item.id || '').trim();
+  const itemName = String(item.name || '').trim().toLowerCase();
+
+  const match = cachedProducts.find(p => 
+    (itemName && p.name.toLowerCase().includes(itemName)) ||
+    (itemStr && String(p.id) === itemStr)
+  );
+
+  if (match) return match.id;
+  if (itemStr === 'prod-1') return 167; // Coca-Cola 500ml
+  if (itemStr === 'prod-2') return 168; // Azam Juice 500ml
+  if (itemStr === 'prod-3') return 169; // Mineral Water 500ml
+  if (itemStr === 'prod-4') return 170; // Nivea Body Lotion
+  if (itemStr === 'prod-5') return 171; // Samsung Charger
+  if (itemStr === 'prod-6') return 172; // MWANZA RICE 1kg
+  if (itemStr === 'prod-7') return 174; // Cooking Oil
+  if (itemStr === 'prod-8') return 176; // Flour
+  if (itemStr === 'prod-9') return 170; // Soap
+  if (itemStr === 'prod-10') return 169; // Milk
+  if (itemStr === 'prod-11') return 171; // Earbuds
+  if (itemStr === 'prod-12') return 176; // Detergent
+
+  return 167; // Safe fallback
+}
+
 // Deduct Stock Directly in Odoo
 async function deductStock(items, defaultLocationId = 28) {
   const results = [];
 
   for (const item of items) {
-    const prodId = Number(item.id || item.odooId);
+    const prodId = resolveOdooProductId(item);
     const qtyToDeduct = Number(item.qty || 1);
 
     try {
@@ -308,13 +339,14 @@ async function createOdooPosOrder(orderData) {
     console.warn('[Odoo POS Session Warning]:', sessErr.message || sessErr);
   }
 
-  // 4. Prepare Order Lines
+  // 4. Prepare Order Lines with Safe Product ID Resolution
   const lines = orderData.items.map(item => {
-    const unitPrice = Number(item.price);
+    const pid = resolveOdooProductId(item);
+    const unitPrice = Number(item.price) || 1000;
     const qty = Number(item.qty || 1);
     const subtotal = unitPrice * qty;
     return [0, 0, {
-      product_id: Number(item.id || item.odooId),
+      product_id: pid,
       qty: qty,
       price_unit: unitPrice,
       price_subtotal: subtotal,

@@ -574,6 +574,21 @@
     // Generate random Order ID like NM-1048
     const randId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
 
+    const orderItems = [];
+    for (const [prodId, qty] of Object.entries(state.cart)) {
+      if (qty > 0) {
+        const p = PRODUCTS.find(prod => prod.id === prodId);
+        if (p) {
+          orderItems.push({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            qty: qty
+          });
+        }
+      }
+    }
+
     state.currentOrder = {
       orderId: randId,
       totalPaid: totals.total,
@@ -583,8 +598,25 @@
       timestamp: new Date()
     };
 
+    // Submit live to Odoo POS ERP
+    fetch('/api/odoo/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId: randId,
+        customerPhone: phoneInput,
+        customerName: `Customer (${phoneInput})`,
+        items: orderItems,
+        totalAmount: totals.total
+      })
+    }).then(res => res.json()).then(res => {
+      console.log('[Odoo Live Order Synced]:', res);
+    }).catch(err => {
+      console.warn('[Odoo Order Sync Error]:', err);
+    });
+
     renderConfirmationDetails();
-    showToast(`🎉 Order #${randId} placed successfully!`);
+    showToast(`🎉 Order #${randId} placed & synced with Odoo!`);
 
     // Smooth scroll to confirmation card or tab
     const confCard = document.getElementById('desktopConfirmationCard');

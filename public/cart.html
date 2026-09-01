@@ -422,6 +422,7 @@
           await NOVA.submitOrderToOdoo({
             orderId: orderId,
             customerPhone: phoneVal,
+            customerName: `Customer (${phoneVal})`,
             items: orderItems,
             totalAmount: totals.total
           });
