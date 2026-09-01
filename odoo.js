@@ -234,7 +234,7 @@ function resolveOdooProductId(item) {
   return 167; // Safe fallback
 }
 
-// Deduct Stock Directly in Odoo
+// Deduct Stock Directly in Odoo (Safe for storable products, skips consumables/services)
 async function deductStock(items, defaultLocationId = 28) {
   const results = [];
 
@@ -243,6 +243,22 @@ async function deductStock(items, defaultLocationId = 28) {
     const qtyToDeduct = Number(item.qty || 1);
 
     try {
+      // Check product type first to avoid Odoo quant error on consumables/services
+      const prodInfo = await callModel('product.product', 'search_read', [
+        [['id', '=', prodId]]
+      ], { fields: ['id', 'name', 'type', 'qty_available'] });
+
+      if (prodInfo && prodInfo.length > 0 && (prodInfo[0].type === 'consu' || prodInfo[0].type === 'service')) {
+        results.push({
+          id: prodId,
+          success: true,
+          isConsumable: true,
+          deducted: qtyToDeduct,
+          remainingStock: prodInfo[0].qty_available || 0
+        });
+        continue;
+      }
+
       const quants = await callModel('stock.quant', 'search_read', [
         [['product_id', '=', prodId], ['location_id.usage', '=', 'internal']]
       ], {
@@ -277,7 +293,7 @@ async function deductStock(items, defaultLocationId = 28) {
         remainingStock: updatedQty
       });
     } catch (err) {
-      console.error(`Failed to deduct stock for product ${prodId}:`, err.message || err);
+      console.warn(`[Stock Quant Note for product ${prodId}]:`, err.message || err);
       results.push({
         id: prodId,
         success: false,
@@ -296,10 +312,7 @@ async function createOdooPosOrder(orderData) {
   const ref = 'WEB-' + (orderData.orderId || ('NM-' + Math.floor(1000 + Math.random() * 9000)));
   const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
-  // 1. Deduct Stock in real-time
-  const stockResults = await deductStock(orderData.items);
-
-  // 2. Resolve or Create Customer in Odoo (res.partner)
+  // 1. Resolve or Create Customer in Odoo (res.partner)
   let partnerId = null;
   const customerPhone = orderData.customerPhone || '';
   const customerName = orderData.customerName || (customerPhone ? `Customer (${customerPhone})` : 'Online POS Customer');
@@ -325,7 +338,7 @@ async function createOdooPosOrder(orderData) {
     console.warn('[Odoo Partner Resolution Warning]:', partnerErr.message || partnerErr);
   }
 
-  // 3. Find active POS Session (fallback to 58)
+  // 2. Find active POS Session (fallback to 58)
   let sessionId = 58;
   try {
     const openSessions = await callModel('pos.session', 'search_read', [
@@ -339,7 +352,7 @@ async function createOdooPosOrder(orderData) {
     console.warn('[Odoo POS Session Warning]:', sessErr.message || sessErr);
   }
 
-  // 4. Prepare Order Lines with Safe Product ID Resolution
+  // 3. Prepare Order Lines with Safe Product ID Resolution
   const lines = orderData.items.map(item => {
     const pid = resolveOdooProductId(item);
     const unitPrice = Number(item.price) || 1000;
@@ -352,13 +365,13 @@ async function createOdooPosOrder(orderData) {
       price_subtotal: subtotal,
       price_subtotal_incl: subtotal,
       discount: 0.0,
-      customer_note: `Phone: ${customerPhone}`
+      customer_note: `Item: ${item.name || ''} | Phone: ${customerPhone}`
     }];
   });
 
   const total = Number(orderData.totalAmount || orderData.totalPaid || 0);
 
-  // 5. Create POS Order record directly in Odoo pos.order
+  // 4. Create POS Order record directly in Odoo pos.order FIRST
   let odooOrderId = null;
   let odooOrderName = `Order ${ref}`;
 
@@ -385,7 +398,7 @@ async function createOdooPosOrder(orderData) {
     odooOrderId = await callModel('pos.order', 'create', [orderPayload]);
     console.log(`[Odoo POS Order Created]: ID #${odooOrderId}`);
 
-    // 6. Mark Order as Paid and Confirmed in Odoo
+    // 5. Mark Order as Paid and Confirmed in Odoo
     if (odooOrderId) {
       await callModel('pos.order', 'action_pos_order_paid', [[odooOrderId]]);
       const readOrder = await callModel('pos.order', 'search_read', [
@@ -399,6 +412,14 @@ async function createOdooPosOrder(orderData) {
     }
   } catch (orderErr) {
     console.error('[Odoo pos.order.create Error]:', orderErr.message || orderErr);
+  }
+
+  // 6. Deduct Stock safely in the background
+  let stockResults = [];
+  try {
+    stockResults = await deductStock(orderData.items);
+  } catch (stockErr) {
+    console.warn('[Stock Deduction Non-blocking Warning]:', stockErr.message || stockErr);
   }
 
   return {
