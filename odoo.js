@@ -265,11 +265,53 @@ async function createOdooPosOrder(orderData) {
   const ref = 'WEB-' + (orderData.orderId || ('NM-' + Math.floor(1000 + Math.random() * 9000)));
   const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
+  // 1. Deduct Stock in real-time
   const stockResults = await deductStock(orderData.items);
 
+  // 2. Resolve or Create Customer in Odoo (res.partner)
+  let partnerId = null;
+  const customerPhone = orderData.customerPhone || '';
+  const customerName = orderData.customerName || (customerPhone ? `Customer (${customerPhone})` : 'Online POS Customer');
+
+  try {
+    if (customerPhone) {
+      const existingPartners = await callModel('res.partner', 'search_read', [
+        [['phone', '=', customerPhone]]
+      ], { fields: ['id', 'name'], limit: 1 });
+
+      if (existingPartners && existingPartners.length > 0) {
+        partnerId = existingPartners[0].id;
+      } else {
+        partnerId = await callModel('res.partner', 'create', [{
+          name: customerName,
+          phone: customerPhone,
+          customer_rank: 1,
+          company_id: 3 // TZ Company
+        }]);
+      }
+    }
+  } catch (partnerErr) {
+    console.warn('[Odoo Partner Resolution Warning]:', partnerErr.message || partnerErr);
+  }
+
+  // 3. Find active POS Session (fallback to 58)
+  let sessionId = 58;
+  try {
+    const openSessions = await callModel('pos.session', 'search_read', [
+      [['state', '=', 'opened'], ['config_id', '=', 26]]
+    ], { fields: ['id', 'name'], limit: 1 });
+
+    if (openSessions && openSessions.length > 0) {
+      sessionId = openSessions[0].id;
+    }
+  } catch (sessErr) {
+    console.warn('[Odoo POS Session Warning]:', sessErr.message || sessErr);
+  }
+
+  // 4. Prepare Order Lines
   const lines = orderData.items.map(item => {
     const unitPrice = Number(item.price);
-    const qty = Number(item.qty);
+    const qty = Number(item.qty || 1);
     const subtotal = unitPrice * qty;
     return [0, 0, {
       product_id: Number(item.id || item.odooId),
@@ -278,54 +320,63 @@ async function createOdooPosOrder(orderData) {
       price_subtotal: subtotal,
       price_subtotal_incl: subtotal,
       discount: 0.0,
-      customer_note: `Web Order Phone: ${orderData.customerPhone || ''}`
+      customer_note: `Phone: ${customerPhone}`
     }];
   });
 
   const total = Number(orderData.totalAmount || orderData.totalPaid || 0);
 
-  const posPayload = {
-    name: `Order ${ref}`,
-    pos_reference: ref,
-    amount_paid: total,
-    amount_total: total,
-    amount_tax: 0.0,
-    amount_return: 0.0,
-    lines: lines,
-    statement_ids: [
-      [0, 0, {
-        name: dateStr,
-        amount: total,
-        payment_method_id: 6,
-        payment_date: dateStr
-      }]
-    ],
-    pos_session_id: 58,
-    user_id: 8,
-    partner_id: false,
-    uid: ref,
-    sequence_number: Math.floor(Math.random() * 900) + 10,
-    creation_date: dateStr,
-    to_invoice: false
-  };
-
+  // 5. Create POS Order record directly in Odoo pos.order
   let odooOrderId = null;
+  let odooOrderName = `Order ${ref}`;
+
   try {
-    const res = await callModel('pos.order', 'sync_from_ui', [[posPayload]]);
-    if (res && res['pos.order'] && res['pos.order'].length > 0) {
-      odooOrderId = res['pos.order'][0].id;
+    const orderPayload = {
+      session_id: sessionId,
+      partner_id: partnerId || false,
+      pos_reference: `Order ${ref}`,
+      amount_total: total,
+      amount_paid: total,
+      amount_tax: 0.0,
+      amount_return: 0.0,
+      lines: lines,
+      payment_ids: [
+        [0, 0, {
+          name: 'Mobile Money / Card Payment',
+          amount: total,
+          payment_method_id: 6,
+          payment_date: dateStr
+        }]
+      ]
+    };
+
+    odooOrderId = await callModel('pos.order', 'create', [orderPayload]);
+    console.log(`[Odoo POS Order Created]: ID #${odooOrderId}`);
+
+    // 6. Mark Order as Paid and Confirmed in Odoo
+    if (odooOrderId) {
+      await callModel('pos.order', 'action_pos_order_paid', [[odooOrderId]]);
+      const readOrder = await callModel('pos.order', 'search_read', [
+        [['id', '=', odooOrderId]]
+      ], { fields: ['id', 'name', 'state', 'amount_total'] });
+
+      if (readOrder && readOrder.length > 0) {
+        odooOrderName = readOrder[0].name;
+        console.log(`[Odoo POS Order Confirmed]: ${odooOrderName} (State: ${readOrder[0].state})`);
+      }
     }
-  } catch (posErr) {
-    console.warn('[POS sync_from_ui fallback]:', posErr.message || posErr);
+  } catch (orderErr) {
+    console.error('[Odoo pos.order.create Error]:', orderErr.message || orderErr);
   }
 
   return {
     success: true,
     orderId: orderData.orderId || ref,
     odooOrderId: odooOrderId,
+    odooOrderName: odooOrderName,
     totalPaid: total,
     stockResults: stockResults,
-    phone: orderData.customerPhone,
+    phone: customerPhone,
     timestamp: dateStr
   };
 }
