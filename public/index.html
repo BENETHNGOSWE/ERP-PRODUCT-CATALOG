@@ -269,8 +269,8 @@
     </div>
   </main>
 
-  <!-- Mobile Floating Cart Bar (Shown when items > 0 on mobile screens) -->
-  <a href="#orderSummaryCard" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;" onclick="document.getElementById('orderSummaryCard').scrollIntoView({ behavior: 'smooth' });">
+  <!-- Mobile Floating Cart Bar (Navigates directly to dedicated Cart page) -->
+  <a href="cart.html" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
     <div class="float-cart-info">
       <div class="float-cart-icon-wrap">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -280,10 +280,10 @@
         </svg>
         <span class="float-badge" id="mobileFloatBadge">0</span>
       </div>
-      <span class="float-cart-text">Review Order</span>
+      <span class="float-cart-text">Cart</span>
     </div>
     <div class="float-view-cart-btn">
-      <span id="mobileFloatTotal">TZS 0 &rarr;</span>
+      <span>View Cart &rarr;</span>
     </div>
   </a>
 
@@ -479,7 +479,7 @@
                   <div class="product-item-subtitle">
                     <span>${p.category || 'General'}</span>
                     <span>&bull;</span>
-                    <span class="stock-badge-tag ${stockClass}" style="display:inline-block; position:static; font-size:0.72rem; padding:1px 6px;">${stockText}</span>
+                    <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
                   </div>
                   <div class="product-item-price">${NOVA.formatTZS(p.price)}</div>
                 </div>

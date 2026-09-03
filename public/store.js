@@ -214,7 +214,7 @@ const NOVA = (function () {
     // Logo Image
     if (store.logo) {
       document.querySelectorAll('.brand-logo-circle').forEach(circle => {
-        circle.innerHTML = `<img src="${store.logo}" alt="${store.name}" class="brand-logo-img">`;
+        circle.innerHTML = `<img src="${store.logo}" alt="" class="brand-logo-img">`;
       });
     }
 
