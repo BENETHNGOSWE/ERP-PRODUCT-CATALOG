@@ -162,5 +162,29 @@
     ],
     "productIds": [],
     "createdDate": "2026-09-03"
+  },
+  {
+    "id": 6,
+    "name": "Kariakoo Spices",
+    "slug": "kariakoospices",
+    "tagline": "Official Online Store",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%230047bb\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"32\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">K</text></svg>",
+    "whatsapp": "+255714998877",
+    "status": "active",
+    "themeColor": "#0047bb",
+    "currency": "TZS",
+    "address": "Dar es Salaam, Tanzania",
+    "posConfigId": 26,
+    "posConfigName": "Website Orders",
+    "categories": [
+      "Food"
+    ],
+    "productKeywords": [
+      "rice",
+      "oil",
+      "flour"
+    ],
+    "productIds": [],
+    "createdDate": "2026-09-03"
   }
 ]

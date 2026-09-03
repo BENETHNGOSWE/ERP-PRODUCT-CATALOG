@@ -291,6 +291,7 @@
       if (phoneEl) phoneEl.textContent = order.phone || '+255 7XX XXX XXX';
 
       NOVA.applyStoreBranding(NOVA.getStore());
+      NOVA.loadOdooProducts();
       NOVA.updateHeaderCartBadge();
 
       // View Order Modal

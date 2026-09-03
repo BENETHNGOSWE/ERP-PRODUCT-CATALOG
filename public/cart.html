@@ -456,7 +456,7 @@
           NOVA.resetCart();
 
           // Instant navigation to confirmation page
-          window.location.href = 'confirmation.html';
+          const slug = NOVA.getStoreSlug(); window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
         });
       }
 

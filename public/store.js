@@ -9,8 +9,11 @@ const NOVA = (function () {
   // Helper to extract store slug from URL pathname (e.g., /abcstore -> abcstore)
   function getActiveStoreSlug() {
     const path = window.location.pathname.replace(/^\/|\/$/g, '');
-    const first = path.split('/')[0];
-    if (first && first !== 'index.html' && first !== 'cart.html' && first !== 'confirmation.html' && first !== 'dashboard.html' && first !== 'odoo_preview.html' && first !== 'admin.html') {
+    const parts = path.split('/');
+    const first = parts[0];
+    
+    // Check if path is a known static page or store slug
+    if (first && first !== 'index.html' && first !== 'cart' && first !== 'cart.html' && first !== 'confirmation' && first !== 'confirmation.html' && first !== 'dashboard' && first !== 'dashboard.html' && first !== 'odoo_preview.html' && first !== 'admin') {
       return first;
     }
     const params = new URLSearchParams(window.location.search);
@@ -57,7 +60,7 @@ const NOVA = (function () {
   // LocalStorage Cart
   function getCart() {
     try {
-      const stored = localStorage.getItem(getCartKey()) || localStorage.getItem('nova_mart_cart');
+      const stored = localStorage.getItem(getCartKey());
       if (stored !== null) return JSON.parse(stored);
     } catch (e) {}
     return { ...DEFAULT_CART };
@@ -66,13 +69,12 @@ const NOVA = (function () {
   function saveCart(cart) {
     try {
       localStorage.setItem(getCartKey(), JSON.stringify(cart));
-      localStorage.setItem('nova_mart_cart', JSON.stringify(cart));
     } catch (e) {}
   }
 
   function getLatestOrder() {
     try {
-      const stored = localStorage.getItem(getOrderKey()) || localStorage.getItem('nova_mart_order');
+      const stored = localStorage.getItem(getOrderKey());
       if (stored) return JSON.parse(stored);
     } catch (e) {}
     return { ...DEFAULT_ORDER };
@@ -81,7 +83,6 @@ const NOVA = (function () {
   function saveLatestOrder(order) {
     try {
       localStorage.setItem(getOrderKey(), JSON.stringify(order));
-      localStorage.setItem('nova_mart_order', JSON.stringify(order));
     } catch (e) {}
   }
 
@@ -137,15 +138,30 @@ const NOVA = (function () {
     };
   }
 
+  // Rewrite all internal links to preserve store context
+  function rewriteStoreLinks() {
+    const isCustomSlug = currentSlug && currentSlug !== 'novamart';
+    const storePrefix = isCustomSlug ? `/${currentSlug}` : '';
+    const queryParam = isCustomSlug ? `?store=${currentSlug}` : '';
+
+    // Cart links
+    document.querySelectorAll('a[href="cart.html"], a[href="/cart"], a#btnHeaderCart, a#mobileFloatingCart').forEach(el => {
+      el.href = isCustomSlug ? `/${currentSlug}/cart` : 'cart.html';
+    });
+
+    // Home / Shop links
+    document.querySelectorAll('a[href="index.html"], a[href="/"], a.brand-block, a.nav-link[href="index.html"]').forEach(el => {
+      el.href = isCustomSlug ? `/${currentSlug}` : 'index.html';
+    });
+  }
+
   // Load Products for this Store from Server
   async function loadOdooProducts(force = false) {
     try {
-      // First try store-specific endpoint
       let url = `/api/${currentSlug}/products?refresh=${force}`;
       let res = await fetch(url);
       
       if (!res.ok) {
-        // Fallback to global products
         res = await fetch(`/api/odoo/products?refresh=${force}`);
       }
 
@@ -161,11 +177,13 @@ const NOVA = (function () {
         if (data.categories) {
           liveCategories = data.categories;
         }
+        rewriteStoreLinks();
         return { products: liveProducts, categories: liveCategories, store: activeStore };
       }
     } catch (err) {
       console.warn('[Store Fetch Note]:', err.message);
     }
+    rewriteStoreLinks();
     return { products: liveProducts, categories: liveCategories, store: activeStore };
   }
 
@@ -173,7 +191,7 @@ const NOVA = (function () {
   function applyStoreBranding(store) {
     if (!store) return;
     
-    // Title
+    // Page Title
     document.title = `${store.name || 'Store'} — Online Catalog`;
 
     // Brand Name Elements
@@ -193,12 +211,14 @@ const NOVA = (function () {
       });
     }
 
-    // Logo
+    // Logo Image
     if (store.logo) {
       document.querySelectorAll('.brand-logo-circle').forEach(circle => {
-        circle.innerHTML = `<img src="${store.logo}" alt="${store.name}" style="width:100%; height:100%; object-fit:contain; border-radius:50%;">`;
+        circle.innerHTML = `<img src="${store.logo}" alt="${store.name}" class="brand-logo-img">`;
       });
     }
+
+    rewriteStoreLinks();
   }
 
   // Update Cart Quantity
@@ -310,6 +330,7 @@ const NOVA = (function () {
     getCategories: () => liveCategories,
     loadOdooProducts,
     applyStoreBranding,
+    rewriteStoreLinks,
     getCart,
     saveCart,
     getLatestOrder,
