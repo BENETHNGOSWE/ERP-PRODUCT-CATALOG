@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Achete.me — Multi-Client Digital Storefront Platform</title>
+  <link rel="icon" type="image/png" href="assets/products/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #0047bb;
+      --primary-hover: #00368f;
+      --navy-dark: #081735;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-page: #f8fafc;
+      --border-color: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .portal-nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .portal-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .portal-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--navy-dark);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #22c55e;
+    }
+
+    .portal-logo-text {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--navy-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .portal-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-create-store-top {
+      padding: 8px 16px;
+      background: #0047bb;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0, 71, 187, 0.25);
+    }
+
+    .btn-admin-link {
+      padding: 8px 14px;
+      background: #f1f5f9;
+      color: #334155;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* Hero Banner */
+    .portal-hero {
+      background: linear-gradient(135deg, #081735 0%, #0f2756 100%);
+      color: #ffffff;
+      padding: 60px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 2.3rem;
+      font-weight: 900;
+      line-height: 1.2;
+      max-width: 800px;
+      margin: 0 auto 14px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: #94a3b8;
+      max-width: 650px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+
+    .hero-stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .hero-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-stat-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .hero-stat-label {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Main Store Directory */
+    .portal-main {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+      flex: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy-dark);
+    }
+
+    .stores-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .store-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+
+    .store-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+      border-color: #cbd5e1;
+    }
+
+    .store-card-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .store-card-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      padding: 4px;
+    }
+
+    .store-card-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .store-card-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--navy-dark);
+    }
+
+    .store-card-slug {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0047bb;
+    }
+
+    .store-card-tagline {
+      font-size: 0.84rem;
+      color: #64748b;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .store-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #475569;
+    }
+
+    .store-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn-visit-store {
+      flex: 1;
+      padding: 10px;
+      background: #0047bb;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .btn-visit-store:hover {
+      background: #00368f;
+    }
+
+    .btn-wa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #25d366;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    /* Create Store Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 23, 53, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--navy-dark);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .form-input {
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .slug-preview-box {
+      background: #eff6ff;
+      border: 1px dashed #93c5fd;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-cancel {
+      padding: 9px 16px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-create-submit {
+      padding: 9px 20px;
+      background: #0047bb;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="portal-nav">
+    <a href="/" class="portal-logo-wrap">
+      <div class="portal-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <span class="portal-logo-text">Achete.me</span>
+    </a>
+
+    <div class="portal-nav-actions">
+      <a href="/dashboard" class="btn-admin-link">Admin Dashboard</a>
+      <a href="/odoo-preview" class="btn-admin-link">Odoo 18 ERP</a>
+      <button class="btn-create-store-top" onclick="openCreateModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>New Client Store</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="portal-hero">
+    <div class="hero-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.075-1.925-.453-1.424-.582-2.339-2.023-2.41-2.118-.071-.096-.582-.774-.582-1.476 0-.702.368-1.047.5-1.189.131-.144.288-.179.384-.179.096 0 .192.002.276.006.09.004.21-.034.329.251.12.288.41.996.446 1.068.036.072.06.156.012.252-.048.096-.072.156-.144.24-.072.084-.15.187-.216.252-.072.072-.148.15-.064.294.084.144.372.613.799.992.549.488 1.01.639 1.154.711.144.072.228.06.312-.036.084-.096.36-42.456-.564.096-.144.192-.12.336-.072.144.048.912.43 1.068.508.156.078.26.116.298.182.038.066.038.384-.106.789z"/></svg>
+      <span>Multi-Client Digital Storefronts + WhatsApp Order Alerts</span>
+    </div>
+
+    <h1 class="hero-title">Personalized Digital Storefronts Powered by Odoo 18 ERP</h1>
+    <p class="hero-sub">
+      Every client gets their own branded URL (<code>achete.me/:shopname</code>), isolated product catalog, instant mobile-first checkout, and direct OpenWA WhatsApp order notifications.
+    </p>
+
+    <div class="hero-stats-row">
+      <div class="hero-stat-item">
+        <span class="hero-stat-num" id="statTotalStores">4</span>
+        <span class="hero-stat-label">Active Client Stores</span>
+      </div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num" id="statTotalProducts">122</span>
+        <span class="hero-stat-label">Odoo POS Products</span>
+      </div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">OpenWA</span>
+        <span class="hero-stat-label">WhatsApp Gateway</span>
+      </div>
+      <div class="hero-stat-item">
+        <span class="hero-stat-num">100%</span>
+        <span class="hero-stat-label">Product Isolation</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Store Directory -->
+  <main class="portal-main">
+    <div class="section-header">
+      <h2 class="section-title">Active Client Storefronts</h2>
+      <button class="btn-create-store-top" onclick="openCreateModal()">+ Create New Client Store</button>
+    </div>
+
+    <div class="stores-grid" id="storesGrid">
+      <!-- Dynamic Store Cards -->
+    </div>
+  </main>
+
+  <!-- Create Store Modal -->
+  <div class="modal-overlay" id="createModal" onclick="closeCreateModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Client Store</h3>
+        <button style="border:none; background:transparent; font-size:1.4rem; cursor:pointer;" onclick="closeCreateModal()">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Client / Shop Name *</label>
+        <input type="text" id="newStoreName" class="form-input" placeholder="e.g. ABC Store" oninput="autoGenerateSlug()">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Shop Slug (URL Path) *</label>
+        <input type="text" id="newStoreSlug" class="form-input" placeholder="e.g. abcstore" oninput="updateSlugPreview()">
+        <div class="slug-preview-box" id="slugPreview">
+          Store URL: <strong>achete.me/abcstore</strong>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Shop Tagline</label>
+        <input type="text" id="newStoreTagline" class="form-input" placeholder="e.g. Your Daily Groceries & Snacks">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Client WhatsApp Number (E.164) *</label>
+        <input type="tel" id="newStoreWa" class="form-input" placeholder="e.g. +255 712 345 678" value="+255">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Assigned POS Categories / Keywords</label>
+        <input type="text" id="newStoreKeywords" class="form-input" placeholder="e.g. Food, Drinks, Snacks, Household">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Brand Accent Color</label>
+        <input type="color" id="newStoreColor" value="#0047bb" style="height:38px; width:100%; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
+        <button class="btn-create-submit" id="btnSubmitCreateStore" onclick="submitNewStore()">Create Storefront</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let storesList = [];
+
+    async function loadPortal() {
+      try {
+        const res = await fetch('/api/stores');
+        const data = await res.json();
+        storesList = data.stores || [];
+
+        document.getElementById('statTotalStores').textContent = data.activeCount || storesList.length;
+
+        const grid = document.getElementById('storesGrid');
+        grid.innerHTML = storesList.map(s => `
+          <div class="store-card">
+            <div class="store-card-top">
+              <img src="${s.logo}" alt="${s.name}" class="store-card-logo">
+              <div class="store-card-info">
+                <h3 class="store-card-name">${s.name}</h3>
+                <span class="store-card-slug">achete.me/${s.slug}</span>
+              </div>
+            </div>
+
+            <p class="store-card-tagline">${s.tagline}</p>
+
+            <div class="store-card-meta">
+              <div class="meta-row">
+                <span>WhatsApp:</span>
+                <strong>${s.whatsapp}</strong>
+              </div>
+              <div class="meta-row">
+                <span>POS Register:</span>
+                <strong>${s.posConfigName || 'Website Orders'}</strong>
+              </div>
+              <div class="meta-row">
+                <span>Categories:</span>
+                <strong>${(s.categories || []).slice(0, 3).join(', ')}</strong>
+              </div>
+            </div>
+
+            <div class="store-card-actions">
+              <a href="/${s.slug}" class="btn-visit-store" style="background:${s.themeColor || '#0047bb'};">
+                Visit Storefront &rarr;
+              </a>
+              <a href="https://wa.me/${(s.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" class="btn-wa-icon" title="Chat on WhatsApp">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.075-1.925-.453-1.424-.582-2.339-2.023-2.41-2.118-.071-.096-.582-.774-.582-1.476 0-.702.368-1.047.5-1.189.131-.144.288-.179.384-.179.096 0 .192.002.276.006.09.004.21-.034.329.251.12.288.41.996.446 1.068.036.072.06.156.012.252-.048.096-.072.156-.144.24-.072.084-.15.187-.216.252-.072.072-.148.15-.064.294.084.144.372.613.799.992.549.488 1.01.639 1.154.711.144.072.228.06.312-.036.084-.096.36-42.456-.564.096-.144.192-.12.336-.072.144.048.912.43 1.068.508.156.078.26.116.298.182.038.066.038.384-.106.789z"/></svg>
+              </a>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading portal:', err);
+      }
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').style.display = 'flex';
+    }
+
+    function closeCreateModal(e) {
+      if (!e || e.target.id === 'createModal' || !e.target.closest('.modal-box')) {
+        document.getElementById('createModal').style.display = 'none';
+      }
+    }
+
+    function autoGenerateSlug() {
+      const name = document.getElementById('newStoreName').value;
+      const slugInput = document.getElementById('newStoreSlug');
+      const cleanSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      slugInput.value = cleanSlug;
+      updateSlugPreview();
+    }
+
+    function updateSlugPreview() {
+      const slug = document.getElementById('newStoreSlug').value.toLowerCase().trim() || 'shopname';
+      document.getElementById('slugPreview').innerHTML = `Store URL: <strong>achete.me/${slug}</strong>`;
+    }
+
+    async function submitNewStore() {
+      const name = document.getElementById('newStoreName').value.trim();
+      const slug = document.getElementById('newStoreSlug').value.trim().toLowerCase();
+      const tagline = document.getElementById('newStoreTagline').value.trim();
+      const whatsapp = document.getElementById('newStoreWa').value.trim();
+      const color = document.getElementById('newStoreColor').value;
+      const kw = document.getElementById('newStoreKeywords').value.split(',').map(k => k.trim()).filter(Boolean);
+
+      if (!name || !slug) {
+        alert('Please enter Store Name and Slug.');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitCreateStore');
+      btn.textContent = 'Creating in Odoo...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/stores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            slug: slug,
+            tagline: tagline,
+            whatsapp: whatsapp,
+            themeColor: color,
+            productKeywords: kw,
+            categories: kw.length > 0 ? kw : ['General']
+          })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to create store');
+
+        alert(`✅ Store "${name}" created!\n\nAccessible at achete.me/${slug}`);
+        closeCreateModal();
+        loadPortal();
+      } catch (err) {
+        alert('Could not create store: ' + err.message);
+      } finally {
+        btn.textContent = 'Create Storefront';
+        btn.disabled = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPortal);
+  </script>
+</body>
+</html>

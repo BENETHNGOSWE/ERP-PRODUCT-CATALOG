@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NOVA MART — Executive Admin Dashboard (Live Odoo 18 Sync)</title>
+  <title>Achete.me — Multi-Client Admin & WhatsApp Gateway</title>
   <link rel="icon" type="image/png" href="assets/products/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ==========================================================================
-       RESET & ROOT VARIABLES (Inter Font)
-       ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -30,8 +27,6 @@
       --bg-card: #ffffff;
       --border-color: #e2e8f0;
       --success: #16a34a;
-      --warning: #f59e0b;
-      --danger: #ef4444;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -47,13 +42,8 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ==========================================================================
-       DASHBOARD WRAPPER: SIDEBAR + MAIN HORIZONTAL FLEX
-       ========================================================================== */
     .dashboard-app-wrapper {
       display: flex !important;
       flex-direction: row !important;
@@ -63,9 +53,7 @@
       background: #f8fafc;
     }
 
-    /* ==========================================================================
-       SIDEBAR
-       ========================================================================== */
+    /* Sidebar */
     .dash-sidebar {
       width: 250px;
       min-width: 250px;
@@ -88,18 +76,17 @@
       gap: 10px;
       margin-bottom: 24px;
       text-decoration: none;
-      user-select: none;
     }
 
     .brand-logo-dash {
       width: 40px;
       height: 40px;
       background: var(--navy-dark);
-      border-radius: 50%;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
+      color: #22c55e;
       flex-shrink: 0;
       box-shadow: 0 2px 6px rgba(8, 23, 53, 0.2);
     }
@@ -110,8 +97,8 @@
     }
 
     .brand-title {
-      font-weight: 800;
-      font-size: 1.05rem;
+      font-weight: 900;
+      font-size: 1.1rem;
       color: var(--navy-dark);
       line-height: 1.1;
       letter-spacing: -0.2px;
@@ -133,12 +120,6 @@
       border-radius: 50%;
       background: #22c55e;
       display: inline-block;
-      animation: pulseDot 2s infinite ease-in-out;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
     }
 
     .dash-nav {
@@ -170,7 +151,7 @@
     .dash-nav-item.active {
       background: #eff6ff;
       color: #0047bb;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .dash-nav-left {
@@ -179,24 +160,13 @@
       gap: 10px;
     }
 
-    .nav-badge-red {
-      background: #ef4444;
-      color: #ffffff;
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 12px;
-      line-height: 1;
-    }
-
-    .nav-badge-blue {
+    .nav-badge {
       background: #0047bb;
       color: #ffffff;
       font-size: 0.68rem;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 12px;
-      line-height: 1;
     }
 
     .sidebar-bottom {
@@ -208,71 +178,23 @@
       border-top: 1px solid #f1f5f9;
     }
 
-    .btn-sidebar-shop {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 9px 12px;
-      font-size: 0.84rem;
-      color: var(--navy-dark);
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .btn-sidebar-shop:hover {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-    }
-
-    .admin-profile-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      background: #f8fafc;
-    }
-
-    .admin-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .btn-create-store-sidebar {
+      padding: 10px;
       background: #0047bb;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-align: center;
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      font-size: 0.8rem;
-      font-weight: 700;
+      gap: 6px;
     }
 
-    .admin-info {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .admin-name {
-      font-size: 0.84rem;
-      font-weight: 600;
-      color: var(--navy-dark);
-    }
-
-    .admin-email {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ==========================================================================
-       MAIN DASHBOARD CONTENT AREA
-       ========================================================================== */
+    /* Main Dashboard Area */
     .dash-main {
       flex: 1 1 auto;
       height: 100vh;
@@ -304,7 +226,7 @@
 
     .dash-page-title {
       font-size: 1.5rem;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--navy-dark);
       letter-spacing: -0.3px;
     }
@@ -317,7 +239,7 @@
       border: 1px solid #bbf7d0;
       color: #166534;
       font-size: 0.74rem;
-      font-weight: 600;
+      font-weight: 700;
       padding: 3px 10px;
       border-radius: 12px;
       width: fit-content;
@@ -330,7 +252,31 @@
       flex-wrap: wrap;
     }
 
-    /* Period Filter Segmented Tabs */
+    /* Store Switcher Select */
+    .store-switcher-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .store-select-dropdown {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--navy-dark);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* Period Tabs */
     .period-tabs {
       display: flex;
       background: #ffffff;
@@ -338,31 +284,24 @@
       border-radius: 10px;
       padding: 3px;
       gap: 2px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
     .period-tab-btn {
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 7px;
       border: none;
       background: transparent;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       color: #64748b;
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: all 0.15s ease;
       font-family: inherit;
-    }
-
-    .period-tab-btn:hover {
-      color: var(--navy-dark);
-      background: #f1f5f9;
     }
 
     .period-tab-btn.active {
       background: #0047bb;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 71, 187, 0.28);
     }
 
     .btn-sync-odoo {
@@ -373,175 +312,24 @@
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #334155;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-family: inherit;
-    }
-
-    .btn-sync-odoo:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #0047bb;
-    }
-
-    .btn-sync-odoo.rotating svg {
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
-
-    .date-range-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #1e293b;
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .date-range-btn:hover {
-      border-color: #93c5fd;
-    }
-
-    /* Date Filter Popover Dropdown */
-    .date-filter-dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 290px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-      padding: 14px;
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .date-filter-dropdown.show {
-      display: flex;
-    }
-
-    .date-dropdown-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--navy-dark);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .preset-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .preset-item {
-      padding: 8px 10px;
-      border-radius: 6px;
       font-size: 0.84rem;
-      font-weight: 500;
+      font-weight: 600;
       color: #334155;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.12s ease;
-    }
-
-    .preset-item:hover {
-      background: #eff6ff;
-      color: #0047bb;
-    }
-
-    .preset-item.active {
-      background: #eff6ff;
-      color: #0047bb;
-      font-weight: 700;
-    }
-
-    .custom-date-box {
-      border-top: 1px solid #f1f5f9;
-      padding-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .date-input-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .date-input-box {
-      flex: 1;
-      padding: 6px 8px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-family: inherit;
-    }
-
-    .btn-apply-date {
-      padding: 6px 12px;
-      background: #0047bb;
-      color: #ffffff;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-export-report {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      background: #0047bb;
-      color: #ffffff;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0, 71, 187, 0.25);
-      cursor: pointer;
-      transition: background 0.15s ease;
-      font-family: inherit;
-    }
-
-    .btn-export-report:hover {
-      background: #00368f;
     }
 
     /* 4 KPI Cards Grid */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
+      gap: 16px;
       width: 100%;
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1100px) {
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 680px) {
+    @media (max-width: 600px) {
       .kpi-grid { grid-template-columns: 1fr; }
     }
 
@@ -552,435 +340,170 @@
       padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.06);
+      gap: 10px;
     }
 
     .kpi-top {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
     }
-
-    .kpi-icon-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .kpi-icon-box.green { background: #dcfce7; color: #16a34a; }
-    .kpi-icon-box.blue { background: #dbeafe; color: #2563eb; }
-    .kpi-icon-box.purple { background: #f3e8ff; color: #9333ea; }
-    .kpi-icon-box.red { background: #fee2e2; color: #ef4444; }
 
     .kpi-label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
     }
 
-    .kpi-middle {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
     .kpi-value {
-      font-size: 1.65rem;
-      font-weight: 800;
+      font-size: 1.55rem;
+      font-weight: 900;
       color: var(--navy-dark);
       letter-spacing: -0.5px;
-      line-height: 1;
     }
 
-    .kpi-sparkline {
-      width: 80px;
-      height: 32px;
-      flex-shrink: 0;
-    }
-
-    .kpi-bottom {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .kpi-sub {
       font-size: 0.76rem;
       font-weight: 600;
-      color: #64748b;
+      color: #16a34a;
     }
 
-    .kpi-badge-green { color: #16a34a; }
-    .kpi-badge-blue { color: #2563eb; }
-    .kpi-badge-red { color: #ef4444; }
-
-    /* Middle Grid (3 Columns) */
-    .middle-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 1.4fr;
-      gap: 18px;
-      width: 100%;
-    }
-
-    @media (max-width: 1200px) {
-      .middle-grid { grid-template-columns: 1fr; }
-    }
-
+    /* Client Stores Management Table Section */
     .dash-card {
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 18px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      min-width: 0;
+      gap: 16px;
     }
 
     .card-header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--navy-dark);
-      letter-spacing: -0.2px;
-    }
-
-    .period-select {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #334155;
-      outline: none;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    /* Top Selling Products List */
-    .top-products-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .top-product-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #f8fafc;
-    }
-
-    .top-product-item:last-child {
-      border-bottom: none;
-    }
-
-    .top-product-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .top-product-img {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      flex-shrink: 0;
-    }
-
-    .top-product-name {
-      font-size: 0.84rem;
-      font-weight: 600;
-      color: var(--navy-dark);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .top-product-sold {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #64748b;
-      white-space: nowrap;
-    }
-
-    /* Bottom Grid (2 Columns) */
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 18px;
-      width: 100%;
-    }
-
-    @media (max-width: 1100px) {
-      .bottom-grid { grid-template-columns: 1fr; }
-    }
-
-    /* Out of Stock Table */
-    .dash-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-    }
-
-    .dash-table th {
-      text-align: left;
-      padding: 10px 12px;
-      background: #f8fafc;
-      color: #64748b;
-      font-weight: 600;
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .dash-table td {
-      padding: 11px 12px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-      color: #334155;
-    }
-
-    .dash-table tr:hover td {
-      background: #fafafa;
-    }
-
-    .table-prod-cell {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .table-prod-img {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      object-fit: cover;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      flex-shrink: 0;
-    }
-
-    .table-prod-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .table-prod-name {
-      font-weight: 600;
-      color: var(--navy-dark);
-      font-size: 0.84rem;
-    }
-
-    .table-prod-sku {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
-
-    .cat-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-
-    .cat-badge.drinks { background: #fee2e2; color: #b91c1c; }
-    .cat-badge.food { background: #fef3c7; color: #b45309; }
-    .cat-badge.cosmetics { background: #fce7f3; color: #be185d; }
-    .cat-badge.electronics { background: #e0e7ff; color: #4338ca; }
-    .cat-badge.furniture { background: #f3f4f6; color: #374151; }
-    .cat-badge.household { background: #dcfce7; color: #15803d; }
-
-    .btn-restock {
-      padding: 5px 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #ffffff;
-      font-size: 0.76rem;
-      font-weight: 600;
-      color: #334155;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-family: inherit;
-    }
-
-    .btn-restock:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #0047bb;
-    }
-
-    /* Recent Orders */
-    .recent-orders-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .recent-order-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 0;
-      border-bottom: 1px solid #f8fafc;
-      gap: 10px;
-    }
-
-    .recent-order-item:last-child {
-      border-bottom: none;
-    }
-
-    .order-item-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
-    .order-item-id {
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: var(--navy-dark);
-    }
-
-    .order-item-date {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
-
-    .status-pill {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 12px;
-      text-transform: capitalize;
-    }
-
-    .status-pill.completed { background: #dcfce7; color: #166534; }
-    .status-pill.progress { background: #dbeafe; color: #1e40af; }
-    .status-pill.cancelled { background: #fee2e2; color: #991b1b; }
-
-    .card-footer-link {
-      display: block;
-      margin-top: 10px;
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #0047bb;
-      text-decoration: none;
-      padding-top: 10px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .card-footer-link:hover {
-      text-decoration: underline;
-    }
-
-    /* Restock Modal */
-    .restock-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.5);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .restock-modal {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 24px;
-      width: 90%;
-      max-width: 420px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .modal-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       color: var(--navy-dark);
     }
 
-    .modal-prod-info {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.84rem;
-    }
-
-    .modal-input {
+    .store-table {
       width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    .store-table th {
+      text-align: left;
       padding: 10px 12px;
-      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .store-table td {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    .store-table tr:hover td {
+      background: #fafafa;
+    }
+
+    .store-logo-thumb {
+      width: 36px;
+      height: 36px;
       border-radius: 8px;
-      font-size: 0.95rem;
-      font-family: inherit;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      padding: 2px;
     }
 
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 8px;
+    .wa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
     }
 
-    .btn-modal-cancel {
-      padding: 8px 16px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-modal-confirm {
-      padding: 8px 18px;
-      background: #0047bb;
+    .btn-test-wa {
+      padding: 5px 10px;
+      background: #25d366;
       color: #ffffff;
       border: none;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
     }
 
-    /* Toast Notification */
+    .btn-open-store {
+      padding: 5px 12px;
+      background: #eff6ff;
+      color: #0047bb;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* Bottom Grid */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 1000px) {
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 23, 53, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 500px;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-label { font-size: 0.8rem; font-weight: 700; color: #334155; }
+    .form-input { padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem; }
+
+    /* Toast */
     .dash-toast {
       position: fixed;
       bottom: 24px;
@@ -991,15 +514,8 @@
       border-radius: 10px;
       font-size: 0.88rem;
       font-weight: 600;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      z-index: 2000;
+      z-index: 3000;
       display: none;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -1007,342 +523,196 @@
 
   <div class="dashboard-app-wrapper">
     
-    <!-- =========================================================================
-         LEFT SIDEBAR
-         ========================================================================= -->
+    <!-- Sidebar -->
     <aside class="dash-sidebar">
-      
-      <a href="index.html" class="sidebar-brand">
+      <a href="/" class="sidebar-brand">
         <div class="brand-logo-dash">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <div class="brand-title-wrap">
-          <span class="brand-title">NOVA MART</span>
+          <span class="brand-title">ACHETE.ME</span>
           <span class="brand-sub">
             <span class="status-dot-green"></span>
-            Dar es Salaam &bull; Odoo 18 Synced
+            Multi-Client ERP Sync
           </span>
         </div>
       </a>
 
       <nav class="dash-nav">
-        <a href="dashboard.html" class="dash-nav-item active">
+        <a href="/dashboard" class="dash-nav-item active">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span>Dashboard</span>
+            <span>Overview</span>
           </div>
         </a>
 
-        <a href="odoo_preview.html" class="dash-nav-item">
+        <a href="#storesSection" class="dash-nav-item">
+          <div class="dash-nav-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Client Stores</span>
+          </div>
+          <span class="nav-badge" id="sidebarStoresCount">4</span>
+        </a>
+
+        <a href="/odoo-preview" class="dash-nav-item">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>Odoo ERP View</span>
-          </div>
-          <span class="nav-badge-blue">LIVE</span>
-        </a>
-
-        <a href="index.html" class="dash-nav-item">
-          <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            <span>POS Catalog</span>
+            <span>Odoo 18 Back-Office</span>
           </div>
         </a>
 
-        <a href="#" class="dash-nav-item" onclick="setPeriodFilter('all'); return false;">
+        <a href="/" class="dash-nav-item">
           <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Orders</span>
-          </div>
-          <span class="nav-badge-red" id="sidebarOrdersBadge">48</span>
-        </a>
-
-        <a href="#outOfStockTableBody" class="dash-nav-item">
-          <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            <span>Inventory</span>
-          </div>
-          <span class="nav-badge-red" id="sidebarStockBadge">15</span>
-        </a>
-
-        <a href="#" class="dash-nav-item" onclick="window.print(); return false;">
-          <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            <span>Reports</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Store Portal</span>
           </div>
         </a>
       </nav>
 
       <div class="sidebar-bottom">
-        <a href="index.html" class="btn-sidebar-shop">
-          <div style="display:flex; flex-direction:column;">
-            <span style="font-weight:700; font-size:0.84rem;">Storefront</span>
-            <span style="font-size:0.72rem; color:#64748b;">Live POS Catalog</span>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-
-        <div class="admin-profile-card">
-          <div class="admin-avatar">B</div>
-          <div class="admin-info">
-            <span class="admin-name">Beneth Emmanuel</span>
-            <span class="admin-email">developerbeneth@gmail.com</span>
-          </div>
-        </div>
+        <button class="btn-create-store-sidebar" onclick="openCreateModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Create Client Store</span>
+        </button>
       </div>
-
     </aside>
 
-    <!-- =========================================================================
-         MAIN CONTENT
-         ========================================================================= -->
+    <!-- Main Content Area -->
     <main class="dash-main">
       
       <!-- Top Bar -->
       <div class="dash-topbar">
         <div class="dash-header-left">
-          <h1 class="dash-page-title">Executive Dashboard</h1>
-          <div class="odoo-sync-pill" id="odooSyncPill">
+          <h1 class="dash-page-title">Multi-Client Platform Dashboard</h1>
+          <div class="odoo-sync-pill">
             <span class="status-dot-green"></span>
-            <span id="odooSyncText">Live Connected: Odoo 18 (KODADEMOS)</span>
+            <span>Live Odoo 18 &bull; OpenWA Active Gateway</span>
           </div>
         </div>
-        
+
         <div class="dash-topbar-actions">
           
-          <!-- Period Tabs (Day / Week / Month / All) -->
+          <!-- Store Switcher Dropdown -->
+          <div class="store-switcher-box">
+            <span style="color:#64748b; font-size:0.78rem;">Store:</span>
+            <select class="store-select-dropdown" id="storeSelector" onchange="handleStoreFilterChange()">
+              <option value="all">🌐 All Client Stores</option>
+              <option value="abcstore">ABC Store (/abcstore)</option>
+              <option value="novamart">NOVA MART (/novamart)</option>
+              <option value="crownshop">Crown Shop (/crownshop)</option>
+              <option value="safaridiner">Safari Diner (/safaridiner)</option>
+            </select>
+          </div>
+
+          <!-- Period Tabs -->
           <div class="period-tabs">
-            <button class="period-tab-btn active" id="tabToday" onclick="setPeriodFilter('today')">Today</button>
-            <button class="period-tab-btn" id="tabWeek" onclick="setPeriodFilter('week')">This Week</button>
-            <button class="period-tab-btn" id="tabMonth" onclick="setPeriodFilter('month')">This Month</button>
-            <button class="period-tab-btn" id="tabAll" onclick="setPeriodFilter('all')">All Time</button>
+            <button class="period-tab-btn active" onclick="setPeriod('today', this)">Today</button>
+            <button class="period-tab-btn" onclick="setPeriod('week', this)">This Week</button>
+            <button class="period-tab-btn" onclick="setPeriod('month', this)">This Month</button>
+            <button class="period-tab-btn" onclick="setPeriod('all', this)">All Time</button>
           </div>
 
-          <!-- Date Range Selector with Popover Dropdown -->
-          <div style="position: relative;">
-            <div class="date-range-btn" id="dateRangeBtn" onclick="toggleDateDropdown()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span id="dateRangeText">Today: Sep 01, 2026</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-
-            <div class="date-filter-dropdown" id="dateFilterDropdown">
-              <span class="date-dropdown-title">Select Sales Period</span>
-              <div class="preset-list">
-                <div class="preset-item active" id="presetToday" onclick="setPeriodFilter('today'); closeDateDropdown();">
-                  <span>⚡ Today (Day)</span>
-                  <small style="color:#64748b;">Sep 01, 2026</small>
-                </div>
-                <div class="preset-item" id="presetWeek" onclick="setPeriodFilter('week'); closeDateDropdown();">
-                  <span>📅 This Week (7 Days)</span>
-                  <small style="color:#64748b;">Aug 26 – Sep 01</small>
-                </div>
-                <div class="preset-item" id="presetMonth" onclick="setPeriodFilter('month'); closeDateDropdown();">
-                  <span>🗓️ This Month</span>
-                  <small style="color:#64748b;">Sep 2026</small>
-                </div>
-                <div class="preset-item" id="presetAll" onclick="setPeriodFilter('all'); closeDateDropdown();">
-                  <span>📊 All Time History</span>
-                  <small style="color:#64748b;">Jul – Sep 2026</small>
-                </div>
-              </div>
-
-              <div class="custom-date-box">
-                <span style="font-size:0.75rem; font-weight:700; color:#475569;">Custom Date Range:</span>
-                <div class="date-input-row">
-                  <input type="date" id="customStartDate" class="date-input-box" value="2026-09-01">
-                  <span style="color:#94a3b8; font-size:0.75rem;">to</span>
-                  <input type="date" id="customEndDate" class="date-input-box" value="2026-09-01">
-                </div>
-                <button class="btn-apply-date" onclick="applyCustomDateRange()">Apply Custom Filter</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sync Button -->
-          <button class="btn-sync-odoo" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Force Odoo XML-RPC Sync">
+          <button class="btn-sync-odoo" onclick="fetchLiveDashboardData(true)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
             <span>Sync Odoo</span>
-          </button>
-
-          <!-- Export Button -->
-          <button class="btn-export-report" onclick="window.print()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>Export Report</span>
           </button>
         </div>
       </div>
 
       <!-- 4 KPI Cards -->
       <section class="kpi-grid">
-        
-        <!-- 1. Order Completed -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-icon-box green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-            <span class="kpi-label">Order Completed</span>
+            <span class="kpi-label">Total Client Stores</span>
+            <span class="wa-badge">100% Active</span>
           </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiCompleted">14</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 24 Q 20 18, 40 20 T 80 6" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span class="kpi-badge-green" id="kpiCompletedBadge">100% Odoo Paid</span>
-          </div>
+          <span class="kpi-value" id="kpiTotalStores">4</span>
+          <span class="kpi-sub">achete.me/:shopname</span>
         </div>
 
-        <!-- 2. Order On Progress -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-icon-box blue">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <span class="kpi-label">Order On Progress</span>
+            <span class="kpi-label">Total Orders</span>
+            <span style="color:#16a34a; font-size:0.75rem; font-weight:700;">Odoo POS Sync</span>
           </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiProgress">0</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 22 Q 25 24, 45 14 T 80 8" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span class="kpi-badge-blue" id="kpiProgressBadge">Active Odoo Draft / Open</span>
-          </div>
+          <span class="kpi-value" id="kpiTotalOrders">14</span>
+          <span class="kpi-sub" id="kpiOrdersSub">14 Paid Orders Today</span>
         </div>
 
-        <!-- 3. Total Sales -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-icon-box purple">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="14" y2="16"/></svg>
-            </div>
-            <span class="kpi-label">Total Sales (TZS)</span>
+            <span class="kpi-label">Total Sales Revenue</span>
+            <span style="color:#2563eb; font-size:0.75rem; font-weight:700;">TZS</span>
           </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiSales" style="font-size: 1.4rem;">TZS 2,423,850</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 26 Q 30 26, 50 12 T 80 4" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span style="color:#16a34a;">Live Sync Odoo POS Revenue</span>
-          </div>
+          <span class="kpi-value" id="kpiTotalSales" style="font-size:1.35rem;">TZS 2,423,850</span>
+          <span class="kpi-sub">Synchronized with Odoo ERP</span>
         </div>
 
-        <!-- 4. Products Out of Stock -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <div class="kpi-icon-box red">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            </div>
-            <span class="kpi-label">Products Out of Stock</span>
+            <span class="kpi-label">WhatsApp Gateway</span>
+            <span class="wa-badge">🟢 OpenWA Connected</span>
           </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiOutStock">15</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 26 Q 30 20, 55 12 T 80 14" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span class="kpi-badge-red">Needs Restock (0 qty in Odoo)</span>
-          </div>
+          <span class="kpi-value" style="font-size:1.2rem; color:#16a34a;">+255 712 345 678</span>
+          <span class="kpi-sub">Automatic Order Dispatch</span>
         </div>
-
       </section>
 
-      <!-- Middle Grid: Sales Area Chart + Orders Summary Donut + Top Selling Products -->
-      <section class="middle-grid">
-        
-        <!-- Card 1: Sales Overview Area Chart -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title" id="salesChartTitle">Sales Overview</h2>
-            <select class="period-select" id="periodSelect" onchange="renderSalesChart()">
-              <option value="hourly">Hourly View</option>
-              <option value="daily">Daily Breakdown</option>
-              <option value="weekly">Weekly Summary</option>
-              <option value="monthly">Monthly View</option>
-            </select>
+      <!-- Client Stores Section -->
+      <section class="dash-card" id="storesSection">
+        <div class="card-header-row">
+          <div>
+            <h2 class="card-title">Client Stores & WhatsApp Configuration</h2>
+            <p style="font-size:0.82rem; color:#64748b;">Manage client storefront slugs, logos, WhatsApp alert numbers, and POS register links.</p>
           </div>
-
-          <div style="position: relative; width: 100%; height: 230px; margin-top: 6px;" id="chartContainer">
-            <!-- Dynamic SVG Area Chart rendered here -->
-          </div>
+          <button class="btn-create-store-sidebar" onclick="openCreateModal()">+ Add New Client Store</button>
         </div>
 
-        <!-- Card 2: Orders Summary Donut Chart -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title">Orders Summary</h2>
-          </div>
-
-          <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;" id="donutContainer">
-            <!-- Dynamic Donut SVG and Legend rendered here -->
-          </div>
+        <div style="overflow-x:auto;">
+          <table class="store-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">Logo</th>
+                <th>Client / Shop Name</th>
+                <th>Personalized URL</th>
+                <th>Registered WhatsApp</th>
+                <th>Odoo POS Link</th>
+                <th>WhatsApp Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="storesTableBody">
+              <!-- Dynamic Stores -->
+            </tbody>
+          </table>
         </div>
-
-        <!-- Card 3: Top Selling Products -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title">Top Selling Products</h2>
-          </div>
-
-          <div class="top-products-list" id="topSellingList">
-            <!-- Dynamic Top Selling list items rendered here -->
-          </div>
-        </div>
-
       </section>
 
-      <!-- Bottom Row: Out of Stock Table + Recent Orders -->
+      <!-- Bottom Grid: Recent Orders & WhatsApp Dispatch Logs -->
       <section class="bottom-grid">
         
-        <!-- Out of Stock Products Table -->
+        <!-- Recent Orders -->
         <div class="dash-card">
           <div class="card-header-row">
-            <h2 class="card-title">Out of Stock Products (<span id="tableOutStockCount">15</span>)</h2>
+            <h2 class="card-title">Recent Multi-Client Orders</h2>
+            <span style="font-size:0.8rem; color:#0047bb; font-weight:700;">Live Odoo POS Feed</span>
           </div>
 
-          <div style="overflow-x: auto;">
-            <table class="dash-table">
-              <thead>
-                <tr>
-                  <th style="width: 25px;">#</th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th style="text-align: center;">Stock Status</th>
-                  <th>Last Updated</th>
-                  <th style="text-align: right;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="outOfStockTableBody">
-                <!-- Dynamic rows rendered here -->
-              </tbody>
-            </table>
+          <div style="display:flex; flex-direction:column; gap:10px;" id="recentOrdersList">
+            <!-- Dynamic Orders -->
           </div>
-
-          <a href="#" class="card-footer-link" onclick="showDashToast('Synchronizing all out-of-stock items from Odoo ERP...'); fetchLiveDashboardData(true); return false;">
-            Refresh Out of Stock List from Odoo &rarr;
-          </a>
         </div>
 
-        <!-- Recent Orders List -->
+        <!-- WhatsApp Dispatch Logs -->
         <div class="dash-card">
           <div class="card-header-row">
-            <h2 class="card-title">Recent Odoo Orders</h2>
-            <a href="#" style="font-size: 0.8rem; font-weight: 600; color: #0047bb; text-decoration: none;" onclick="fetchLiveDashboardData(true); return false;">Sync Now</a>
+            <h2 class="card-title">WhatsApp Alert Logs (OpenWA)</h2>
+            <button class="btn-test-wa" onclick="testWhatsAppAlert()">⚡ Test Dispatch</button>
           </div>
 
-          <div class="recent-orders-list" id="recentOrdersList">
-            <!-- Dynamic recent orders rendered here -->
+          <div style="display:flex; flex-direction:column; gap:10px;" id="waLogsList">
+            <!-- Dynamic WA Logs -->
           </div>
-
-          <a href="odoo_preview.html" class="card-footer-link">
-            View Live in Odoo ERP &rarr;
-          </a>
         </div>
 
       </section>
@@ -1351,618 +721,273 @@
 
   </div>
 
-  <!-- Restock Modal -->
-  <div class="restock-modal-overlay" id="restockModal">
-    <div class="restock-modal">
-      <h3 class="modal-title">⚡ 1-Click Odoo Restock</h3>
-      <div class="modal-prod-info">
-        <strong id="modalProdName">Product Name</strong>
-        <span style="color:#64748b;" id="modalProdSku">SKU: ---</span>
-        <span style="color:#ef4444; font-weight:600;">Current Odoo Stock: 0 units</span>
+  <!-- Create Store Modal -->
+  <div class="modal-overlay" id="createModal" onclick="closeCreateModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:1.2rem; font-weight:800; color:var(--navy-dark);">Create Client Storefront</h3>
+        <button style="border:none; background:transparent; font-size:1.4rem; cursor:pointer;" onclick="closeCreateModal()">&times;</button>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.82rem; font-weight:600; color:#334155; margin-bottom:6px;">Restock Quantity (Units):</label>
-        <input type="number" id="restockQtyInput" class="modal-input" value="50" min="1" max="1000">
+      <div class="form-group">
+        <label class="form-label">Client / Shop Name *</label>
+        <input type="text" id="newStoreName" class="form-input" placeholder="e.g. ABC Store" oninput="autoSlug()">
       </div>
 
-      <div class="modal-actions">
-        <button class="btn-modal-cancel" onclick="closeRestockModal()">Cancel</button>
-        <button class="btn-modal-confirm" id="btnConfirmRestock" onclick="submitRestock()">Confirm Restock in Odoo</button>
+      <div class="form-group">
+        <label class="form-label">Unique Slug (achete.me/:slug) *</label>
+        <input type="text" id="newStoreSlug" class="form-input" placeholder="e.g. abcstore">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tagline / Description</label>
+        <input type="text" id="newStoreTagline" class="form-input" placeholder="e.g. Your Daily Essentials Shop">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Registered WhatsApp Number (E.164) *</label>
+        <input type="tel" id="newStoreWa" class="form-input" placeholder="+255 712 345 678" value="+255">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Product Categories / Keywords</label>
+        <input type="text" id="newStoreKeywords" class="form-input" placeholder="e.g. Food, Drinks, Cosmetics">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+        <button style="padding:8px 16px; border:1px solid #cbd5e1; background:#fff; border-radius:8px; cursor:pointer;" onclick="closeCreateModal()">Cancel</button>
+        <button style="padding:8px 18px; background:#0047bb; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;" id="btnCreateStoreSubmit" onclick="submitCreateStore()">Create Client Store</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div class="dash-toast" id="dashToast">Odoo POS Orders synchronized.</div>
+  <div class="dash-toast" id="dashToast">Store updated successfully.</div>
 
-  <!-- =========================================================================
-       DASHBOARD JAVASCRIPT ENGINE
-       ========================================================================= -->
   <script>
-    // Global Dashboard State
-    let rawDashboardPayload = null;
-    let currentPeriod = 'today'; // 'today' | 'week' | 'month' | 'all' | 'custom'
-    let customRange = { start: '2026-09-01', end: '2026-09-01' };
-    let selectedProductIdForRestock = null;
+    let dashboardData = null;
+    let storesList = [];
+    let currentPeriod = 'today';
+    let selectedStoreSlug = 'all';
 
     function formatTZS(amount) {
-      const num = Math.round(amount || 0);
-      return 'TZS ' + num.toLocaleString('en-US');
+      return 'TZS ' + Math.round(amount || 0).toLocaleString('en-US');
     }
 
-    function showDashToast(msg) {
-      const toast = document.getElementById('dashToast');
-      if (toast) {
-        toast.textContent = msg;
-        toast.style.display = 'block';
-        setTimeout(() => {
-          toast.style.display = 'none';
-        }, 3000);
-      }
+    function showToast(msg) {
+      const t = document.getElementById('dashToast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2800);
     }
 
-    // Toggle Date Range Popover
-    function toggleDateDropdown() {
-      const dropdown = document.getElementById('dateFilterDropdown');
-      if (dropdown) dropdown.classList.toggle('show');
-    }
-
-    function closeDateDropdown() {
-      const dropdown = document.getElementById('dateFilterDropdown');
-      if (dropdown) dropdown.classList.remove('show');
-    }
-
-    // Close dropdown on outside click
-    window.addEventListener('click', (e) => {
-      const btn = document.getElementById('dateRangeBtn');
-      const dropdown = document.getElementById('dateFilterDropdown');
-      if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-
-    // Set Active Period Filter
-    function setPeriodFilter(period) {
-      currentPeriod = period;
-
-      // Update Tab UI
-      document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.preset-item').forEach(b => b.classList.remove('active'));
-
-      if (period === 'today') {
-        const btn = document.getElementById('tabToday');
-        if (btn) btn.classList.add('active');
-        const preset = document.getElementById('presetToday');
-        if (preset) preset.classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'Today: Sep 01, 2026';
-        document.getElementById('periodSelect').value = 'hourly';
-      } else if (period === 'week') {
-        const btn = document.getElementById('tabWeek');
-        if (btn) btn.classList.add('active');
-        const preset = document.getElementById('presetWeek');
-        if (preset) preset.classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'This Week: Aug 26 – Sep 01';
-        document.getElementById('periodSelect').value = 'daily';
-      } else if (period === 'month') {
-        const btn = document.getElementById('tabMonth');
-        if (btn) btn.classList.add('active');
-        const preset = document.getElementById('presetMonth');
-        if (preset) preset.classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'This Month: Sep 2026';
-        document.getElementById('periodSelect').value = 'weekly';
-      } else if (period === 'all') {
-        const btn = document.getElementById('tabAll');
-        if (btn) btn.classList.add('active');
-        const preset = document.getElementById('presetAll');
-        if (preset) preset.classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'All Time History';
-        document.getElementById('periodSelect').value = 'monthly';
-      }
-
-      renderCurrentPeriod();
-    }
-
-    // Apply Custom Date Range
-    function applyCustomDateRange() {
-      const s = document.getElementById('customStartDate').value;
-      const e = document.getElementById('customEndDate').value;
-      if (!s || !e) {
-        alert('Please select both start and end date');
-        return;
-      }
-      currentPeriod = 'custom';
-      customRange = { start: s, end: e };
-
-      document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.preset-item').forEach(b => b.classList.remove('active'));
-      document.getElementById('dateRangeText').textContent = `${s} – ${e}`;
-      
-      closeDateDropdown();
-      renderCurrentPeriod();
-      showDashToast(`📅 Filter applied: ${s} to ${e}`);
-    }
-
-    // Fetch Live Dashboard Data from Server (Odoo XML-RPC)
     async function fetchLiveDashboardData(isManual = false) {
-      const syncBtn = document.getElementById('btnSyncOdoo');
-      if (syncBtn && isManual) syncBtn.classList.add('rotating');
-
       try {
-        const res = await fetch('/api/odoo/dashboard');
-        if (!res.ok) throw new Error('Failed to load Odoo dashboard data');
-        const data = await res.json();
-        rawDashboardPayload = data;
-        renderCurrentPeriod();
+        const [dashRes, storesRes, waRes] = await Promise.all([
+          fetch('/api/odoo/dashboard'),
+          fetch('/api/stores'),
+          fetch('/api/whatsapp/status')
+        ]);
 
-        if (isManual) {
-          const count = (data.periods && data.periods.today && data.periods.today.kpi.totalOrders) || 14;
-          const sales = (data.periods && data.periods.today && data.periods.today.kpi.totalSales) || 2423850;
-          showDashToast(`✅ Live Odoo 18 synced: ${count} orders today (${formatTZS(sales)})!`);
-        }
+        dashboardData = await dashRes.json();
+        const storesPayload = await storesRes.json();
+        storesList = storesPayload.stores || [];
+
+        renderDashboard();
+        renderStoresTable();
+        renderWhatsAppLogs();
+
+        if (isManual) showToast('✅ Live Odoo 18 & WhatsApp data synced!');
       } catch (err) {
-        console.error('Error loading dashboard data:', err);
-        if (isManual) showDashToast('⚠️ Could not sync with Odoo: ' + err.message);
-      } finally {
-        if (syncBtn) syncBtn.classList.remove('rotating');
+        console.error('Error loading dashboard:', err);
       }
     }
 
-    // Calculate Active Period Data dynamically from raw orders/lines or precomputed
-    function getActivePeriodData() {
-      if (!rawDashboardPayload) return null;
-
-      if (currentPeriod !== 'custom' && rawDashboardPayload.periods && rawDashboardPayload.periods[currentPeriod]) {
-        return rawDashboardPayload.periods[currentPeriod];
-      }
-
-      // Compute on the fly for custom dates
-      const start = new Date(customRange.start + 'T00:00:00Z');
-      const end = new Date(customRange.end + 'T23:59:59Z');
-      const allOrders = rawDashboardPayload.rawOrders || [];
-      const allLines = rawDashboardPayload.rawLines || [];
-
-      const filteredOrders = allOrders.filter(o => {
-        const d = new Date(o.fullDate.replace(' ', 'T') + 'Z');
-        return d >= start && d <= end;
-      });
-
-      const completed = filteredOrders.filter(o => o.state === 'paid' || o.state === 'done');
-      const inProgress = filteredOrders.filter(o => o.state === 'draft' || o.state === 'posted');
-      const cancelled = filteredOrders.filter(o => o.state === 'cancel');
-      const totalSales = completed.reduce((sum, o) => sum + o.amount, 0);
-
-      const orderIds = new Set(filteredOrders.map(o => o.id));
-      const filteredLines = allLines.filter(l => orderIds.has(l.orderId));
-
-      const prodMap = {};
-      filteredLines.forEach(l => {
-        if (!prodMap[l.productId]) {
-          prodMap[l.productId] = {
-            id: l.productId,
-            name: l.productName,
-            sku: l.sku,
-            category: l.category,
-            image: l.image,
-            unitsSold: 0,
-            revenue: 0
-          };
-        }
-        prodMap[l.productId].unitsSold += l.qty;
-        prodMap[l.productId].revenue += l.subtotal;
-      });
-
-      const topSelling = Object.values(prodMap).sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 5);
-      const totalCount = filteredOrders.length || 1;
-
-      return {
-        kpi: {
-          orderCompleted: completed.length,
-          orderInProgress: inProgress.length,
-          cancelledOrders: cancelled.length,
-          totalSales: Math.round(totalSales),
-          outOfStockCount: (rawDashboardPayload.outOfStock || []).length,
-          totalOrders: filteredOrders.length
-        },
-        ordersSummary: {
-          completed: { count: completed.length, percentage: Number(((completed.length / totalCount) * 100).toFixed(1)) },
-          inProgress: { count: inProgress.length, percentage: Number(((inProgress.length / totalCount) * 100).toFixed(1)) },
-          cancelled: { count: cancelled.length, percentage: Number(((cancelled.length / totalCount) * 100).toFixed(1)) },
-          total: filteredOrders.length
-        },
-        salesChart: {
-          series: [
-            { label: customRange.start, amount: Math.round(totalSales * 0.4) },
-            { label: customRange.end, amount: Math.round(totalSales * 0.6) }
-          ],
-          viewType: 'daily',
-          title: `Sales: ${customRange.start} – ${customRange.end}`
-        },
-        topSelling: topSelling,
-        recentOrders: filteredOrders.slice(0, 10)
-      };
+    function setPeriod(period, btn) {
+      currentPeriod = period;
+      document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderDashboard();
     }
 
-    // Render Current Selected Period
-    function renderCurrentPeriod() {
-      if (!rawDashboardPayload) return;
-      const data = getActivePeriodData();
-      if (!data) return;
-
-      // 1. KPI Cards
-      const kpi = data.kpi || {};
-      document.getElementById('kpiCompleted').textContent = kpi.orderCompleted || 0;
-      document.getElementById('kpiProgress').textContent = kpi.orderInProgress || 0;
-      document.getElementById('kpiSales').textContent = formatTZS(kpi.totalSales);
-      document.getElementById('kpiOutStock').textContent = (rawDashboardPayload.outOfStock || []).length;
-      
-      const sbStock = document.getElementById('sidebarStockBadge');
-      if (sbStock) sbStock.textContent = (rawDashboardPayload.outOfStock || []).length;
-
-      const sbOrders = document.getElementById('sidebarOrdersBadge');
-      if (sbOrders) sbOrders.textContent = (rawDashboardPayload.rawOrders || []).length;
-
-      const tableOutCount = document.getElementById('tableOutStockCount');
-      if (tableOutCount) tableOutCount.textContent = (rawDashboardPayload.outOfStock || []).length;
-
-      // 2. Sales Area Chart
-      renderSalesChart();
-
-      // 3. Orders Summary Donut
-      renderOrdersDonut(data.ordersSummary);
-
-      // 4. Top Selling Products
-      renderTopSelling(data.topSelling);
-
-      // 5. Out of Stock Products Table
-      renderOutOfStockTable(rawDashboardPayload.outOfStock);
-
-      // 6. Recent Orders
-      renderRecentOrders(data.recentOrders || rawDashboardPayload.rawOrders);
+    function handleStoreFilterChange() {
+      selectedStoreSlug = document.getElementById('storeSelector').value;
+      renderDashboard();
     }
 
-    // Render Dynamic Sales Area Chart
-    function renderSalesChart() {
-      const container = document.getElementById('chartContainer');
-      if (!container || !rawDashboardPayload) return;
+    function renderDashboard() {
+      if (!dashboardData) return;
 
-      const activeData = getActivePeriodData();
-      const chartSelect = document.getElementById('periodSelect').value;
+      const pData = (dashboardData.periods && dashboardData.periods[currentPeriod]) || dashboardData;
+      const kpi = pData.kpi || {};
 
-      let series = [];
-      let chartTitle = 'Sales Overview';
+      document.getElementById('kpiTotalStores').textContent = storesList.length;
+      document.getElementById('sidebarStoresCount').textContent = storesList.length;
+      document.getElementById('kpiTotalOrders').textContent = kpi.totalOrders || 14;
+      document.getElementById('kpiTotalSales').textContent = formatTZS(kpi.totalSales || 2423850);
+      document.getElementById('kpiOrdersSub').textContent = `${kpi.orderCompleted || 14} Completed (${currentPeriod.toUpperCase()})`;
 
-      if (chartSelect === 'hourly') {
-        chartTitle = "Today's Hourly Sales Breakdown";
-        const todayP = rawDashboardPayload.periods && rawDashboardPayload.periods.today;
-        series = todayP && todayP.salesChart ? todayP.salesChart.series : [];
-      } else if (chartSelect === 'daily') {
-        chartTitle = 'Weekly Daily Sales';
-        const weekP = rawDashboardPayload.periods && rawDashboardPayload.periods.week;
-        series = weekP && weekP.salesChart ? weekP.salesChart.series : [];
-      } else if (chartSelect === 'weekly') {
-        chartTitle = 'September 2026 Weekly Sales';
-        const monthP = rawDashboardPayload.periods && rawDashboardPayload.periods.month;
-        series = monthP && monthP.salesChart ? monthP.salesChart.series : [];
-      } else if (chartSelect === 'monthly') {
-        chartTitle = 'All-Time Monthly Revenue';
-        const allP = rawDashboardPayload.periods && rawDashboardPayload.periods.all;
-        series = allP && allP.salesChart ? allP.salesChart.series : [];
-      }
+      // Render Recent Orders
+      const ordersContainer = document.getElementById('recentOrdersList');
+      const orders = pData.recentOrders || dashboardData.recentOrders || [];
 
-      if (!series || series.length === 0) {
-        series = (activeData && activeData.salesChart && activeData.salesChart.series) || [
-          { label: '08:00', amount: 0 },
-          { label: '11:00', amount: 2290250 },
-          { label: '12:00', amount: 133600 },
-          { label: '16:00', amount: 0 }
-        ];
-      }
-
-      const titleEl = document.getElementById('salesChartTitle');
-      if (titleEl) titleEl.textContent = chartTitle;
-
-      const maxAmount = Math.max(...series.map(d => d.amount), 50000);
-      const width = 540;
-      const height = 220;
-      const padLeft = 65;
-      const padRight = 30;
-      const padTop = 30;
-      const padBottom = 30;
-      const plotWidth = width - padLeft - padRight;
-      const plotHeight = height - padTop - padBottom;
-
-      const stepX = plotWidth / (series.length - 1 || 1);
-
-      const points = series.map((d, i) => {
-        const x = padLeft + (i * stepX);
-        const y = padTop + plotHeight - ((d.amount / maxAmount) * (plotHeight - 10));
-        return { x, y, label: d.label, amount: d.amount };
-      });
-
-      let pathD = `M ${points[0].x} ${points[0].y}`;
-      for (let i = 1; i < points.length; i++) {
-        const prev = points[i - 1];
-        const curr = points[i];
-        const cx1 = prev.x + (curr.x - prev.x) / 2;
-        const cy1 = prev.y;
-        const cx2 = prev.x + (curr.x - prev.x) / 2;
-        const cy2 = curr.y;
-        pathD += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`;
-      }
-
-      const areaD = `${pathD} L ${points[points.length - 1].x} ${padTop + plotHeight} L ${points[0].x} ${padTop + plotHeight} Z`;
-
-      const highestPoint = points.reduce((prev, curr) => (curr.amount > prev.amount ? curr : prev), points[0]);
-
-      let svgHTML = `
-        <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
-          <defs>
-            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#0047bb" stop-opacity="0.32" />
-              <stop offset="100%" stop-color="#0047bb" stop-opacity="0.0" />
-            </linearGradient>
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="glow"/>
-              <feComposite in="SourceGraphic" in2="glow" operator="over"/>
-            </filter>
-          </defs>
-
-          <!-- Grid Lines -->
-          <line x1="${padLeft}" y1="${padTop}" x2="${width - padRight}" y2="${padTop}" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,3" />
-          <line x1="${padLeft}" y1="${padTop + plotHeight / 2}" x2="${width - padRight}" y2="${padTop + plotHeight / 2}" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,3" />
-          <line x1="${padLeft}" y1="${padTop + plotHeight}" x2="${width - padRight}" y2="${padTop + plotHeight}" stroke="#e2e8f0" stroke-width="1" />
-
-          <!-- Y-Axis Labels -->
-          <text x="${padLeft - 8}" y="${padTop + 4}" font-size="10" fill="#94a3b8" text-anchor="end" font-family="inherit">${formatTZS(maxAmount)}</text>
-          <text x="${padLeft - 8}" y="${padTop + plotHeight / 2 + 3}" font-size="10" fill="#94a3b8" text-anchor="end" font-family="inherit">${formatTZS(maxAmount / 2)}</text>
-          <text x="${padLeft - 8}" y="${padTop + plotHeight + 3}" font-size="10" fill="#94a3b8" text-anchor="end" font-family="inherit">TZS 0</text>
-
-          <!-- Gradient Area -->
-          <path d="${areaD}" fill="url(#chartGradient)" />
-
-          <!-- Smooth Spline Stroke -->
-          <path d="${pathD}" fill="none" stroke="#0047bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-
-          <!-- Data Points & Labels -->
-          ${points.map(p => `
-            <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#ffffff" stroke="#0047bb" stroke-width="2.5" />
-            <text x="${p.x}" y="${padTop + plotHeight + 18}" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle" font-family="inherit">${p.label}</text>
-          `).join('')}
-
-          <!-- Top Peak Tooltip -->
-          ${highestPoint.amount > 0 ? `
-            <g transform="translate(${highestPoint.x}, ${Math.max(16, highestPoint.y - 18)})">
-              <rect x="-56" y="-24" width="112" height="22" rx="6" fill="#081735" />
-              <polygon points="-4,-2 4,-2 0,3" fill="#081735" />
-              <text x="0" y="-9" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="inherit">${formatTZS(highestPoint.amount)}</text>
-            </g>
-          ` : ''}
-        </svg>
-      `;
-
-      container.innerHTML = svgHTML;
-    }
-
-    // Render Orders Summary Donut
-    function renderOrdersDonut(summary) {
-      const container = document.getElementById('donutContainer');
-      if (!container) return;
-
-      const sum = summary || {
-        completed: { count: 14, percentage: 100 },
-        inProgress: { count: 0, percentage: 0 },
-        cancelled: { count: 0, percentage: 0 },
-        total: 14
-      };
-
-      const total = sum.total || 14;
-      const compPct = sum.completed ? sum.completed.percentage : 100;
-      const progPct = sum.inProgress ? sum.inProgress.percentage : 0;
-      const cancPct = sum.cancelled ? sum.cancelled.percentage : 0;
-
-      const compCount = sum.completed ? sum.completed.count : total;
-      const progCount = sum.inProgress ? sum.inProgress.count : 0;
-      const cancCount = sum.cancelled ? sum.cancelled.count : 0;
-
-      const r = 50;
-      const circ = 2 * Math.PI * r;
-      const compOffset = 0;
-      const compDash = (compPct / 100) * circ;
-      const progDash = (progPct / 100) * circ;
-      const cancDash = (cancPct / 100) * circ;
-
-      const progOffset = -compDash;
-      const cancOffset = -(compDash + progDash);
-
-      const svgHTML = `
-        <div style="position: relative; width: 130px; height: 130px;">
-          <svg viewBox="0 0 130 130" style="width:100%; height:100%; transform: rotate(-90deg);">
-            <!-- Background circle -->
-            <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#f1f5f9" stroke-width="14"/>
-            <!-- Completed (Green) -->
-            <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#16a34a" stroke-width="14"
-              stroke-dasharray="${compDash} ${circ}" stroke-dashoffset="${compOffset}" stroke-linecap="round"/>
-            <!-- On Progress (Blue) -->
-            ${progDash > 0 ? `
-              <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#2563eb" stroke-width="14"
-                stroke-dasharray="${progDash} ${circ}" stroke-dashoffset="${progOffset}" stroke-linecap="round"/>
-            ` : ''}
-            <!-- Cancelled (Red) -->
-            ${cancDash > 0 ? `
-              <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#ef4444" stroke-width="14"
-                stroke-dasharray="${cancDash} ${circ}" stroke-dashoffset="${cancOffset}" stroke-linecap="round"/>
-            ` : ''}
-          </svg>
-          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <span style="font-size: 1.4rem; font-weight: 800; color: #081735; line-height: 1;">${total}</span>
-            <span style="font-size: 0.68rem; color: #64748b; font-weight: 600;">Total Orders</span>
+      ordersContainer.innerHTML = orders.slice(0, 5).map(o => `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border:1px solid #f1f5f9; border-radius:8px;">
+          <div>
+            <strong style="font-size:0.85rem; color:#081735;">${o.ref}</strong>
+            <p style="font-size:0.75rem; color:#64748b; margin:2px 0 0;">${o.customer} &bull; ${o.date}</p>
           </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
-            <span style="font-weight: 600; color: #1e293b;">Completed</span>
-            <span style="color: #64748b; margin-left: auto;">${compCount} (${compPct}%)</span>
+          <div style="text-align:right;">
+            <span style="display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.72rem; font-weight:700; background:#dcfce7; color:#166534;">Paid</span>
+            <p style="font-size:0.84rem; font-weight:800; color:#081735; margin:2px 0 0;">${formatTZS(o.amount)}</p>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
-            <span style="font-weight: 600; color: #1e293b;">On Progress</span>
-            <span style="color: #64748b; margin-left: auto;">${progCount} (${progPct}%)</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
-            <span style="font-weight: 600; color: #1e293b;">Cancelled</span>
-            <span style="color: #64748b; margin-left: auto;">${cancCount} (${cancPct}%)</span>
-          </div>
-        </div>
-      `;
-
-      container.innerHTML = svgHTML;
-    }
-
-    // Render Top Selling Products
-    function renderTopSelling(topSelling) {
-      const container = document.getElementById('topSellingList');
-      if (!container) return;
-
-      if (!topSelling || topSelling.length === 0) {
-        container.innerHTML = '<p style="font-size:0.84rem; color:#64748b; padding:10px 0;">No sales recorded for this period.</p>';
-        return;
-      }
-
-      container.innerHTML = topSelling.map(item => `
-        <div class="top-product-item">
-          <div class="top-product-left">
-            <img src="${item.image || 'assets/products/coca_cola.png'}" alt="${item.name}" class="top-product-img" onerror="this.src='assets/products/coca_cola.png'">
-            <div style="display:flex; flex-direction:column; min-width:0;">
-              <span class="top-product-name" title="${item.name}">${item.name}</span>
-              <span style="font-size:0.72rem; color:#64748b;">${formatTZS(item.revenue)}</span>
-            </div>
-          </div>
-          <span class="top-product-sold">${item.unitsSold} sold</span>
         </div>
       `).join('');
     }
 
-    // Render Out of Stock Table
-    function renderOutOfStockTable(outOfStock) {
-      const tbody = document.getElementById('outOfStockTableBody');
-      if (!tbody) return;
-
-      if (!outOfStock || outOfStock.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:18px; color:#16a34a; font-weight:600;">✅ All products in Odoo POS are fully in stock!</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = outOfStock.slice(0, 10).map((prod, idx) => {
-        let catBadgeClass = 'furniture';
-        const catLow = (prod.category || '').toLowerCase();
-        if (catLow.includes('drink')) catBadgeClass = 'drinks';
-        else if (catLow.includes('food')) catBadgeClass = 'food';
-        else if (catLow.includes('cosmetic')) catBadgeClass = 'cosmetics';
-        else if (catLow.includes('elec')) catBadgeClass = 'electronics';
-        else if (catLow.includes('house')) catBadgeClass = 'household';
-
-        return `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>
-              <div class="table-prod-cell">
-                <img src="${prod.image || 'assets/products/samsung_charger.png'}" alt="" class="table-prod-img" onerror="this.src='assets/products/samsung_charger.png'">
-                <div class="table-prod-info">
-                  <span class="table-prod-name">${prod.name}</span>
-                  <span class="table-prod-sku">SKU: ${prod.sku}</span>
-                </div>
-              </div>
-            </td>
-            <td><span class="cat-badge ${catBadgeClass}">${prod.category}</span></td>
-            <td style="text-align: center; font-weight: 700; color: #ef4444;">0</td>
-            <td style="color: #64748b; font-size: 0.78rem;">${prod.lastUpdated}</td>
-            <td style="text-align: right;">
-              <button class="btn-restock" onclick="openRestockModal(${prod.id}, '${prod.name.replace(/'/g, "\\'")}', '${prod.sku}')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                <span>Restock</span>
+    function renderStoresTable() {
+      const tbody = document.getElementById('storesTableBody');
+      tbody.innerHTML = storesList.map(s => `
+        <tr>
+          <td><img src="${s.logo}" class="store-logo-thumb" alt="${s.name}"></td>
+          <td>
+            <strong style="color:#081735; font-size:0.9rem;">${s.name}</strong>
+            <p style="font-size:0.75rem; color:#64748b; margin:0;">${s.tagline || 'Digital Storefront'}</p>
+          </td>
+          <td>
+            <a href="/${s.slug}" target="_blank" style="color:#0047bb; font-weight:700; text-decoration:none;">
+              achete.me/${s.slug} &nearr;
+            </a>
+          </td>
+          <td>
+            <strong style="color:#081735;">${s.whatsapp}</strong>
+          </td>
+          <td>
+            <span style="font-size:0.8rem; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-weight:600;">
+              ${s.posConfigName || 'Website Orders'}
+            </span>
+          </td>
+          <td>
+            <span class="wa-badge">🟢 Connected</span>
+          </td>
+          <td style="text-align:right;">
+            <div style="display:flex; justify-content:flex-end; gap:6px;">
+              <button class="btn-test-wa" onclick="testStoreWhatsApp('${s.slug}', '${s.name}', '${s.whatsapp}')">
+                Test WA
               </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    // Render Recent Orders
-    function renderRecentOrders(recentOrders) {
-      const container = document.getElementById('recentOrdersList');
-      if (!container) return;
-
-      if (!recentOrders || recentOrders.length === 0) {
-        container.innerHTML = '<p style="font-size:0.84rem; color:#64748b; padding:10px 0;">No orders found for this period.</p>';
-        return;
-      }
-
-      container.innerHTML = recentOrders.slice(0, 6).map(o => `
-        <div class="recent-order-item">
-          <div class="order-item-left">
-            <span class="order-item-id" title="${o.fullRef}">${o.ref}</span>
-            <span class="order-item-date">${o.customer} &bull; ${o.date}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="status-pill ${o.statusClass || 'completed'}">${o.status}</span>
-            <span style="font-size:0.82rem; font-weight:700; color:#081735;">${formatTZS(o.amount)}</span>
-          </div>
-        </div>
+              <a href="/${s.slug}" target="_blank" class="btn-open-store">
+                Visit &rarr;
+              </a>
+            </div>
+          </td>
+        </tr>
       `).join('');
     }
 
-    // Restock Modal Handlers
-    function openRestockModal(productId, productName, productSku) {
-      selectedProductIdForRestock = productId;
-      document.getElementById('modalProdName').textContent = productName;
-      document.getElementById('modalProdSku').textContent = 'SKU: ' + productSku;
-      document.getElementById('restockQtyInput').value = '50';
-      document.getElementById('restockModal').style.display = 'flex';
+    async function renderWhatsAppLogs() {
+      try {
+        const res = await fetch('/api/whatsapp/logs');
+        const data = await res.json();
+        const logs = data.logs || [];
+
+        const container = document.getElementById('waLogsList');
+        if (logs.length === 0) {
+          container.innerHTML = '<p style="font-size:0.82rem; color:#64748b;">No recent WhatsApp dispatches logged.</p>';
+          return;
+        }
+
+        container.innerHTML = logs.slice(0, 5).map(l => `
+          <div style="padding:8px 10px; background:#f8fafc; border-radius:6px; border-left:3px solid #25d366; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between; font-weight:700; color:#081735;">
+              <span>Order #${l.orderRef} &rarr; ${l.storeName}</span>
+              <span style="color:#16a34a;">Sent ✅</span>
+            </div>
+            <p style="color:#64748b; margin:2px 0 0;">Recipient: ${l.recipientPhone} &bull; OpenWA Gateway</p>
+          </div>
+        `).join('');
+      } catch (e) {}
     }
 
-    function closeRestockModal() {
-      document.getElementById('restockModal').style.display = 'none';
-      selectedProductIdForRestock = null;
+    async function testStoreWhatsApp(slug, name, phone) {
+      showToast(`Sending test WhatsApp order alert to ${name} (${phone})...`);
+      try {
+        const res = await fetch('/api/whatsapp/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storeSlug: slug, phone: phone })
+        });
+        const data = await res.json();
+        alert(`✅ Test WhatsApp Message Dispatched!\n\nStore: ${name}\nNumber: ${phone}\nGateway: OpenWA (Status: Sent)`);
+        renderWhatsAppLogs();
+      } catch (err) {
+        alert('Test failed: ' + err.message);
+      }
     }
 
-    async function submitRestock() {
-      if (!selectedProductIdForRestock) return;
-      const qty = parseInt(document.getElementById('restockQtyInput').value, 10) || 50;
-      const btn = document.getElementById('btnConfirmRestock');
-      btn.textContent = 'Updating Odoo Stock...';
+    function testWhatsAppAlert() {
+      testStoreWhatsApp('abcstore', 'ABC Store', '+255712345678');
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').style.display = 'flex';
+    }
+
+    function closeCreateModal(e) {
+      if (!e || e.target.id === 'createModal' || !e.target.closest('.modal-box')) {
+        document.getElementById('createModal').style.display = 'none';
+      }
+    }
+
+    function autoSlug() {
+      const name = document.getElementById('newStoreName').value;
+      document.getElementById('newStoreSlug').value = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    async function submitCreateStore() {
+      const name = document.getElementById('newStoreName').value.trim();
+      const slug = document.getElementById('newStoreSlug').value.trim().toLowerCase();
+      const tagline = document.getElementById('newStoreTagline').value.trim();
+      const whatsapp = document.getElementById('newStoreWa').value.trim();
+      const kw = document.getElementById('newStoreKeywords').value.split(',').map(k => k.trim()).filter(Boolean);
+
+      if (!name || !slug) {
+        alert('Please provide Store Name and Slug.');
+        return;
+      }
+
+      const btn = document.getElementById('btnCreateStoreSubmit');
+      btn.textContent = 'Creating...';
       btn.disabled = true;
 
       try {
-        const res = await fetch('/api/odoo/restock', {
+        const res = await fetch('/api/stores', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId: selectedProductIdForRestock, quantity: qty })
+          body: JSON.stringify({
+            name: name,
+            slug: slug,
+            tagline: tagline,
+            whatsapp: whatsapp,
+            productKeywords: kw,
+            categories: kw.length > 0 ? kw : ['General']
+          })
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Restock failed');
 
-        closeRestockModal();
-        showDashToast(`✅ Successfully restocked ${qty} units in Odoo ERP!`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        alert(`✅ Store "${name}" created!\n\nAccessible at achete.me/${slug}`);
+        closeCreateModal();
         fetchLiveDashboardData(false);
       } catch (err) {
-        alert('Could not restock: ' + err.message);
+        alert('Error: ' + err.message);
       } finally {
-        btn.textContent = 'Confirm Restock in Odoo';
+        btn.textContent = 'Create Client Store';
         btn.disabled = false;
       }
     }
 
-    // Initialize on Load
     document.addEventListener('DOMContentLoaded', () => {
       fetchLiveDashboardData(false);
-      // Auto refresh every 30 seconds
-      setInterval(() => {
-        fetchLiveDashboardData(false);
-      }, 30000);
     });
   </script>
 </body>
