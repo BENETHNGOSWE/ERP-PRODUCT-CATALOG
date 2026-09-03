@@ -1,5 +1,41 @@
 [
   {
+    "id": 4,
+    "orderId": "NM-TEST-CLEAN-01",
+    "odooOrderId": 108,
+    "odooOrderName": "Order WEB-1788463680062",
+    "receiptNumber": "Order WEB-1788463680062",
+    "storeId": 8,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255712999888",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Beneth Customer",
+      "phone": "+255710459064",
+      "deliveryAddress": "Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": 18,
+        "name": "Azam Mango Juice 500ml",
+        "price": 1500,
+        "qty": 2,
+        "subtotal": 3000
+      }
+    ],
+    "itemCount": 2,
+    "subtotal": 3000,
+    "discount": 0,
+    "totalAmount": 3000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": "https://api.whatsapp.com/send?phone=255712999888&text=*NEW%20ORDER%20%23NM-TEST-CLEAN-01*%0A*Store%3A*%20Ben%20Store%0A%0A*Customer%3A*%20Beneth%20Customer%0A*Phone%3A*%20%2B255710459064%0A*Delivery%3A*%20Dar%20es%20Salaam%2C%20Tanzania%0A%0A*Items%20Ordered%3A*%0A%E2%80%A2%20Azam%20Mango%20Juice%20500ml%20%C3%97%202%20%E2%80%94%20TZS%203%2C000%0A%0A*TOTAL%20AMOUNT%3A%20TZS%203%2C000*%0A%0AAction%20Required%3A%20Please%20process%20and%20confirm%20this%20order.",
+    "createdAt": "2026-09-03T19:28:01.258Z",
+    "dateFormatted": "3 Sept 2026, 19:28"
+  },
+  {
     "id": 3,
     "orderId": "BEN-FINAL-88",
     "odooOrderId": 105,
