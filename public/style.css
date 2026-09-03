@@ -781,10 +781,14 @@ img {
 }
 
 .cart-heading-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--navy-dark);
-  gap: 8px;
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .cart-heading-link:hover {
@@ -792,6 +796,9 @@ img {
 }
 
 .btn-clear-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--text-muted);
   font-size: 0.84rem;
   font-weight: 500;
@@ -799,11 +806,14 @@ img {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-clear-cart:hover {
   color: var(--danger-red);
   border-color: var(--danger-red);
+  background: #fff5f5;
 }
 
 .cart-grid-layout {
@@ -916,8 +926,15 @@ img {
 
 .cart-delete-btn {
   color: #94a3b8;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
 }
 
 .cart-delete-btn:hover {
@@ -930,6 +947,9 @@ img {
 }
 
 .btn-outline-continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
   border: 1.5px solid var(--primary);
   border-radius: var(--radius-md);
@@ -937,6 +957,9 @@ img {
   font-size: 0.88rem;
   font-weight: 600;
   background: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-outline-continue:hover {
@@ -1050,6 +1073,10 @@ img {
 }
 
 .btn-place-order {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   padding: 13px;
   background: #0047bb;
@@ -1057,8 +1084,11 @@ img {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.3px;
+  border: none;
+  cursor: pointer;
   border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 71, 187, 0.28);
+  transition: all 0.2s ease;
 }
 
 .btn-place-order:hover {

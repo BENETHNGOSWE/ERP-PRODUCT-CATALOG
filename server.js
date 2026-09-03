@@ -22,6 +22,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Nested Static Asset Fallbacks for dynamic subpaths (e.g., /:slug/style.css, /:slug/store.js, /:slug/assets/*)
+app.get('/:slug/style.css', (req, res) => res.sendFile(path.join(__dirname, 'public', 'style.css')));
+app.get('/:slug/store.js', (req, res) => res.sendFile(path.join(__dirname, 'public', 'store.js')));
+app.use('/:slug/assets', express.static(path.join(__dirname, 'public', 'assets')));
+
 // =========================================================================
 // MULTI-CLIENT STORE API ROUTES
 // =========================================================================
