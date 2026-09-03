@@ -232,6 +232,40 @@ class StoreManager {
     return store;
   }
 
+  assignProductsToStore(idOrSlug, productIds) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    store.productIds = Array.from(new Set((productIds || []).map(Number)));
+    this.saveStores();
+    console.log(`[StoreManager] Assigned ${store.productIds.length} products to store "${store.name}"`);
+    return store;
+  }
+
+  addProductToStore(idOrSlug, productId) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    if (!Array.isArray(store.productIds)) store.productIds = [];
+    const numId = Number(productId);
+    if (!store.productIds.includes(numId)) {
+      store.productIds.push(numId);
+      this.saveStores();
+    }
+    return store;
+  }
+
+  removeProductFromStore(idOrSlug, productId) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    if (Array.isArray(store.productIds)) {
+      store.productIds = store.productIds.filter(id => Number(id) !== Number(productId));
+      this.saveStores();
+    }
+    return store;
+  }
+
   deleteStore(idOrSlug) {
     const index = this.stores.findIndex(s => s.id === Number(idOrSlug) || s.slug === idOrSlug);
     if (index === -1) {

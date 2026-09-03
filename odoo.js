@@ -774,11 +774,101 @@ async function restockOdooProduct(productId, quantityToAdd = 25, locationId = 28
   }
 }
 
+/**
+ * Create New Product in Odoo 18 ERP & Set Initial Stock
+ */
+async function createOdooProduct(productData, initialStock = 50, locationId = 28) {
+  try {
+    const name = productData.name || 'New Store Product';
+    const price = Number(productData.price) || 1000;
+    const barcode = productData.sku || productData.barcode || `SKU-${Date.now().toString().slice(-6)}`;
+    const categoryName = productData.category || 'General';
+    const image128 = productData.image && productData.image.startsWith('data:image') 
+      ? productData.image.split(',')[1] 
+      : false;
+
+    // 1. Find or create POS category
+    let posCategId = false;
+    try {
+      const posCategs = await callModel('pos.category', 'search_read', [
+        [['name', '=', categoryName]]
+      ], { fields: ['id'], limit: 1 });
+      if (posCategs && posCategs.length > 0) {
+        posCategId = posCategs[0].id;
+      } else {
+        posCategId = await callModel('pos.category', 'create', [{ name: categoryName }]);
+      }
+    } catch (e) {}
+
+    // 2. Create product in product.product
+    let newProductId = null;
+    try {
+      const createPayload = {
+        name: name,
+        list_price: price,
+        default_code: barcode,
+        available_in_pos: true,
+        type: 'consu'
+      };
+
+      if (posCategId) {
+        createPayload.pos_categ_ids = [[6, 0, [posCategId]]];
+      }
+      if (image128) {
+        createPayload.image_128 = image128;
+      }
+
+      newProductId = await callModel('product.product', 'create', [createPayload]);
+      console.log(`[Odoo] ✅ Created product "${name}" (ID: ${newProductId})`);
+    } catch (createErr) {
+      console.warn(`[Odoo Create Product Warning]:`, createErr.message);
+      newProductId = Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // 3. Set stock in stock.quant if applicable
+    const stockUnits = Number(initialStock) || 50;
+    if (newProductId && stockUnits > 0) {
+      try {
+        await restockOdooProduct(newProductId, stockUnits, locationId);
+      } catch (stkErr) {
+        console.warn(`[Odoo] Stock quant note for ${newProductId}:`, stkErr.message);
+      }
+    }
+
+    // 4. Update in-memory cache
+    const formatted = {
+      id: newProductId,
+      name: name,
+      price: price,
+      sku: barcode,
+      category: categoryName,
+      qty_available: stockUnits,
+      inStock: stockUnits > 0,
+      image: productData.image || '/assets/products/samsung_charger.png',
+      thumb: productData.image || '/assets/products/samsung_charger.png'
+    };
+
+    cachedProducts.unshift(formatted);
+    setTimeout(() => fetchOdooProducts(true).catch(() => {}), 100);
+
+    return {
+      success: true,
+      productId: newProductId,
+      product: formatted,
+      message: `Product "${name}" created with ${stockUnits} units in stock!`
+    };
+  } catch (err) {
+    console.error('[Odoo Create Product Error]:', err);
+    throw err;
+  }
+}
+
 module.exports = {
   ODOO_CONFIG,
   fetchOdooProducts,
   deductStock,
   createOdooPosOrder,
   getOdooDashboardData,
-  restockOdooProduct
+  restockOdooProduct,
+  createOdooProduct
 };

@@ -1,5 +1,41 @@
 [
   {
+    "id": 2,
+    "orderId": "BEN-ORD-01",
+    "odooOrderId": 100,
+    "odooOrderName": "Order WEB-1788462075106",
+    "receiptNumber": "Order WEB-1788462075106",
+    "storeId": 8,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255712999888",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Khalfan Said",
+      "phone": "+255 766 111 222",
+      "deliveryAddress": "Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": 183,
+        "name": "BenStore Wireless ANC Earbuds",
+        "price": 65000,
+        "qty": 3,
+        "subtotal": 195000
+      }
+    ],
+    "itemCount": 3,
+    "subtotal": 195000,
+    "discount": 0,
+    "totalAmount": 195000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": "https://wa.me/255712999888?text=%F0%9F%9B%8D%EF%B8%8F%20*NEW%20ORDER%20%23BEN-ORD-01*%0A%F0%9F%8F%AA%20*Store%3A*%20Ben%20Store%0A%0A%F0%9F%91%A4%20*Customer%3A*%20Khalfan%20Said%0A%F0%9F%93%9E%20*Phone%3A*%20%2B255%20766%20111%20222%0A%F0%9F%93%8D%20*Delivery%3A*%20Dar%20es%20Salaam%2C%20Tanzania%0A%0A%F0%9F%93%A6%20*Items%20Ordered%3A*%0A%E2%80%A2%20BenStore%20Wireless%20ANC%20Earbuds%20%C3%97%203%20%E2%80%94%20TZS%20195%2C000%0A%0A%F0%9F%92%B0%20*TOTAL%20AMOUNT%3A%20TZS%20195%2C000*%0A%0A%F0%9F%9A%80%20*Action%20Required%3A*%20Please%20process%20and%20confirm%20this%20order.",
+    "createdAt": "2026-09-03T19:01:16.227Z",
+    "dateFormatted": "3 Sept 2026, 19:01"
+  },
+  {
     "id": 1,
     "orderId": "TEST-ORD-99",
     "odooOrderId": 99,

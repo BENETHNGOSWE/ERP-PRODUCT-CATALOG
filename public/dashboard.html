@@ -1326,6 +1326,179 @@
     </div>
   </div>
 
+  <!-- Store Stock & Inventory Manager Modal -->
+  <div class="restock-modal-overlay" id="storeInventoryModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 800px; width: 95%; max-height: 92vh; overflow-y: auto; padding: 24px;">
+      
+      <!-- Store Header Banner -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #e2e8f0; padding-bottom:16px; margin-bottom:18px;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: #ffffff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+            <img id="invModalStoreLogo" src="/assets/products/logo.png" alt="Store Logo" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #081735; margin:0;" id="invModalStoreName">Store Name</h3>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 3px 0 0;">
+              URL: <a href="#" id="invModalStoreUrl" target="_blank" style="color: #0047bb; font-weight: 700; text-decoration: none;">achete.me/slug &nearr;</a> &bull; <span id="invModalProdCount" style="font-weight: 700; color: #16a34a;">0 products loaded</span>
+            </p>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; font-size:1.6rem; cursor:pointer; color:#64748b;" onclick="closeStoreInventoryModal()">&times;</button>
+      </div>
+
+      <!-- Inventory Tabs -->
+      <div style="display:flex; gap:8px; border-bottom:1.5px solid #e2e8f0; margin-bottom:18px; overflow-x:auto;">
+        <button class="period-tab-btn active" id="tabInvCurrent" onclick="switchInvTab('current')">📋 Store Products (<span id="tabCountBadge">0</span>)</button>
+        <button class="period-tab-btn" id="tabInvAdd" onclick="switchInvTab('add')">➕ Quick Add Product</button>
+        <button class="period-tab-btn" id="tabInvAssign" onclick="switchInvTab('assign')">🔍 Pick from Odoo ERP</button>
+        <button class="period-tab-btn" id="tabInvImport" onclick="switchInvTab('import')">📥 Bulk CSV Import</button>
+      </div>
+
+      <!-- TAB 1: CURRENT STORE INVENTORY -->
+      <div id="invViewCurrent">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:0.86rem; font-weight:700; color:#334155;">Products Loaded in this Store:</span>
+          <button onclick="switchInvTab('add')" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
+            + Add Another Product
+          </button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="out-of-stock-table" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th style="text-align:center;">Stock on Hand</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="storeInvTableBody">
+              <!-- Dynamically rendered rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: QUICK ADD NEW PRODUCT -->
+      <div id="invViewAdd" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px;">
+          <h4 style="font-size:0.96rem; font-weight:800; color:#081735; margin-bottom:12px;">Add Brand New Product &amp; Stock to this Store</h4>
+          
+          <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:12px;">
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Name *</label>
+              <input type="text" id="newProdName" class="modal-input" placeholder="e.g. Leather Executive Bag">
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Category *</label>
+              <input type="text" id="newProdCat" class="modal-input" placeholder="e.g. Bags, Electronics, Food">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-top:12px;">
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Sales Price (TZS) *</label>
+              <input type="number" id="newProdPrice" class="modal-input" placeholder="e.g. 45000">
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Initial Stock (Units) *</label>
+              <input type="number" id="newProdStock" class="modal-input" value="50" min="1">
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">SKU / Barcode</label>
+              <input type="text" id="newProdSku" class="modal-input" placeholder="e.g. BAG-001">
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Image (Upload Photo or Paste URL)</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="file" id="newProdImageFile" accept="image/*" style="display:none;" onchange="handleNewProdImageFile(event)">
+              <button type="button" onclick="document.getElementById('newProdImageFile').click()" style="background:#ffffff; color:#0f172a; font-size:0.8rem; font-weight:700; padding:8px 14px; border:1.5px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+                📁 Upload Photo
+              </button>
+              <input type="text" id="newProdImageUrl" class="modal-input" placeholder="Or paste image URL (https://...)" style="flex:1;">
+            </div>
+            <div id="newProdImageThumb" style="margin-top:8px; display:none;">
+              <img id="newProdImagePreview" src="" alt="Preview" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1;">
+            </div>
+          </div>
+
+          <div style="margin-top:18px; text-align:right;">
+            <button class="btn-modal-confirm" id="btnSubmitAddProd" onclick="submitQuickAddProduct()" style="padding:10px 20px;">
+              ➕ Save &amp; Add to Store Stock
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: PICK & ASSIGN FROM ODOO ERP -->
+      <div id="invViewAssign" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <input type="text" id="searchErpProds" class="modal-input" placeholder="🔍 Filter Odoo ERP products by name, category, SKU..." oninput="filterErpProdsList()" style="max-width:380px;">
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="toggleSelectAllErpProds(true)" style="background:#f1f5f9; color:#334155; font-size:0.78rem; font-weight:600; padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+              Select All
+            </button>
+            <button type="button" onclick="toggleSelectAllErpProds(false)" style="background:#f1f5f9; color:#334155; font-size:0.78rem; font-weight:600; padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+              Deselect All
+            </button>
+          </div>
+        </div>
+
+        <div style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <table class="out-of-stock-table" style="width:100%;">
+            <thead>
+              <tr>
+                <th style="width:30px;"><input type="checkbox" id="masterErpCheckbox" onchange="toggleSelectAllErpProds(this.checked)"></th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th style="text-align:center;">ERP Stock</th>
+              </tr>
+            </thead>
+            <tbody id="erpProdsAssignTableBody">
+              <!-- Dynamically rendered ERP products -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.82rem; color:#64748b;" id="erpSelectionSummary">0 products selected</span>
+          <button class="btn-modal-confirm" id="btnSubmitAssignProds" onclick="submitAssignErpProducts()" style="padding:10px 22px;">
+            💾 Save Assigned Products to Store
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 4: BULK CSV IMPORT -->
+      <div id="invViewImport" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px;">
+          <h4 style="font-size:0.96rem; font-weight:800; color:#081735; margin-bottom:6px;">Bulk Import Products &amp; Stock via CSV / Text</h4>
+          <p style="font-size:0.8rem; color:#64748b; margin-bottom:12px;">
+            Enter one product per line in the format: <code>Product Name, Price, Stock Units, Category, SKU</code>
+          </p>
+
+          <textarea id="bulkImportTextarea" class="modal-input" rows="8" placeholder="Azam Mango Juice 500ml, 1500, 100, Drinks, AZ-MG-500
+Mwanza Super Rice 25kg, 75000, 40, Food, MW-RC-25
+Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:monospace; font-size:0.84rem;"></textarea>
+
+          <div style="margin-top:14px; text-align:right;">
+            <button class="btn-modal-confirm" id="btnSubmitBulkImport" onclick="submitBulkImport()" style="padding:10px 22px;">
+              🚀 Import Inventory into Store
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="dash-toast" id="dashToast">Odoo POS Orders synchronized.</div>
 
@@ -1637,6 +1810,9 @@
           </td>
           <td style="text-align:right;">
             <div style="display:flex; gap:6px; justify-content:flex-end;">
+              <button class="btn-restock" style="background:#0047bb; color:#ffffff; font-weight:700;" onclick="openStoreInventoryModal(${s.id})">
+                📦 Load Stock
+              </button>
               <button class="btn-restock" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" onclick="openEditStoreModal(${s.id})">
                 ✏️ Edit
               </button>
@@ -1949,6 +2125,354 @@
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Could not delete store: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // STORE INVENTORY & STOCK MANAGER (ASSIGN, QUICK ADD, RESTOCK, IMPORT)
+    // =========================================================================
+    let activeInvStoreId = null;
+    let activeInvStoreData = null;
+    let activeInvErpProducts = [];
+    let activeInvNewProdImg = '';
+
+    async function openStoreInventoryModal(storeId) {
+      activeInvStoreId = storeId;
+      document.getElementById('storeInventoryModal').style.display = 'flex';
+      switchInvTab('current');
+      await loadStoreInventoryData();
+    }
+
+    function closeStoreInventoryModal() {
+      document.getElementById('storeInventoryModal').style.display = 'none';
+      activeInvStoreId = null;
+      activeInvStoreData = null;
+    }
+
+    function switchInvTab(tab) {
+      const tabs = ['current', 'add', 'assign', 'import'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tabInv' + t.charAt(0).toUpperCase() + t.slice(1));
+        const view = document.getElementById('invView' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (btn) btn.classList.toggle('active', t === tab);
+        if (view) view.style.display = (t === tab ? 'block' : 'none');
+      });
+    }
+
+    async function loadStoreInventoryData() {
+      if (!activeInvStoreId) return;
+      try {
+        const res = await fetch(`/api/stores/${activeInvStoreId}/inventory`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        activeInvStoreData = data.store;
+        activeInvErpProducts = data.allProducts || [];
+
+        // Update header info
+        document.getElementById('invModalStoreName').textContent = data.store.name;
+        document.getElementById('invModalStoreLogo').src = data.store.logo || '/assets/products/logo.png';
+        const urlEl = document.getElementById('invModalStoreUrl');
+        urlEl.href = `/${data.store.slug}`;
+        urlEl.textContent = `achete.me/${data.store.slug} ↗`;
+        
+        const prodCount = (data.storeProducts || []).length;
+        document.getElementById('invModalProdCount').textContent = `${prodCount} products loaded`;
+        document.getElementById('tabCountBadge').textContent = prodCount;
+
+        renderStoreInventoryTable(data.storeProducts || []);
+        renderErpAssignTable(activeInvErpProducts);
+      } catch (err) {
+        alert('Could not load store inventory: ' + err.message);
+      }
+    }
+
+    function renderStoreInventoryTable(products) {
+      const tbody = document.getElementById('storeInvTableBody');
+      if (!tbody) return;
+
+      if (products.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:36px 16px; color:#64748b;">
+              <div style="font-size:2rem; margin-bottom:8px;">📦</div>
+              <strong style="color:#081735; font-size:1rem; display:block; margin-bottom:4px;">No stock loaded yet for this store</strong>
+              <p style="font-size:0.84rem; margin-bottom:12px;">Add brand new items or assign products from your Odoo ERP inventory.</p>
+              <div style="display:flex; justify-content:center; gap:8px;">
+                <button onclick="switchInvTab('add')" style="background:#0047bb; color:#ffffff; padding:7px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer;">
+                  ➕ Quick Add Product
+                </button>
+                <button onclick="switchInvTab('assign')" style="background:#f1f5f9; color:#0f172a; padding:7px 14px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; cursor:pointer;">
+                  🔍 Pick from Odoo ERP
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const stock = p.qty_available !== undefined ? p.qty_available : 0;
+        const badgeColor = stock <= 0 ? '#ef4444' : (stock <= 5 ? '#f59e0b' : '#16a34a');
+        const badgeBg = stock <= 0 ? '#fee2e2' : (stock <= 5 ? '#fef3c7' : '#dcfce7');
+
+        return `
+          <tr>
+            <td>
+              <div class="table-prod-cell">
+                <img src="${p.thumb || p.image || '/assets/products/samsung_charger.png'}" class="table-prod-img" alt="" onerror="this.src='/assets/products/samsung_charger.png'">
+                <div class="table-prod-info">
+                  <span class="table-prod-name">${p.name}</span>
+                  <span class="table-prod-sku">SKU: ${p.sku || p.default_code || '---'}</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="cat-badge furniture">${p.category || 'General'}</span></td>
+            <td><strong style="color:#081735; font-size:0.86rem;">${formatTZS(p.price)}</strong></td>
+            <td style="text-align:center;">
+              <span style="font-size:0.8rem; font-weight:700; color:${badgeColor}; background:${badgeBg}; padding:3px 8px; border-radius:6px;">
+                ${stock} units
+              </span>
+            </td>
+            <td style="text-align:right;">
+              <div style="display:flex; gap:6px; justify-content:flex-end;">
+                <button class="btn-restock" onclick="openRestockModal(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.sku || ''}')">
+                  ⚡ Restock
+                </button>
+                <button onclick="removeProductFromStore(${p.id})" title="Remove from store" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:700;">
+                  ✕
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderErpAssignTable(products) {
+      const tbody = document.getElementById('erpProdsAssignTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = products.map(p => `
+        <tr>
+          <td>
+            <input type="checkbox" class="erp-prod-checkbox" data-id="${p.id}" ${p.isAssigned ? 'checked' : ''} onchange="updateErpSelectionSummary()">
+          </td>
+          <td>
+            <div class="table-prod-cell">
+              <img src="${p.thumb || p.image || '/assets/products/samsung_charger.png'}" class="table-prod-img" alt="" onerror="this.src='/assets/products/samsung_charger.png'">
+              <div class="table-prod-info">
+                <span class="table-prod-name">${p.name}</span>
+                <span class="table-prod-sku">SKU: ${p.sku || '---'}</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="cat-badge furniture">${p.category || 'General'}</span></td>
+          <td><strong style="color:#081735; font-size:0.84rem;">${formatTZS(p.price)}</strong></td>
+          <td style="text-align:center; font-weight:700; color:${(p.qty_available || 0) > 0 ? '#16a34a' : '#ef4444'};">
+            ${p.qty_available || 0}
+          </td>
+        </tr>
+      `).join('');
+
+      updateErpSelectionSummary();
+    }
+
+    function updateErpSelectionSummary() {
+      const checked = document.querySelectorAll('.erp-prod-checkbox:checked').length;
+      const el = document.getElementById('erpSelectionSummary');
+      if (el) el.textContent = `${checked} products selected for this store`;
+    }
+
+    function toggleSelectAllErpProds(selectAll) {
+      document.querySelectorAll('.erp-prod-checkbox').forEach(cb => {
+        if (cb.closest('tr').style.display !== 'none') {
+          cb.checked = selectAll;
+        }
+      });
+      updateErpSelectionSummary();
+    }
+
+    function filterErpProdsList() {
+      const q = document.getElementById('searchErpProds').value.toLowerCase().trim();
+      document.querySelectorAll('#erpProdsAssignTableBody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    function handleNewProdImageFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        activeInvNewProdImg = e.target.result;
+        document.getElementById('newProdImagePreview').src = activeInvNewProdImg;
+        document.getElementById('newProdImageThumb').style.display = 'block';
+        document.getElementById('newProdImageUrl').value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function submitQuickAddProduct() {
+      if (!activeInvStoreId) return;
+
+      const name = document.getElementById('newProdName').value.trim();
+      const price = parseFloat(document.getElementById('newProdPrice').value);
+      const stock = parseInt(document.getElementById('newProdStock').value, 10) || 50;
+      const category = document.getElementById('newProdCat').value.trim() || 'General';
+      const sku = document.getElementById('newProdSku').value.trim();
+      const urlImg = document.getElementById('newProdImageUrl').value.trim();
+
+      if (!name || isNaN(price) || price <= 0) {
+        alert('Please enter a valid Product Name and Sales Price.');
+        return;
+      }
+
+      const image = activeInvNewProdImg || urlImg || '/assets/products/samsung_charger.png';
+
+      const btn = document.getElementById('btnSubmitAddProd');
+      btn.textContent = 'Saving to Odoo ERP...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/stores/${activeInvStoreId}/quick-add-product`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, price, initialStock: stock, category, sku, image })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast(`✅ Added "${name}" with ${stock} units to store!`);
+        
+        // Reset form
+        document.getElementById('newProdName').value = '';
+        document.getElementById('newProdPrice').value = '';
+        document.getElementById('newProdStock').value = '50';
+        document.getElementById('newProdCat').value = '';
+        document.getElementById('newProdSku').value = '';
+        document.getElementById('newProdImageUrl').value = '';
+        document.getElementById('newProdImageFile').value = '';
+        document.getElementById('newProdImageThumb').style.display = 'none';
+        activeInvNewProdImg = '';
+
+        switchInvTab('current');
+        await loadStoreInventoryData();
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error adding product: ' + err.message);
+      } finally {
+        btn.textContent = '➕ Save & Add to Store Stock';
+        btn.disabled = false;
+      }
+    }
+
+    async function submitAssignErpProducts() {
+      if (!activeInvStoreId) return;
+
+      const checkedIds = Array.from(document.querySelectorAll('.erp-prod-checkbox:checked'))
+        .map(cb => Number(cb.getAttribute('data-id')));
+
+      const btn = document.getElementById('btnSubmitAssignProds');
+      btn.textContent = 'Updating Store...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/stores/${activeInvStoreId}/assign-products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productIds: checkedIds })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast(`✅ Assigned ${checkedIds.length} products to store!`);
+        switchInvTab('current');
+        await loadStoreInventoryData();
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error assigning products: ' + err.message);
+      } finally {
+        btn.textContent = '💾 Save Assigned Products to Store';
+        btn.disabled = false;
+      }
+    }
+
+    async function removeProductFromStore(productId) {
+      if (!activeInvStoreId) return;
+      if (!confirm('Remove this product from this store?')) return;
+
+      try {
+        const res = await fetch(`/api/stores/${activeInvStoreId}/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast('Product removed from store.');
+        await loadStoreInventoryData();
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Could not remove product: ' + err.message);
+      }
+    }
+
+    async function submitBulkImport() {
+      if (!activeInvStoreId) return;
+      const text = document.getElementById('bulkImportTextarea').value.trim();
+      if (!text) {
+        alert('Please paste products to import.');
+        return;
+      }
+
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const items = [];
+
+      for (const line of lines) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 2) {
+          const name = parts[0];
+          const price = parseFloat(parts[1]) || 1000;
+          const stock = parts[2] ? parseInt(parts[2], 10) : 50;
+          const category = parts[3] || 'General';
+          const sku = parts[4] || `SKU-${Math.floor(1000 + Math.random() * 9000)}`;
+          items.push({ name, price, stock, category, sku });
+        }
+      }
+
+      if (items.length === 0) {
+        alert('Could not parse products. Please format each line as: Name, Price, Stock, Category');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitBulkImport');
+      btn.textContent = `Importing ${items.length} items...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/stores/${activeInvStoreId}/import-stock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast(`🚀 Successfully imported ${data.importedCount} products!`);
+        document.getElementById('bulkImportTextarea').value = '';
+        switchInvTab('current');
+        await loadStoreInventoryData();
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error importing stock: ' + err.message);
+      } finally {
+        btn.textContent = '🚀 Import Inventory into Store';
+        btn.disabled = false;
       }
     }
 

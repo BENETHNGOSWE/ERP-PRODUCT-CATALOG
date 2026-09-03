@@ -103,6 +103,125 @@ app.delete('/api/stores/:id', (req, res) => {
   }
 });
 
+// 5b. Get Store Inventory Management Data (Assigned + Available ERP Products)
+app.get('/api/stores/:id/inventory', async (req, res) => {
+  try {
+    const store = !isNaN(Number(req.params.id)) ? stores.getStoreById(Number(req.params.id)) : stores.getStoreBySlug(req.params.id);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const odooResult = await odoo.fetchOdooProducts(false);
+    const allProducts = odooResult.products || [];
+
+    const assignedSet = new Set((store.productIds || []).map(Number));
+    const storeProducts = stores.filterProductsForStore(allProducts, store);
+
+    res.json({
+      success: true,
+      store: {
+        id: store.id,
+        name: store.name,
+        slug: store.slug,
+        whatsapp: store.whatsapp,
+        logo: store.logo,
+        productIds: store.productIds || []
+      },
+      storeProducts: storeProducts,
+      allProducts: allProducts.map(p => ({
+        ...p,
+        isAssigned: assignedSet.has(p.id) || storeProducts.some(sp => sp.id === p.id)
+      }))
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5c. Assign Selected Products from ERP to a Store
+app.post('/api/stores/:id/assign-products', async (req, res) => {
+  try {
+    const { productIds } = req.body;
+    if (!Array.isArray(productIds)) {
+      return res.status(400).json({ success: false, error: 'productIds must be an array' });
+    }
+    const updated = stores.assignProductsToStore(req.params.id, productIds);
+    res.json({
+      success: true,
+      message: `Assigned ${updated.productIds.length} products to "${updated.name}"!`,
+      store: updated
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 5d. Quick-Add a Brand New Product Specifically to This Store
+app.post('/api/stores/:id/quick-add-product', async (req, res) => {
+  try {
+    const productData = req.body;
+    if (!productData.name) {
+      return res.status(400).json({ success: false, error: 'Product name is required' });
+    }
+
+    const initialStock = Number(productData.initialStock) || 50;
+    const createResult = await odoo.createOdooProduct(productData, initialStock);
+
+    if (createResult.productId) {
+      stores.addProductToStore(req.params.id, createResult.productId);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Product "${productData.name}" created with ${initialStock} units and assigned to store!`,
+      productId: createResult.productId,
+      product: createResult.product
+    });
+  } catch (err) {
+    console.error('[Quick Add Product Error]:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5e. Remove a Product from a Store
+app.delete('/api/stores/:id/products/:productId', (req, res) => {
+  try {
+    const updated = stores.removeProductFromStore(req.params.id, req.params.productId);
+    res.json({
+      success: true,
+      message: 'Product unassigned from store.',
+      store: updated
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 5f. Bulk Import Products and Stock for a Store
+app.post('/api/stores/:id/import-stock', async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: 'No items provided for import' });
+    }
+
+    const addedIds = [];
+    for (const item of items) {
+      const created = await odoo.createOdooProduct(item, item.stock || 50);
+      if (created.productId) {
+        addedIds.push(created.productId);
+        stores.addProductToStore(req.params.id, created.productId);
+      }
+    }
+
+    res.json({
+      success: true,
+      importedCount: addedIds.length,
+      message: `Successfully imported ${addedIds.length} products to store!`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // 6. Get Products Filtered Strictly for a Client Store (Product Separation)
 app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
   try {

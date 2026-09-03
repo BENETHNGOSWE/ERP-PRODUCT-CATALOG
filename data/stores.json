@@ -206,5 +206,27 @@
     "productKeywords": [],
     "productIds": [],
     "createdDate": "2026-09-03"
+  },
+  {
+    "id": 8,
+    "name": "Ben Store",
+    "slug": "benstore",
+    "tagline": "Quality Electronics & Accessories",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" fill=\"white\" font-size=\"28\" font-weight=\"bold\" text-anchor=\"middle\" dominant-baseline=\"middle\">BEN</text></svg>",
+    "whatsapp": "+255712999888",
+    "status": "active",
+    "themeColor": "#0047bb",
+    "currency": "TZS",
+    "address": "Dar es Salaam, Tanzania",
+    "posConfigId": 26,
+    "posConfigName": "Website Orders",
+    "categories": [
+      "General"
+    ],
+    "productKeywords": [],
+    "productIds": [
+      183
+    ],
+    "createdDate": "2026-09-03"
   }
 ]

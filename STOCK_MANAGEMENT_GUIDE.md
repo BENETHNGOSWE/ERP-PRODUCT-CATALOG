@@ -1,151 +1,122 @@
-# 📦 Complete Guide: How to Add Products & Stock to Your Store
+# 📦 Complete Guide: How to Load Stock for a Specific Client Store (e.g., `benstore`)
 
-This guide explains step-by-step how to add products and stock to any client store on **Achete.me / NOVA Catalog**, and how customers see them live on their personalized storefront (`achete.me/{shop_slug}`).
+When you create a new store (like **Ben Store** at `achete.me/benstore`), the store starts completely empty with `0` products as a safety guard.
+
+This guide explains how to **load stock specifically for that store** so that **only that store displays its own inventory**, with complete product isolation from all other stores.
 
 ---
 
-## 🏗️ How the System Architecture Works
+## 🎯 Overview: The 3 Ways to Load Stock into Your Store
+
+In the Admin Dashboard (**`https://catalog.kodatechnologies.co.tz/dashboard`**), click the blue **`📦 Load Stock`** button next to your store in the **Registered Stores** table.
+
+A dedicated modal will open with 3 options:
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                           1. ODOO 18 ERP                                 │
-│  • Products & Pricing (Sales Price, Barcode/SKU, Image)                  │
-│  • Inventory / Stock on Hand (stock.quant / qty_available)               │
-│  • POS Configurations (Website Orders, Mangi shop, Min Market, etc.)     │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     │ (Real-time XML-RPC Sync)
-                                     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                  2. ACHETE.ME STORE PLATFORM & ENGINE                    │
-│  • Multi-Client Isolation (Product Separation by Store)                  │
-│  • Client Branding (Uploaded Logo, Name, WhatsApp Number)                │
-│  • Stock Guard (Empty state until inventory is loaded)                   │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     │
-           ┌─────────────────────────┴─────────────────────────┐
-           ▼                                                   ▼
-┌───────────────────────────────────────┐   ┌───────────────────────────────────────┐
-│       3. CUSTOMER STOREFRONT          │   │      4. ADMIN EXECUTIVE DASHBOARD     │
-│   `achete.me/{shop_slug}`             │   │   `catalog.../dashboard`              │
-│  • Live stock badges & prices         │   │  • 1-Click Restock Tool               │
-│  • Instant cart & checkout            │   │  • Edit Store & Logo Upload           │
-│  • Automated WhatsApp Order Alert     │   │  • Order History & Stock Monitor      │
-└───────────────────────────────────────┘   └───────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│         📦 STORE INVENTORY & STOCK MANAGER: Ben Store (achete.me/benstore)  │
+├────────────────────────────────────────────────────────────────────────────┤
+│  [ 📋 Store Products ]  [ ➕ Quick Add Product ]  [ 🔍 Pick from Odoo ]    │
+│                                                                            │
+│  Option 1: ➕ Quick Add New Product                                        │
+│  • Create brand new items specifically for Ben Store                       │
+│  • Set Sales Price, Initial Stock (e.g. 50 units), Category, Photo         │
+│                                                                            │
+│  Option 2: 🔍 Pick & Assign from Odoo ERP Catalog                          │
+│  • Check the boxes for products that belong to Ben Store                   │
+│  • Instantly links existing inventory with live ERP quantities             │
+│                                                                            │
+│  Option 3: 📥 Bulk CSV Import                                              │
+│  • Paste: Name, Price, Stock Units, Category, SKU                          │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Step-by-Step Flow: Adding Stock to Your Store
+## 🚀 Step-by-Step Instructions
 
-You have **two easy methods** to add products and manage stock:
-- **Method A:** Using the **NOVA Admin Dashboard (1-Click Restock & Store Editor)**
-- **Method B:** Adding New Products & Inventory directly in **Odoo 18 ERP**
+### 🔹 Method 1: Quick-Add a New Product Specifically for Your Store (Most Common)
 
----
+1. Open the Admin Dashboard: **`https://catalog.kodatechnologies.co.tz/dashboard`**.
+2. Scroll to the **Registered Stores & Catalogues** table.
+3. Next to your store (e.g. **Ben Store**), click **`📦 Load Stock`**.
+4. In the modal, click the **`➕ Quick Add Product`** tab.
+5. Fill in the product details:
+   - **Product Name:** e.g., *BenStore Wireless ANC Earbuds*
+   - **Category:** e.g., *Electronics*
+   - **Sales Price (TZS):** e.g., *65,000*
+   - **Initial Stock (Units):** e.g., *50*
+   - **Product Photo:** Click **📁 Upload Photo** (or paste an image URL).
+   - **SKU / Barcode:** e.g., *BEN-ANC-01*
+6. Click **`➕ Save & Add to Store Stock`**.
 
-### 🔹 METHOD A: Using the Admin Dashboard (Fastest)
-
-#### Step 1: Open the Admin Dashboard
-1. Navigate to: **`https://catalog.kodatechnologies.co.tz/dashboard`**
-2. In the top-right corner, click **⚡ Sync Odoo** to ensure you have the latest data.
-
-#### Step 2: Configure Your Store & Link Keywords
-1. Scroll down to **Registered Stores & Catalogues**.
-2. Click **`✏️ Edit`** next to your store.
-3. In the **Product Keywords / Allowed Categories** box:
-   - Add keywords matching the products you sell (e.g. `juice, water, rice, soap, oil`).
-   - *(Note: If this box is left empty, the store remains protected in "Stock Not Loaded" state).*
-4. Attach or update your **Store Logo** (click **📁 Attach Logo File** to upload from your phone/computer).
-5. Click **Save Changes**.
-
-#### Step 3: Restock Products with 1-Click
-1. In the **Out of Stock Products / Inventory Monitor** table:
-2. Find the product you want to add stock for.
-3. Click the green **⚡ Restock** button next to that product.
-4. Enter the units (e.g. `50` or `100`).
-5. Click **Confirm Restock in Odoo**.
-6. The system instantly updates Odoo ERP and your store!
+**Result:**
+- The item is saved into Odoo ERP with 50 units in stock.
+- The item is **strictly assigned to Ben Store**.
+- Opening `https://catalog.kodatechnologies.co.tz/benstore` immediately shows the product with `50 in stock`.
+- Client B (e.g., NOVA MART or ABC Store) will **never** see Ben Store's items.
 
 ---
 
-### 🔹 METHOD B: Adding New Products & Stock in Odoo 18 ERP
+### 🔹 Method 2: Pick & Assign Existing Products from Odoo ERP
 
-If you want to create brand new items with custom barcodes, images, and prices:
+If you already have products in Odoo ERP and want to allocate them to your store:
 
-#### Step 1: Log in to Odoo 18 ERP
-- **URL:** `https://postest.kodatechnologies.co.tz`
-- **Database:** `KODADEMOS`
+1. In the **`📦 Load Stock`** modal for your store, click the **`🔍 Pick from Odoo ERP`** tab.
+2. Use the search bar to find products (e.g. search *Juice*, *Charger*, *Oil*, *Shirt*).
+3. Check the checkboxes for each product that belongs to this store.
+4. Click **`💾 Save Assigned Products to Store`**.
 
-#### Step 2: Create a New Product
-1. Go to: **Point of Sale ➔ Products ➔ Products** (or **Inventory ➔ Products**).
-2. Click **New** (Create).
-3. Fill in the product details:
-   - **Product Name:** e.g., *Mwanza Super Rice 25kg*
-   - **Sales Price:** e.g., *75,000 TZS*
-   - **Product Type:** *Goods / Storable Product* (`is_storable = True`)
-   - **Internal Reference / Barcode:** e.g., *RICE-MW-25KG*
-   - **Point of Sale Tab:** Check `Available in POS` ✅
-   - **Product Image:** Upload the photo of the product.
-4. Click **Save**.
-
-#### Step 3: Add On-Hand Stock (Quantity)
-1. Inside the product form, click the **Update Quantity** smart button (top right).
-2. Set the **Counted Quantity** (e.g., `50` units).
-3. Click **Apply**.
-4. *(Alternative)*: Go to **Inventory ➔ Physical Inventory / Operations ➔ Inventory Adjustment**, set quantity, and click **Apply**.
+**Result:**
+- Only the checked products will appear in your store's catalog.
+- The live stock on hand from Odoo ERP is displayed.
 
 ---
 
-## 👁️ How the Customer Sees Your Stock Live
+### 🔹 Method 3: Bulk Import Inventory via CSV / Text
 
-When you add stock, here is what happens for the customer:
+If you have a list of products to load all at once:
 
-1. **Customer opens your link:** `https://catalog.kodatechnologies.co.tz/{your_store_slug}` (e.g., `achete.me/abcstore`).
-2. **Dynamic Header Branding:** Your uploaded **Store Logo**, shop name, and "Open" badge render at the top.
-3. **Stock Badges:**
-   - **In Stock:** Displays green badge (`50 in stock`).
-   - **Low Stock:** Displays amber badge (`Only 3 left`) when stock is &le; 5 units.
-   - **Out of Stock:** Displays red badge (`Out of stock`) and disables add-to-cart.
-   - **No Stock Loaded Yet:** If a new store has 0 products assigned, it shows a clean message with a direct WhatsApp contact button.
+1. In the **`📦 Load Stock`** modal, click the **`📥 Bulk CSV Import`** tab.
+2. Paste your products, one per line:
+   ```csv
+   BenStore Wireless ANC Earbuds, 65000, 50, Electronics, BEN-01
+   Fast USB-C Braided Cable, 15000, 100, Accessories, BEN-02
+   Magnetic Phone Car Mount, 25000, 30, Accessories, BEN-03
+   ```
+3. Click **`🚀 Import Inventory into Store`**.
 
 ---
 
-## 🔄 What Happens When a Customer Places an Order?
+## 🔄 How Stock Deduction Works When Orders Are Placed
 
-1. **Cart & Mobile Checkout:** The customer adds items to cart and enters their phone number at `/{your_store_slug}/cart`.
-2. **Instant Stock Deduction:**
-   - The product's on-hand stock decreases immediately by the ordered quantity in memory and in Odoo 18 (`stock.quant`).
-   - Subsequent visitors instantly see the updated, reduced stock.
-3. **Order Recording in ERP & Dashboard:**
-   - A POS Order is created and marked **Paid** in Odoo 18 (`Point of Sale ➔ Orders ➔ Orders`).
-   - The order is logged in `data/orders.json` and appears under **Recent Orders** on your Admin Dashboard.
-4. **Automated WhatsApp Notification:**
-   - The server automatically sends a formatted WhatsApp order summary to **your registered WhatsApp number**:
+1. **Customer shops on your store:** Customer adds items to cart on `https://catalog.kodatechnologies.co.tz/benstore` and checks out.
+2. **Instant Stock Deduction:** 
+   - If 3 units are ordered, the on-hand stock drops from `50` &rarr; `47` units in real time.
+   - All subsequent visitors see `47 in stock`.
+3. **Automated WhatsApp Notification:**
+   - The server instantly sends the complete order summary directly to **your store's registered WhatsApp number**:
      ```
-     🛍️ NEW ORDER #NM-4821
-     🏪 Store: ABC Store
+     🛍️ NEW ORDER #BEN-ORD-01
+     🏪 Store: Ben Store
 
-     👤 Customer: John (+255 712 345 678)
-     📞 Phone: +255 712 345 678
-     📍 Delivery: Masaki, Dar es Salaam
+     👤 Customer: Khalfan Said (+255 766 111 222)
+     📞 Phone: +255 766 111 222
+     📍 Delivery: Dar es Salaam, Tanzania
 
      📦 Items Ordered:
-     • Mwanza Super Rice 25kg × 1 — TZS 75,000
-     • Azam Mango Juice 500ml × 2 — TZS 3,000
+     • BenStore Wireless ANC Earbuds × 3 — TZS 195,000
 
-     💰 TOTAL AMOUNT: TZS 78,000
+     💰 TOTAL AMOUNT: TZS 195,000
      ```
-5. **Confirmation Receipt:** The customer gets a confirmation screen with Order #, receipt summary, and a direct **"📲 Chat with Store on WhatsApp"** button.
+4. **Order History:** The order is recorded in your Admin Dashboard under **Recent Orders**.
 
 ---
 
-## 📋 Quick Reference Table
+## ⚡ Restocking Existing Products
 
-| Goal | Where to do it | Action |
-| :--- | :--- | :--- |
-| **Create New Store & Attach Logo** | Dashboard (`/dashboard`) | Click **+ Add Store**, attach logo from computer, set WhatsApp number and slug. |
-| **Edit Store Details or Change Logo** | Dashboard (`/dashboard`) | Click **✏️ Edit** in the Stores table, upload new logo or update WhatsApp. |
-| **Quick Restock Existing Product** | Dashboard (`/dashboard`) | Click **⚡ Restock** in Out of Stock table, enter quantity & confirm. |
-| **Add Brand New Product** | Odoo 18 ERP | **Point of Sale ➔ Products ➔ New**, check `Available in POS`, click **Update Quantity**. |
-| **View Live Storefront** | Browser | Open `https://catalog.kodatechnologies.co.tz/{slug}` |
-| **View Live Orders** | Dashboard / Odoo | Open `/dashboard` or in Odoo: **Point of Sale ➔ Orders ➔ Orders**. |
+When a product runs low or out of stock:
+1. Open the **`📦 Load Stock`** modal for your store (or check the **Out of Stock** table on the dashboard).
+2. Click the **`⚡ Restock`** button next to that product.
+3. Enter the restock quantity (e.g., `50` units).
+4. Click **Confirm Restock** — the store catalog updates immediately!
