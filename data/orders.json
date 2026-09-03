@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "orderId": "TEST-ORD-99",
+    "odooOrderId": 99,
+    "odooOrderName": "Order WEB-1788460610789",
+    "receiptNumber": "Order WEB-1788460610789",
+    "storeId": 7,
+    "storeSlug": "tanzanitefashion",
+    "storeName": "Tanzanite Fashion",
+    "storeWhatsapp": "+255714000111",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Amina Juma",
+      "phone": "+255 755 888 999",
+      "deliveryAddress": "Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": 18,
+        "name": "Azam Mango Juice 500ml",
+        "price": 1500,
+        "qty": 2,
+        "subtotal": 3000
+      }
+    ],
+    "itemCount": 2,
+    "subtotal": 3000,
+    "discount": 0,
+    "totalAmount": 3000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": "https://wa.me/255714000111?text=%F0%9F%9B%8D%EF%B8%8F%20*NEW%20ORDER%20%23TEST-ORD-99*%0A%F0%9F%8F%AA%20*Store%3A*%20Tanzanite%20Fashion%0A%0A%F0%9F%91%A4%20*Customer%3A*%20Amina%20Juma%0A%F0%9F%93%9E%20*Phone%3A*%20%2B255%20755%20888%20999%0A%F0%9F%93%8D%20*Delivery%3A*%20Dar%20es%20Salaam%2C%20Tanzania%0A%0A%F0%9F%93%A6%20*Items%20Ordered%3A*%0A%E2%80%A2%20Azam%20Mango%20Juice%20500ml%20%C3%97%202%20%E2%80%94%20TZS%203%2C000%0A%0A%F0%9F%92%B0%20*TOTAL%20AMOUNT%3A%20TZS%203%2C000*%0A%0A%F0%9F%9A%80%20*Action%20Required%3A*%20Please%20process%20and%20confirm%20this%20order.",
+    "createdAt": "2026-09-03T18:36:51.459Z",
+    "dateFormatted": "3 Sept 2026, 18:36"
+  }
+]

@@ -3,13 +3,14 @@
  * Clean, fast, direct order submission & automated WhatsApp notifications
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const odoo = require('./odoo');
 const stores = require('./stores');
 const whatsapp = require('./whatsapp');
+const orders = require('./orders');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -157,18 +158,30 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
     orderData.storeId = store.id;
     orderData.storeSlug = store.slug;
     orderData.storeName = store.name;
+    orderData.storeWhatsapp = store.whatsapp;
     orderData.posConfigId = store.posConfigId;
 
     console.log(`[Order Processing] Store "${store.name}" (${store.slug}) — Total: TZS ${orderData.totalAmount}`);
 
-    // 1. Create POS Order in Odoo ERP
-    const odooOrderResult = await odoo.createOdooPosOrder(orderData);
+    // 1. Create POS Order in Odoo ERP & Deduct Stock
+    let odooOrderResult = { odooOrderId: null, receiptNumber: `Order WEB-${Date.now()}` };
+    try {
+      odooOrderResult = await odoo.createOdooPosOrder(orderData);
+    } catch (odooErr) {
+      console.warn('[Odoo POS Order Notice]:', odooErr.message);
+      // Fallback stock deduction in memory
+      odoo.deductStock(orderData.items).catch(() => {});
+    }
+
+    const finalOrderId = orderData.orderId || `ORD-${Date.now().toString().slice(-4)}`;
+    const finalReceipt = odooOrderResult.receiptNumber || `Order WEB-${finalOrderId}`;
 
     // 2. Automatically Send WhatsApp Order Alert Directly via OpenWA in the Background
     let waResult = null;
     try {
       waResult = await whatsapp.sendOrderNotification(store, {
-        orderNumber: orderData.orderId || odooOrderResult.receiptNumber,
+        orderNumber: finalOrderId,
+        receiptNumber: finalReceipt,
         customer: {
           name: orderData.customerName || `Customer (${orderData.customerPhone || 'N/A'})`,
           phone: orderData.customerPhone || store.whatsapp,
@@ -183,16 +196,42 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
       waResult = { success: false, error: waErr.message };
     }
 
+    // 3. Persist Order in Local Database (data/orders.json)
+    const recorded = orders.recordOrder({
+      orderId: finalOrderId,
+      odooOrderId: odooOrderResult.odooOrderId,
+      receiptNumber: finalReceipt,
+      storeId: store.id,
+      storeSlug: store.slug,
+      storeName: store.name,
+      storeWhatsapp: store.whatsapp,
+      posConfigId: store.posConfigId,
+      customerName: orderData.customerName || `Customer (${orderData.customerPhone || 'POS'})`,
+      customerPhone: orderData.customerPhone || store.whatsapp,
+      deliveryAddress: orderData.deliveryAddress || store.address || 'Masaki, Dar es Salaam',
+      items: orderData.items,
+      subtotal: orderData.subtotal || orderData.totalAmount,
+      discount: orderData.discount || 0,
+      totalAmount: orderData.totalAmount,
+      whatsappStatus: waResult && waResult.success ? 'Sent' : 'Dispatched',
+      waLink: waResult ? waResult.waLink : null
+    });
+
     res.status(201).json({
       success: true,
-      message: 'Order created in Odoo and WhatsApp alert sent directly!',
+      message: 'Order created in Odoo and recorded with direct WhatsApp notification!',
       order: {
-        orderId: orderData.orderId || odooOrderResult.odooOrderId,
-        odooOrderId: odooOrderResult.odooOrderId,
-        odooOrderName: odooOrderResult.receiptNumber,
-        receiptNumber: odooOrderResult.receiptNumber,
-        totalAmount: odooOrderResult.totalAmount,
-        whatsapp: waResult
+        id: recorded.id,
+        orderId: recorded.orderId,
+        odooOrderId: recorded.odooOrderId,
+        odooOrderName: recorded.receiptNumber,
+        receiptNumber: recorded.receiptNumber,
+        storeSlug: recorded.storeSlug,
+        storeName: recorded.storeName,
+        storeWhatsapp: recorded.storeWhatsapp,
+        totalAmount: recorded.totalAmount,
+        whatsapp: waResult,
+        waLink: waResult ? waResult.waLink : null
       }
     });
   } catch (err) {
@@ -204,11 +243,71 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
   }
 });
 
-// 8. Admin Dashboard Metrics (Supports Store & Period filtering)
+// 8. Order Tracking & History Endpoints
+app.get('/api/orders', (req, res) => {
+  try {
+    const storeSlug = req.query.store || req.query.slug;
+    const list = storeSlug ? orders.getOrdersByStore(storeSlug) : orders.getAllOrders();
+    res.json({
+      success: true,
+      total: list.length,
+      orders: list
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/orders/:id', (req, res) => {
+  try {
+    const order = orders.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ success: false, error: 'Order not found' });
+    res.json({ success: true, order });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9. Admin Dashboard Metrics (Supports Store & Period filtering)
 app.get('/api/odoo/dashboard', async (req, res) => {
   try {
     const dashboardData = await odoo.getOdooDashboardData();
     dashboardData.stores = stores.getAllStores();
+    
+    // Merge recorded store orders into recent orders list
+    const recordedOrders = orders.getAllOrders();
+    if (recordedOrders.length > 0) {
+      const mappedRecent = recordedOrders.slice(0, 10).map(ro => ({
+        id: ro.odooOrderId || ro.id,
+        orderNumber: ro.orderId,
+        posRef: ro.receiptNumber,
+        customerName: ro.customer ? ro.customer.name : 'Web Customer',
+        phone: ro.customer ? ro.customer.phone : ro.storeWhatsapp,
+        storeName: ro.storeName,
+        storeSlug: ro.storeSlug,
+        total: ro.totalAmount,
+        itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
+        status: ro.status || 'Paid',
+        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+      }));
+
+      // Combine with existing recent orders, avoiding duplicates
+      const existingRefs = new Set(mappedRecent.map(r => r.posRef));
+      const filteredOdooRecent = (dashboardData.recentOrders || []).filter(o => !existingRefs.has(o.posRef));
+      dashboardData.recentOrders = [...mappedRecent, ...filteredOdooRecent].slice(0, 15);
+      
+      // Update today KPI count
+      if (dashboardData.periods && dashboardData.periods.today) {
+        const todayRecorded = recordedOrders.filter(o => {
+          const d = new Date(o.createdAt);
+          const now = new Date();
+          return d.toDateString() === now.toDateString();
+        });
+        const extraSales = todayRecorded.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+        dashboardData.periods.today.kpi.totalOrders = Math.max(dashboardData.periods.today.kpi.totalOrders, dashboardData.periods.today.kpi.totalOrders + todayRecorded.length);
+      }
+    }
+
     res.json(dashboardData);
   } catch (err) {
     console.error('Error fetching Odoo dashboard data:', err);

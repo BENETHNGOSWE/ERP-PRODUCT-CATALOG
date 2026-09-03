@@ -248,6 +248,15 @@ async function deductStock(items, locationId = 28) {
     const results = [];
     for (const item of items) {
       const prodId = await resolveOdooProductId(item);
+      const itemQty = Number(item.quantity || item.qty) || 1;
+
+      // Update in-memory product cache immediately so subsequent catalog loads reflect reduced stock
+      const cached = cachedProducts.find(p => p.id === prodId);
+      if (cached) {
+        cached.qty_available = Math.max(0, (cached.qty_available || 0) - itemQty);
+        cached.inStock = cached.qty_available > 0;
+      }
+
       if (!prodId) {
         console.warn(`[Stock Deduct] Could not find Odoo ID for item:`, item.name);
         continue;
@@ -274,7 +283,7 @@ async function deductStock(items, locationId = 28) {
       if (quants && quants.length > 0) {
         const quant = quants[0];
         const currentQty = quant.quantity || 0;
-        const newQty = Math.max(0, currentQty - (item.quantity || 1));
+        const newQty = Math.max(0, currentQty - itemQty);
         await callModel('stock.quant', 'write', [
           [quant.id],
           { quantity: newQty }

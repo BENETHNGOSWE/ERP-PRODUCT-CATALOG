@@ -1227,43 +1227,101 @@
     </div>
   </div>
 
-  <!-- Create Client Store Modal -->
-  <div class="restock-modal-overlay" id="createStoreModal">
-    <div class="restock-modal" style="max-width: 480px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 class="modal-title">Create Client Store</h3>
-        <button style="border:none; background:transparent; font-size:1.4rem; cursor:pointer;" onclick="closeCreateStoreModal()">&times;</button>
+  <!-- Create / Edit Client Store Modal -->
+  <div class="restock-modal-overlay" id="storeModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+        <h3 class="modal-title" id="storeModalTitle" style="font-size: 1.15rem; font-weight: 800; color: #081735;">Create Client Store</h3>
+        <button style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeStoreModal()">&times;</button>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Client / Shop Name *</label>
-        <input type="text" id="newStoreName" class="modal-input" placeholder="e.g. ABC Store" oninput="autoGenerateSlug()">
+      <input type="hidden" id="storeModalId" value="">
+
+      <!-- Logo Attachment & Live Preview Section -->
+      <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ffffff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+          <img id="storeModalLogoPreview" src="/assets/products/logo.png" alt="Logo Preview" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div style="flex: 1;">
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Logo (Attach Image or Paste URL)</label>
+          <div style="display:flex; gap: 8px; align-items:center;">
+            <input type="file" id="storeModalLogoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
+            <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              📁 Attach Logo File
+            </button>
+            <button type="button" onclick="resetStoreLogo()" style="background:#f1f5f9; color:#475569; font-size:0.78rem; font-weight:600; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+              Reset
+            </button>
+          </div>
+          <input type="text" id="storeModalLogoUrl" class="modal-input" placeholder="Or paste image URL (https://... or data:image...)" style="margin-top: 8px; font-size: 0.8rem; padding: 6px 10px;" oninput="handleLogoUrlInput()">
+        </div>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Slug (URL Path) *</label>
-        <input type="text" id="newStoreSlug" class="modal-input" placeholder="e.g. abcstore">
-        <span style="font-size:0.75rem; color:#0047bb; font-weight:600; margin-top:3px; display:block;" id="storeUrlPreview">URL: achete.me/abcstore</span>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Client / Shop Name *</label>
+          <input type="text" id="storeModalName" class="modal-input" placeholder="e.g. ABC Store" oninput="autoGenerateSlug()">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Slug (URL Path) *</label>
+          <input type="text" id="storeModalSlug" class="modal-input" placeholder="e.g. abcstore">
+        </div>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Logo (Image URL or Upload)</label>
-        <input type="text" id="newStoreLogoUrl" class="modal-input" placeholder="https://example.com/logo.png or data:image/png;base64,...">
+      <span style="font-size:0.76rem; color:#0047bb; font-weight:700; margin: 4px 0 12px; display:block;" id="storeUrlPreview">URL: achete.me/shopname</span>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Registered WhatsApp Number *</label>
+          <input type="tel" id="storeModalWhatsapp" class="modal-input" placeholder="+255 712 345 678" value="+255">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Odoo POS Configuration</label>
+          <select id="storeModalPosConfig" class="modal-input" style="background:#ffffff;">
+            <option value="26">Website Orders</option>
+            <option value="3">Mangi shop</option>
+            <option value="4">Min Market</option>
+            <option value="1">Restaurant</option>
+          </select>
+        </div>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Registered WhatsApp Number (E.164) *</label>
-        <input type="tel" id="newStoreWa" class="modal-input" placeholder="+255 712 345 678" value="+255">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Status</label>
+          <select id="storeModalStatus" class="modal-input" style="background:#ffffff;">
+            <option value="active">Active (Open)</option>
+            <option value="inactive">Inactive (Closed)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Tagline / Subtitle</label>
+          <input type="text" id="storeModalTagline" class="modal-input" placeholder="e.g. Daily Groceries & Snacks">
+        </div>
       </div>
 
-      <div>
-        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Assigned Categories / Keywords</label>
-        <input type="text" id="newStoreKw" class="modal-input" placeholder="e.g. Food, Drinks, Cosmetics">
+      <div style="margin-top: 12px;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Physical Location / Address</label>
+        <input type="text" id="storeModalAddress" class="modal-input" placeholder="e.g. Masaki, Dar es Salaam, Tanzania">
       </div>
 
-      <div class="modal-actions">
-        <button class="btn-modal-cancel" onclick="closeCreateStoreModal()">Cancel</button>
-        <button class="btn-modal-confirm" id="btnSubmitCreateStore" onclick="submitNewClientStore()">Create Store</button>
+      <div style="margin-top: 12px;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Keywords / Allowed Categories (Comma-separated)</label>
+        <input type="text" id="storeModalKeywords" class="modal-input" placeholder="e.g. food, drinks, oil, rice (Leave empty until stock is loaded)">
+        <p style="font-size:0.74rem; color:#64748b; margin-top:3px;">Leave keywords empty if store stock has not yet been loaded.</p>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" id="btnDeleteStore" onclick="deleteCurrentStore()" style="display:none; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:8px 14px; border-radius:6px; font-weight:700; font-size:0.82rem; cursor:pointer;">
+          🗑️ Delete Store
+        </button>
+        <div style="display:flex; gap:10px; margin-left:auto;">
+          <button class="btn-modal-cancel" onclick="closeStoreModal()">Cancel</button>
+          <button class="btn-modal-confirm" id="btnSubmitStoreModal" onclick="submitStoreForm()">Save Store</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1556,7 +1614,7 @@
 
       tbody.innerHTML = storesList.map(s => `
         <tr>
-          <td><img src="${s.logo || 'assets/products/logo.png'}" class="store-table-thumb" alt="${s.name}" onerror="this.src='assets/products/logo.png'"></td>
+          <td><img src="${s.logo || '/assets/products/logo.png'}" class="store-table-thumb" alt="${s.name}" onerror="this.src='/assets/products/logo.png'"></td>
           <td>
             <strong style="color:#081735; font-size:0.88rem;">${s.name}</strong>
             <p style="font-size:0.74rem; color:#64748b; margin:0;">${s.tagline || 'Client Storefront'}</p>
@@ -1572,11 +1630,20 @@
               ${s.posConfigName || 'Website Orders'}
             </span>
           </td>
-          <td><span class="wa-badge-pill">🟢 Connected</span></td>
+          <td>
+            <span class="wa-badge-pill" style="${s.status === 'inactive' ? 'background:#fef2f2; color:#ef4444; border-color:#fca5a5;' : ''}">
+              ${s.status === 'inactive' ? '🔴 Inactive' : '🟢 Active & Connected'}
+            </span>
+          </td>
           <td style="text-align:right;">
-            <a href="/${s.slug}" target="_blank" class="btn-restock" style="text-decoration:none;">
-              Open Shop &rarr;
-            </a>
+            <div style="display:flex; gap:6px; justify-content:flex-end;">
+              <button class="btn-restock" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" onclick="openEditStoreModal(${s.id})">
+                ✏️ Edit
+              </button>
+              <a href="/${s.slug}" target="_blank" class="btn-restock" style="text-decoration:none;">
+                Visit &rarr;
+              </a>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -1679,63 +1746,209 @@
       }
     }
 
-    // Create Store Modal
+    // =========================================================================
+    // UNIFIED STORE MANAGEMENT (CREATE, EDIT, ATTACH LOGO, DELETE)
+    // =========================================================================
+    let currentStoreLogoData = '';
+    let currentEditStoreId = null;
+
     function openCreateStoreModal() {
-      document.getElementById('createStoreModal').style.display = 'flex';
+      currentEditStoreId = null;
+      document.getElementById('storeModalTitle').textContent = 'Create Client Store';
+      document.getElementById('storeModalId').value = '';
+      document.getElementById('storeModalName').value = '';
+      document.getElementById('storeModalSlug').value = '';
+      document.getElementById('storeModalWhatsapp').value = '+255 ';
+      document.getElementById('storeModalPosConfig').value = '26';
+      document.getElementById('storeModalStatus').value = 'active';
+      document.getElementById('storeModalTagline').value = '';
+      document.getElementById('storeModalAddress').value = 'Dar es Salaam, Tanzania';
+      document.getElementById('storeModalKeywords').value = '';
+      document.getElementById('storeModalLogoUrl').value = '';
+      document.getElementById('storeModalLogoFileInput').value = '';
+      document.getElementById('btnDeleteStore').style.display = 'none';
+      document.getElementById('btnSubmitStoreModal').textContent = 'Create Store';
+      
+      currentStoreLogoData = '';
+      document.getElementById('storeModalLogoPreview').src = '/assets/products/logo.png';
+      document.getElementById('storeUrlPreview').textContent = 'URL: achete.me/shopname';
+      
+      document.getElementById('storeModal').style.display = 'flex';
     }
 
-    function closeCreateStoreModal() {
-      document.getElementById('createStoreModal').style.display = 'none';
+    function openEditStoreModal(storeId) {
+      const store = storesList.find(s => s.id === storeId);
+      if (!store) return;
+
+      currentEditStoreId = store.id;
+      document.getElementById('storeModalTitle').textContent = `Edit Store: ${store.name}`;
+      document.getElementById('storeModalId').value = store.id;
+      document.getElementById('storeModalName').value = store.name || '';
+      document.getElementById('storeModalSlug').value = store.slug || '';
+      document.getElementById('storeModalWhatsapp').value = store.whatsapp || '+255 ';
+      document.getElementById('storeModalPosConfig').value = store.posConfigId || '26';
+      document.getElementById('storeModalStatus').value = store.status || 'active';
+      document.getElementById('storeModalTagline').value = store.tagline || '';
+      document.getElementById('storeModalAddress').value = store.address || '';
+      document.getElementById('storeModalKeywords').value = (store.productKeywords || []).join(', ');
+      
+      currentStoreLogoData = store.logo || '';
+      document.getElementById('storeModalLogoUrl').value = store.logo && !store.logo.startsWith('data:') ? store.logo : '';
+      document.getElementById('storeModalLogoFileInput').value = '';
+      document.getElementById('storeModalLogoPreview').src = store.logo || '/assets/products/logo.png';
+      
+      document.getElementById('storeUrlPreview').textContent = `URL: achete.me/${store.slug}`;
+      document.getElementById('btnDeleteStore').style.display = 'inline-block';
+      document.getElementById('btnSubmitStoreModal').textContent = 'Save Changes';
+
+      document.getElementById('storeModal').style.display = 'flex';
+    }
+
+    function closeStoreModal() {
+      document.getElementById('storeModal').style.display = 'none';
+      currentEditStoreId = null;
+    }
+
+    function handleLogoFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file (PNG, JPG, SVG, WebP).');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentStoreLogoData = e.target.result;
+        document.getElementById('storeModalLogoPreview').src = currentStoreLogoData;
+        document.getElementById('storeModalLogoUrl').value = '';
+        showDashToast('✅ Logo attached successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLogoUrlInput() {
+      const url = document.getElementById('storeModalLogoUrl').value.trim();
+      if (url) {
+        currentStoreLogoData = url;
+        document.getElementById('storeModalLogoPreview').src = url;
+      }
+    }
+
+    function resetStoreLogo() {
+      currentStoreLogoData = '';
+      document.getElementById('storeModalLogoUrl').value = '';
+      document.getElementById('storeModalLogoFileInput').value = '';
+      const name = document.getElementById('storeModalName').value || 'S';
+      const initial = name.charAt(0).toUpperCase();
+      const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="32" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+      document.getElementById('storeModalLogoPreview').src = fallbackSvg;
     }
 
     function autoGenerateSlug() {
-      const name = document.getElementById('newStoreName').value;
+      if (currentEditStoreId) return; // Don't overwrite slug when editing unless user changes it
+      const name = document.getElementById('storeModalName').value;
       const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      document.getElementById('newStoreSlug').value = slug;
+      document.getElementById('storeModalSlug').value = slug;
       document.getElementById('storeUrlPreview').textContent = `URL: achete.me/${slug || 'shopname'}`;
     }
 
-    async function submitNewClientStore() {
-      const name = document.getElementById('newStoreName').value.trim();
-      const slug = document.getElementById('newStoreSlug').value.trim().toLowerCase();
-      const logo = document.getElementById('newStoreLogoUrl').value.trim();
-      const whatsapp = document.getElementById('newStoreWa').value.trim();
-      const kw = document.getElementById('newStoreKw').value.split(',').map(k => k.trim()).filter(Boolean);
+    async function submitStoreForm() {
+      const name = document.getElementById('storeModalName').value.trim();
+      const slug = document.getElementById('storeModalSlug').value.trim().toLowerCase();
+      const whatsapp = document.getElementById('storeModalWhatsapp').value.trim();
+      const posConfigId = document.getElementById('storeModalPosConfig').value;
+      const status = document.getElementById('storeModalStatus').value;
+      const tagline = document.getElementById('storeModalTagline').value.trim();
+      const address = document.getElementById('storeModalAddress').value.trim();
+      const kw = document.getElementById('storeModalKeywords').value.split(',').map(k => k.trim()).filter(Boolean);
 
       if (!name || !slug) {
         alert('Please enter Store Name and Slug.');
         return;
       }
 
-      const btn = document.getElementById('btnSubmitCreateStore');
-      btn.textContent = 'Creating in Odoo...';
+      if (!whatsapp || whatsapp.length < 8) {
+        alert('Please enter a valid WhatsApp Number (e.g. +255 712 345 678).');
+        return;
+      }
+
+      const posConfigNameMap = {
+        '26': 'Website Orders',
+        '3': 'Mangi shop',
+        '4': 'Min Market',
+        '1': 'Restaurant'
+      };
+
+      const payload = {
+        name,
+        slug,
+        whatsapp,
+        posConfigId: Number(posConfigId),
+        posConfigName: posConfigNameMap[posConfigId] || 'Website Orders',
+        status,
+        tagline,
+        address,
+        productKeywords: kw,
+        categories: kw.length > 0 ? kw : []
+      };
+
+      if (currentStoreLogoData) {
+        payload.logo = currentStoreLogoData;
+      }
+
+      const btn = document.getElementById('btnSubmitStoreModal');
+      btn.textContent = 'Saving...';
       btn.disabled = true;
 
       try {
-        const res = await fetch('/api/stores', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name,
-            slug: slug,
-            logo: logo || undefined,
-            whatsapp: whatsapp,
-            productKeywords: kw,
-            categories: kw.length > 0 ? kw : ['General']
-          })
-        });
+        let res;
+        if (currentEditStoreId) {
+          // Update Existing Store
+          res = await fetch(`/api/stores/${currentEditStoreId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          // Create New Store
+          res = await fetch('/api/stores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
 
         const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Failed');
+        if (!data.success) throw new Error(data.error || 'Operation failed');
 
-        alert(`✅ Store "${name}" created!\n\nStore URL: achete.me/${slug}`);
-        closeCreateStoreModal();
+        showDashToast(`✅ Store "${name}" saved successfully!`);
+        closeStoreModal();
         fetchLiveDashboardData(false);
       } catch (err) {
-        alert('Error creating store: ' + err.message);
+        alert('Error saving store: ' + err.message);
       } finally {
-        btn.textContent = 'Create Store';
+        btn.textContent = currentEditStoreId ? 'Save Changes' : 'Create Store';
         btn.disabled = false;
+      }
+    }
+
+    async function deleteCurrentStore() {
+      if (!currentEditStoreId) return;
+      const store = storesList.find(s => s.id === currentEditStoreId);
+      if (!confirm(`Are you sure you want to delete store "${store ? store.name : 'this store'}"?`)) return;
+
+      try {
+        const res = await fetch(`/api/stores/${currentEditStoreId}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to delete store');
+
+        showDashToast(`🗑️ Store removed successfully.`);
+        closeStoreModal();
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Could not delete store: ' + err.message);
       }
     }
 

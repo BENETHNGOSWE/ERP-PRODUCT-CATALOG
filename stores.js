@@ -196,7 +196,13 @@ class StoreManager {
   }
 
   updateStore(idOrSlug, data) {
-    const store = typeof idOrSlug === 'number' ? this.getStoreById(idOrSlug) : this.getStoreBySlug(idOrSlug);
+    let store = null;
+    if (!isNaN(Number(idOrSlug))) {
+      store = this.getStoreById(Number(idOrSlug));
+    }
+    if (!store) {
+      store = this.getStoreBySlug(String(idOrSlug));
+    }
     if (!store) {
       throw new Error(`Store not found: ${idOrSlug}`);
     }
@@ -218,9 +224,9 @@ class StoreManager {
     if (data.address) store.address = data.address;
     if (data.posConfigId) store.posConfigId = Number(data.posConfigId);
     if (data.posConfigName) store.posConfigName = data.posConfigName;
-    if (data.categories) store.categories = data.categories;
-    if (data.productKeywords) store.productKeywords = data.productKeywords;
-    if (data.productIds) store.productIds = data.productIds;
+    if (data.categories) store.categories = Array.isArray(data.categories) ? data.categories : [data.categories];
+    if (data.productKeywords) store.productKeywords = Array.isArray(data.productKeywords) ? data.productKeywords : [];
+    if (data.productIds) store.productIds = Array.isArray(data.productIds) ? data.productIds : [];
 
     this.saveStores();
     return store;
@@ -238,40 +244,55 @@ class StoreManager {
 
   /**
    * Filter Odoo Products strictly for this Client Store
-   * Enforces strict Product Separation
+   * Enforces strict Product Separation & Stock Loading Guard
    */
   filterProductsForStore(allProducts, store) {
     if (!store || !allProducts || allProducts.length === 0) return [];
 
-    // 1. Explicit Product IDs match
-    if (store.productIds && store.productIds.length > 0) {
+    // 1. Explicit Product IDs match (Highest precedence)
+    if (Array.isArray(store.productIds) && store.productIds.length > 0) {
       const idSet = new Set(store.productIds.map(Number));
-      const explicitMatches = allProducts.filter(p => idSet.has(p.id));
-      if (explicitMatches.length > 0) return explicitMatches;
+      return allProducts.filter(p => idSet.has(p.id));
     }
 
-    // 2. Keyword & Category Isolation
-    const storeCategories = (store.categories || []).map(c => c.toLowerCase());
-    const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
+    // 2. Built-in default stores use curated keywords/categories
+    const isBuiltinStore = [1, 2, 3, 4].includes(store.id) || ['abcstore', 'novamart', 'crownshop', 'safaridiner'].includes(store.slug);
+    
+    if (isBuiltinStore) {
+      const storeCategories = (store.categories || []).map(c => c.toLowerCase());
+      const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
 
-    const filtered = allProducts.filter(p => {
-      const pName = (p.name || '').toLowerCase();
-      const pCat = (p.category || '').toLowerCase();
-      const pSku = (p.default_code || '').toLowerCase();
+      return allProducts.filter(p => {
+        const pName = (p.name || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+        const pSku = (p.default_code || '').toLowerCase();
 
-      // Check Category match
-      const catMatch = storeCategories.some(sc => pCat.includes(sc) || sc.includes(pCat));
-      if (catMatch) return true;
+        const catMatch = storeCategories.some(sc => pCat.includes(sc) || sc.includes(pCat));
+        if (catMatch) return true;
 
-      // Check Keyword match
-      const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
-      if (keyMatch) return true;
+        const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
+        if (keyMatch) return true;
 
-      return false;
-    });
+        return false;
+      });
+    }
 
-    // If filtering yields nothing (new empty store), return curated subset or empty
-    return filtered;
+    // 3. For newly created user stores:
+    // If the store has specific productKeywords configured by user, filter by those keywords
+    if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
+      const storeKeywords = store.productKeywords.map(k => k.toLowerCase().trim()).filter(Boolean);
+      if (storeKeywords.length > 0) {
+        return allProducts.filter(p => {
+          const pName = (p.name || '').toLowerCase();
+          const pSku = (p.default_code || '').toLowerCase();
+          return storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
+        });
+      }
+    }
+
+    // 4. If no products/stock are loaded yet for this new store, return empty array (0 products)
+    // Prevents unlinked new stores from displaying global/demo inventory unexpectedly!
+    return [];
   }
 }
 
