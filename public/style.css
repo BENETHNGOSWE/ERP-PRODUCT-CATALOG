@@ -1787,9 +1787,10 @@ img {
 .app-footer {
   background: #ffffff;
   border-top: 1px solid var(--border-color);
-  padding: 16px 20px;
+  padding: 18px 20px;
   margin-top: auto;
   width: 100%;
+  text-align: center;
 }
 
 .footer-container {
@@ -1797,20 +1798,25 @@ img {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  flex-wrap: wrap;
+  text-align: center;
+  width: 100%;
 }
 
-.footer-links {
-  display: flex;
-  gap: 14px;
+.footer-copy {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-.footer-links a:hover {
-  color: var(--primary);
+.footer-copy strong {
+  color: var(--navy-dark);
+  font-weight: 700;
 }
 
 /* Modals */
