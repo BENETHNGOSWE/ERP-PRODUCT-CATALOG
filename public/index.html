@@ -10,6 +10,90 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Compact item summary rows inside sticky checkout */
+    .summary-item-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #f1f5f9;
+      font-size: 0.85rem;
+    }
+    .summary-item-entry:last-child {
+      border-bottom: none;
+    }
+    .summary-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+    .summary-item-mini-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+    .summary-item-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .summary-item-name {
+      font-weight: 600;
+      color: var(--navy-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.82rem;
+    }
+    .summary-item-unit {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .summary-item-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .summary-item-price {
+      font-weight: 700;
+      color: var(--navy-dark);
+      font-size: 0.84rem;
+    }
+    .summary-item-del {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s ease;
+    }
+    .summary-item-del:hover {
+      color: #ef4444;
+    }
+    .empty-summary-box {
+      text-align: center;
+      padding: 20px 10px;
+      color: #94a3b8;
+    }
+    .empty-summary-box svg {
+      margin-bottom: 8px;
+    }
+    .empty-summary-box p {
+      font-size: 0.82rem;
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
 
@@ -18,7 +102,7 @@
     <div class="header-container">
       
       <!-- Brand Logo & Location -->
-      <a href="index.html" class="brand-block" title="NOVA MART Home">
+      <a href="index.html" class="brand-block" title="Store Home">
         <div class="brand-logo-circle">
           <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="9" cy="21" r="1"/>
@@ -83,7 +167,7 @@
     </div>
   </header>
 
-  <!-- Page Content: Catalog -->
+  <!-- Page Content: Unified 1-Page Layout -->
   <main class="shop-main">
     <div class="shop-container">
 
@@ -128,18 +212,65 @@
         </div>
       </div>
 
-      <!-- Products Grid -->
-      <section class="products-grid-section" aria-label="Products Catalog">
-        <div class="products-grid" id="productsGrid">
-          <!-- Rendered dynamically -->
+      <!-- Unified Single-Page 2-Column Section (Catalog + Sticky Order Summary) -->
+      <section class="shop-unified-layout" aria-label="Catalog & Order Summary">
+        
+        <!-- Left Side: Product List with Horizontal Item Cards (Image 1 Style) -->
+        <div class="product-list-column" id="productsListContainer">
+          <!-- Dynamically Populated Cards -->
         </div>
+
+        <!-- Right Side: Sticky Order Summary & Quick Checkout Panel (Image 2 Style) -->
+        <aside class="order-summary-panel" id="orderSummaryCard">
+          <h2 class="summary-heading" style="margin-bottom: 14px;">Order Summary</h2>
+
+          <!-- Selected Items Scrollable List -->
+          <div class="summary-items-list" id="summaryItemsList">
+            <!-- Dynamically Populated Items -->
+          </div>
+
+          <!-- Dynamic Subtotal, Discount, and Total -->
+          <div class="summary-rows" style="margin-bottom: 18px;">
+            <div class="summary-row">
+              <span class="summary-label">Subtotal</span>
+              <span class="summary-val" id="summarySubtotal">TZS 0</span>
+            </div>
+            <div class="summary-row discount-row">
+              <span class="summary-label">Discount</span>
+              <span class="summary-val discount-val" id="summaryDiscount">TZS 0</span>
+            </div>
+            <div class="summary-row total-row">
+              <span class="summary-label">Total</span>
+              <span class="summary-val total-val" id="summaryTotal">TZS 0</span>
+            </div>
+          </div>
+
+          <!-- Mobile Number Input Box -->
+          <div class="mobile-number-box" style="margin-bottom: 16px;">
+            <label for="customerPhone" class="input-label">Mobile Number</label>
+            <div class="phone-input-wrapper">
+              <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+              <input type="tel" id="customerPhone" class="phone-input" placeholder="+255 7XX XXX XXX" value="+255 712 345 678" autocomplete="tel">
+            </div>
+            <p class="phone-hint">Enter your phone number to receive order updates via SMS/WhatsApp.</p>
+          </div>
+
+          <!-- Place Order Button -->
+          <button class="btn-place-order" id="btnPlaceOrder">
+            PLACE ORDER
+          </button>
+        </aside>
+
       </section>
 
     </div>
   </main>
 
-  <!-- Mobile Floating Cart Bar (Shown when items > 0) -->
-  <a href="cart.html" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
+  <!-- Mobile Floating Cart Bar (Shown when items > 0 on mobile screens) -->
+  <a href="#orderSummaryCard" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;" onclick="document.getElementById('orderSummaryCard').scrollIntoView({ behavior: 'smooth' });">
     <div class="float-cart-info">
       <div class="float-cart-icon-wrap">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -149,10 +280,10 @@
         </svg>
         <span class="float-badge" id="mobileFloatBadge">0</span>
       </div>
-      <span class="float-cart-text">Cart</span>
+      <span class="float-cart-text">Review Order</span>
     </div>
     <div class="float-view-cart-btn">
-      <span>View Cart &rarr;</span>
+      <span id="mobileFloatTotal">TZS 0 &rarr;</span>
     </div>
   </a>
 
@@ -206,11 +337,74 @@
       let currentSearch = '';
       let currentSort = 'popular';
 
-      function renderCatalog() {
-        const grid = document.getElementById('productsGrid');
+      const listContainer = document.getElementById('productsListContainer');
+      const summaryList = document.getElementById('summaryItemsList');
+      const subtotalEl = document.getElementById('summarySubtotal');
+      const discountEl = document.getElementById('summaryDiscount');
+      const totalEl = document.getElementById('summaryTotal');
+      const mobileTotalEl = document.getElementById('mobileFloatTotal');
+      const phoneInput = document.getElementById('customerPhone');
+      const btnPlaceOrder = document.getElementById('btnPlaceOrder');
+
+      // Load saved customer phone if available
+      const savedPhone = NOVA.getPhone();
+      if (savedPhone && phoneInput) phoneInput.value = savedPhone;
+
+      // Render both Catalog & Sticky Order Summary simultaneously
+      function renderStoreView() {
         const cart = NOVA.getCart();
         const products = NOVA.getProducts();
+        const totals = NOVA.calculateTotals(cart);
 
+        // 1. Update Order Summary Calculations
+        if (subtotalEl) subtotalEl.textContent = NOVA.formatTZS(totals.subtotal);
+        if (discountEl) discountEl.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
+        if (totalEl) totalEl.textContent = NOVA.formatTZS(totals.total);
+        if (mobileTotalEl) mobileTotalEl.textContent = totals.total > 0 ? `${NOVA.formatTZS(totals.total)} \u2192` : 'Review \u2192';
+
+        if (btnPlaceOrder) {
+          btnPlaceOrder.disabled = totals.itemCount === 0;
+        }
+
+        // 2. Render Order Summary Items List
+        const cartEntries = Object.entries(cart).filter(([_, qty]) => qty > 0);
+        if (cartEntries.length === 0) {
+          summaryList.innerHTML = `
+            <div class="empty-summary-box">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.8">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              <p>No products selected yet.<br>Click <strong>+</strong> to add items.</p>
+            </div>
+          `;
+        } else {
+          let summaryHtml = '';
+          cartEntries.forEach(([id, qty]) => {
+            const p = products.find(prod => String(prod.id) === String(id));
+            if (!p) return;
+            const itemSubtotal = p.price * qty;
+            summaryHtml += `
+              <div class="summary-item-entry" data-id="${p.id}">
+                <div class="summary-item-left">
+                  <img src="${p.thumb || p.image}" alt="${p.name}" class="summary-item-mini-thumb">
+                  <div class="summary-item-text">
+                    <span class="summary-item-name" title="${p.name}">${p.name}</span>
+                    <span class="summary-item-unit">${qty} &times; ${NOVA.formatTZS(p.price)}</span>
+                  </div>
+                </div>
+                <div class="summary-item-right">
+                  <span class="summary-item-price">${NOVA.formatTZS(itemSubtotal)}</span>
+                  <button class="summary-item-del" data-id="${p.id}" title="Remove item">&times;</button>
+                </div>
+              </div>
+            `;
+          });
+          summaryList.innerHTML = summaryHtml;
+        }
+
+        // 3. Filter & Sort Products for Product List
         const filtered = products.filter(p => {
           const catMatch = currentCategory === 'All' || p.category === currentCategory || 
                            (currentCategory === 'Safety Gear' && (p.category.includes('Protection') || p.category.includes('Safety')));
@@ -224,6 +418,7 @@
           return 0;
         });
 
+        // 4. Handle Empty Store Inventory State
         if (filtered.length === 0) {
           if (products.length === 0) {
             const store = NOVA.getStore() || { name: 'Store', whatsapp: '+255712345678' };
@@ -231,8 +426,8 @@
             if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
             else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
 
-            grid.innerHTML = `
-              <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 20px 0;">
+            listContainer.innerHTML = `
+              <div style="text-align: center; padding: 50px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 10px 0;">
                 <div style="font-size: 2.8rem; margin-bottom: 12px;">📦</div>
                 <h3 style="font-size: 1.25rem; font-weight: 700; color: #081735; margin-bottom: 8px;">Stock Not Loaded Yet</h3>
                 <p style="font-size: 0.92rem; color: #64748b; max-width: 440px; margin: 0 auto 18px; line-height: 1.5;">
@@ -247,15 +442,16 @@
             return;
           }
 
-          grid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
-              <p style="font-size: 1.1rem; font-weight: 600;">No products found</p>
-              <p style="font-size: 0.9rem; margin-top: 4px;">Try searching for another product or change category.</p>
+          listContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #64748b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <p style="font-size: 1.1rem; font-weight: 600; color: #1e293b;">No products found</p>
+              <p style="font-size: 0.9rem; margin-top: 4px;">Try searching for another keyword or select a different category.</p>
             </div>
           `;
           return;
         }
 
+        // 5. Render Horizontal Product Item Cards (Image 1 Style)
         let html = '';
         filtered.forEach(p => {
           const strId = String(p.id);
@@ -273,27 +469,37 @@
           }
 
           html += `
-            <article class="product-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
-              <span class="stock-badge-tag ${stockClass}">${stockText}</span>
-              <div class="product-card-img-wrap" title="Click to add to cart">
-                <img src="${p.image}" alt="${p.name}" class="product-card-img" loading="lazy">
+            <article class="product-item-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
+              <div class="product-item-left">
+                <div class="product-item-thumb-wrap" title="Click to add to cart">
+                  <img src="${p.thumb || p.image}" alt="${p.name}" class="product-item-thumb" loading="lazy">
+                </div>
+                <div class="product-item-meta">
+                  <h3 class="product-item-title" title="${p.name}">${p.name}</h3>
+                  <div class="product-item-subtitle">
+                    <span>${p.category || 'General'}</span>
+                    <span>&bull;</span>
+                    <span class="stock-badge-tag ${stockClass}" style="display:inline-block; position:static; font-size:0.72rem; padding:1px 6px;">${stockText}</span>
+                  </div>
+                  <div class="product-item-price">${NOVA.formatTZS(p.price)}</div>
+                </div>
               </div>
-              <h3 class="product-card-title" title="${p.name}">${p.name}</h3>
-              <div class="product-card-price">${NOVA.formatTZS(p.price)}</div>
-              <div class="stepper-control">
-                <button class="stepper-btn btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} aria-label="Decrease">&minus;</button>
-                <span class="stepper-val" id="qty-${p.id}">${qty}</span>
-                <button class="stepper-btn btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} aria-label="Increase">&#43;</button>
+              <div class="product-item-stepper-wrap">
+                <div class="stepper-vertical">
+                  <button class="stepper-btn-v btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
+                  <span class="stepper-val-v" id="qty-${p.id}">${qty}</span>
+                  <button class="stepper-btn-v btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} title="Increase quantity">&#43;</button>
+                </div>
               </div>
             </article>
           `;
         });
 
-        grid.innerHTML = html;
+        listContainer.innerHTML = html;
         NOVA.updateHeaderCartBadge();
       }
 
-      // Click to add: Steppers + Image Click
+      // Event Delegation: Steppers, Card Clicks, and Quick Deletes
       document.addEventListener('click', (e) => {
         // 1. Plus Button
         const plus = e.target.closest('.btn-plus');
@@ -303,7 +509,7 @@
           const products = NOVA.getProducts();
           const p = products.find(x => String(x.id) === String(id));
           if (p) NOVA.showToast(`Added ${p.name} to cart`);
-          renderCatalog();
+          renderStoreView();
           return;
         }
 
@@ -312,14 +518,26 @@
         if (minus) {
           const id = minus.getAttribute('data-id');
           NOVA.updateItemQty(id, -1);
-          renderCatalog();
+          renderStoreView();
           return;
         }
 
-        // 3. Click directly on Product Image to Add to Cart
-        const imgWrap = e.target.closest('.product-card-img-wrap') || e.target.closest('.product-card-title');
+        // 3. Quick Delete from Summary List
+        const delBtn = e.target.closest('.summary-item-del');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-id');
+          const products = NOVA.getProducts();
+          const p = products.find(x => String(x.id) === String(id));
+          NOVA.removeItem(id);
+          if (p) NOVA.showToast(`Removed ${p.name}`, 'danger');
+          renderStoreView();
+          return;
+        }
+
+        // 4. Click Product Thumbnail or Title to Add
+        const imgWrap = e.target.closest('.product-item-thumb-wrap') || e.target.closest('.product-item-title');
         if (imgWrap) {
-          const card = imgWrap.closest('.product-card');
+          const card = imgWrap.closest('.product-item-card');
           if (card) {
             const id = card.getAttribute('data-id');
             const products = NOVA.getProducts();
@@ -339,13 +557,13 @@
 
             NOVA.updateItemQty(id, 1);
             if (p) NOVA.showToast(`Added ${p.name} to cart`);
-            renderCatalog();
+            renderStoreView();
             return;
           }
         }
       });
 
-      // Category pills
+      // Category filter pills
       const catBox = document.getElementById('categoryPills');
       if (catBox) {
         catBox.addEventListener('click', (e) => {
@@ -354,18 +572,18 @@
           catBox.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
           pill.classList.add('active');
           currentCategory = pill.getAttribute('data-category') || 'All';
-          renderCatalog();
+          renderStoreView();
         });
       }
 
-      // Search
+      // Search bar
       const searchInput = document.getElementById('searchInput');
       const searchClear = document.getElementById('searchClearBtn');
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
           currentSearch = e.target.value.trim();
           if (searchClear) searchClear.style.display = currentSearch ? 'block' : 'none';
-          renderCatalog();
+          renderStoreView();
         });
       }
       if (searchClear) {
@@ -373,16 +591,16 @@
           if (searchInput) searchInput.value = '';
           currentSearch = '';
           searchClear.style.display = 'none';
-          renderCatalog();
+          renderStoreView();
         });
       }
 
-      // Sort
+      // Sort Select
       const sortSelect = document.getElementById('sortSelect');
       if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
           currentSort = e.target.value;
-          renderCatalog();
+          renderStoreView();
         });
       }
 
@@ -392,12 +610,100 @@
         syncBtn.addEventListener('click', async () => {
           syncBtn.disabled = true;
           syncBtn.querySelector('.sync-text').textContent = 'Syncing...';
-          NOVA.showToast('🔄 Updating stock...');
+          NOVA.showToast('🔄 Updating stock with Odoo ERP...');
           await NOVA.loadOdooProducts(true);
-          renderCatalog();
+          renderStoreView();
           syncBtn.disabled = false;
           syncBtn.querySelector('.sync-text').textContent = 'Sync Stock';
           NOVA.showToast('✅ Stock updated successfully!');
+        });
+      }
+
+      // Direct Single-Page Order Checkout Execution
+      if (btnPlaceOrder) {
+        btnPlaceOrder.addEventListener('click', async () => {
+          const totals = NOVA.calculateTotals();
+          if (totals.itemCount === 0) {
+            NOVA.showToast('⚠️ Your order summary is empty. Add products first!', 'danger');
+            return;
+          }
+
+          btnPlaceOrder.disabled = true;
+          btnPlaceOrder.innerHTML = `
+            <span class="loading-spinner"></span>
+            <span>Processing Order...</span>
+          `;
+
+          const phoneVal = phoneInput?.value.trim() || '+255 712 345 678';
+          NOVA.savePhone(phoneVal);
+
+          const cart = NOVA.getCart();
+          const products = NOVA.getProducts();
+          const orderItems = [];
+
+          for (const [id, qty] of Object.entries(cart)) {
+            if (qty > 0) {
+              const p = products.find(item => String(item.id) === String(id));
+              if (p) {
+                orderItems.push({
+                  id: p.id,
+                  name: p.name,
+                  price: p.price,
+                  qty: qty,
+                  subtotal: p.price * qty
+                });
+              }
+            }
+          }
+
+          const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
+          NOVA.showToast('Submitting order to Odoo ERP...');
+          
+          let odooResult = null;
+          try {
+            odooResult = await NOVA.submitOrderToOdoo({
+              orderId: orderId,
+              customerPhone: phoneVal,
+              customerName: `Customer (${phoneVal})`,
+              items: orderItems,
+              totalAmount: totals.total
+            });
+          } catch (netErr) {
+            console.error('Order submission error:', netErr);
+          }
+
+          if (!odooResult || !odooResult.success) {
+            NOVA.showToast('⚠️ Failed to place order in Odoo POS: ' + (odooResult && odooResult.error ? odooResult.error : 'Connection error. Please try again.'), 'danger');
+            btnPlaceOrder.disabled = false;
+            btnPlaceOrder.innerHTML = 'PLACE ORDER';
+            return;
+          }
+
+          const confirmedOrder = {
+            orderId: orderId,
+            odooOrderId: odooResult && odooResult.order ? odooResult.order.odooOrderId : null,
+            odooOrderName: odooResult && odooResult.order ? odooResult.order.odooOrderName : null,
+            receiptNumber: odooResult && odooResult.order ? odooResult.order.receiptNumber : null,
+            storeSlug: odooResult && odooResult.order ? odooResult.order.storeSlug : NOVA.getStoreSlug(),
+            storeName: odooResult && odooResult.order ? odooResult.order.storeName : ((NOVA.getStore() && NOVA.getStore().name) || 'Store'),
+            storeWhatsapp: odooResult && odooResult.order ? odooResult.order.storeWhatsapp : ((NOVA.getStore() && NOVA.getStore().whatsapp) || '+255712345678'),
+            waLink: odooResult && odooResult.order ? odooResult.order.waLink : null,
+            totalPaid: totals.total,
+            subtotal: totals.subtotal,
+            discount: totals.discount,
+            itemCount: totals.itemCount,
+            phone: phoneVal,
+            items: orderItems,
+            status: 'Order Placed & Confirmed in Odoo',
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          };
+
+          NOVA.saveLatestOrder(confirmedOrder);
+          NOVA.resetCart();
+
+          // Smooth transition to confirmation receipt
+          const slug = NOVA.getStoreSlug();
+          window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
         });
       }
 
@@ -410,9 +716,9 @@
       };
 
       // Initial Render & Stock fetch
-      renderCatalog();
+      renderStoreView();
       NOVA.loadOdooProducts().then(() => {
-        renderCatalog();
+        renderStoreView();
       });
     })();
   </script>
