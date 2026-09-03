@@ -214,7 +214,12 @@ const NOVA = (function () {
     // Logo Image
     if (store.logo) {
       document.querySelectorAll('.brand-logo-circle').forEach(circle => {
-        circle.innerHTML = `<img src="${store.logo}" alt="" class="brand-logo-img">`;
+        circle.innerHTML = '';
+        const img = document.createElement('img');
+        img.className = 'brand-logo-img';
+        img.alt = '';
+        img.src = store.logo;
+        circle.appendChild(img);
       });
     }
 
