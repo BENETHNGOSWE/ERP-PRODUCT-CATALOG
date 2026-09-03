@@ -464,7 +464,7 @@
           return;
         }
 
-        // 5. Render Horizontal Product Item Cards (Image 1 Style)
+        // 5. Render Horizontal Product Item Cards (Exact Match to User Reference)
         let html = '';
         filtered.forEach(p => {
           const strId = String(p.id);
@@ -489,19 +489,15 @@
                 </div>
                 <div class="product-item-meta">
                   <h3 class="product-item-title" title="${p.name}">${p.name}</h3>
-                  <div class="product-item-subtitle">
-                    <span>${p.category || 'General'}</span>
-                    <span>&bull;</span>
-                    <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
-                  </div>
+                  <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
                   <div class="product-item-price">${NOVA.formatTZS(p.price)}</div>
                 </div>
               </div>
               <div class="product-item-stepper-wrap">
-                <div class="stepper-vertical">
-                  <button class="stepper-btn-v btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
-                  <span class="stepper-val-v" id="qty-${p.id}">${qty}</span>
-                  <button class="stepper-btn-v btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} title="Increase quantity">&#43;</button>
+                <div class="stepper-horizontal">
+                  <button class="stepper-btn-h btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
+                  <span class="stepper-val-h" id="qty-${p.id}">${qty}</span>
+                  <button class="stepper-btn-h btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} title="Increase quantity">&#43;</button>
                 </div>
               </div>
             </article>
@@ -549,7 +545,7 @@
 
         // 4. Click ANYWHERE on the Product Card Container to Add to Cart
         const card = e.target.closest('.product-item-card');
-        if (card && !e.target.closest('.stepper-vertical') && !e.target.closest('.stepper-btn-v')) {
+        if (card && !e.target.closest('.stepper-horizontal') && !e.target.closest('.stepper-btn-h') && !e.target.closest('.btn-plus') && !e.target.closest('.btn-minus')) {
           const id = card.getAttribute('data-id');
           const products = NOVA.getProducts();
           const p = products.find(x => String(x.id) === String(id));
