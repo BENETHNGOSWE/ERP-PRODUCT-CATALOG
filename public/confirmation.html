@@ -298,13 +298,17 @@
       if (phoneEl) phoneEl.textContent = order.phone || '+255 7XX XXX XXX';
 
       const btnWhatsAppDirect = document.getElementById('btnWhatsAppDirect');
-      const storeWa = order.storeWhatsapp || (NOVA.getStore() && NOVA.getStore().whatsapp) || '+255712345678';
-      let cleanWa = String(storeWa).replace(/[^0-9]/g, '');
-      if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
-      else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
-      const waLink = order.waLink || `https://wa.me/${cleanWa}?text=${encodeURIComponent(`Hello, I just placed Order #${order.orderId || 'NEW'} (${NOVA.formatTZS(order.totalPaid || 0)})!`)}`;
       if (btnWhatsAppDirect) {
-        btnWhatsAppDirect.href = waLink;
+        if (order && order.waLink) {
+          btnWhatsAppDirect.href = order.waLink;
+        } else {
+          const storeWa = order.storeWhatsapp || (NOVA.getStore() && NOVA.getStore().whatsapp) || '+255712345678';
+          let cleanWa = String(storeWa).replace(/[^0-9]/g, '');
+          if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
+          else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
+          const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\nTotal: TZS ${NOVA.formatTZS(order.totalPaid || 0)}\nPhone: ${order.phone || ''}`;
+          btnWhatsAppDirect.href = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(msg)}`;
+        }
       }
 
       NOVA.applyStoreBranding(NOVA.getStore());

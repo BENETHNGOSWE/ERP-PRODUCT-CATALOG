@@ -45,11 +45,11 @@ class WhatsAppService {
   }
 
   /**
-   * Generate Direct WhatsApp Click-to-Chat Link (https://wa.me/255XXXXXXXXX?text=...)
+   * Generate Direct WhatsApp Click-to-Chat Link (https://api.whatsapp.com/send?phone=255XXXXXXXXX&text=...)
    */
   getDirectWhatsAppLink(phone, messageText) {
     const clean = this.normalizePhone(phone);
-    return `https://wa.me/${clean}?text=${encodeURIComponent(messageText)}`;
+    return `https://api.whatsapp.com/send?phone=${clean}&text=${encodeURIComponent(messageText)}`;
   }
 
   /**
@@ -60,7 +60,7 @@ class WhatsAppService {
     const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
     const custName = order.customer ? (order.customer.name || 'Customer') : 'Walk-in Customer';
     const custPhone = order.customer ? (order.customer.phone || 'N/A') : (order.customerPhone || 'N/A');
-    const delivery = order.customer ? (order.customer.deliveryAddress || store.address || 'Dar es Salaam') : 'Store Pickup';
+    const delivery = order.customer ? (order.customer.deliveryAddress || (store && store.address) || 'Dar es Salaam') : 'Store Pickup';
     
     // Format Items List
     let itemsText = '';
@@ -79,19 +79,19 @@ class WhatsAppService {
     const totalFormatted = (Number(order.totalAmount) || 0).toLocaleString('en-US');
 
     return (
-`🛍️ *NEW ORDER #${orderRef}*
-🏪 *Store:* ${storeName}
+`*NEW ORDER #${orderRef}*
+*Store:* ${storeName}
 
-👤 *Customer:* ${custName}
-📞 *Phone:* ${custPhone}
-📍 *Delivery:* ${delivery}
+*Customer:* ${custName}
+*Phone:* ${custPhone}
+*Delivery:* ${delivery}
 
-📦 *Items Ordered:*
+*Items Ordered:*
 ${itemsText}
 
-💰 *TOTAL AMOUNT: TZS ${totalFormatted}*
+*TOTAL AMOUNT: TZS ${totalFormatted}*
 
-🚀 *Action Required:* Please process and confirm this order.`
+Action Required: Please process and confirm this order.`
     );
   }
 

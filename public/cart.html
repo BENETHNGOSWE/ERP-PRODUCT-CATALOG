@@ -460,8 +460,18 @@
           NOVA.saveLatestOrder(confirmedOrder);
           NOVA.resetCart();
 
+          // Automatically trigger WhatsApp direct send to store owner so message is dispatched immediately!
+          if (confirmedOrder.waLink) {
+            try {
+              window.open(confirmedOrder.waLink, '_blank');
+            } catch (e) {
+              console.warn('Popup blocked, available on confirmation receipt');
+            }
+          }
+
           // Instant navigation to confirmation page
-          const slug = NOVA.getStoreSlug(); window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
+          const slug = NOVA.getStoreSlug();
+          window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
         });
       }
 

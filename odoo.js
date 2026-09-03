@@ -391,6 +391,35 @@ async function createOdooPosOrder(orderData) {
       console.warn('[Odoo POS Pay Warning]:', payErr.message);
     }
 
+    // Also create Sales Order (sale.order) so orders appear in Sales -> Orders -> Orders
+    let saleOrderId = null;
+    try {
+      const saleLines = [];
+      for (const item of (orderData.items || [])) {
+        const prodId = await resolveOdooProductId(item);
+        if (prodId) {
+          saleLines.push([0, 0, {
+            product_id: prodId,
+            product_uom_qty: Number(item.quantity || item.qty) || 1,
+            price_unit: Number(item.price) || 0,
+            name: item.name || 'Store Item'
+          }]);
+        }
+      }
+
+      if (saleLines.length > 0) {
+        saleOrderId = await callModel('sale.order', 'create', [{
+          partner_id: customerId || 1,
+          client_order_ref: orderData.orderNumber || orderData.orderId || `WEB-${Date.now().toString().slice(-4)}`,
+          note: `Store: ${orderData.storeName || 'Digital Storefront'} (${orderData.storeSlug || ''})\nCustomer Phone: ${orderData.customerPhone || ''}\nDelivery Address: ${orderData.deliveryAddress || ''}`,
+          order_line: saleLines
+        }]);
+        console.log(`[Odoo] ✅ Created Sales Order (ID: ${saleOrderId}) in Sales -> Orders -> Orders!`);
+      }
+    } catch (saleErr) {
+      console.warn('[Odoo Sales Order Creation Note]:', saleErr.message);
+    }
+
     deductStock(orderData.items).catch(err => {
       console.warn('[Background Stock Update Warning]:', err.message);
     });
@@ -398,6 +427,7 @@ async function createOdooPosOrder(orderData) {
     return {
       success: true,
       odooOrderId: newPosOrderId,
+      saleOrderId: saleOrderId,
       receiptNumber: posReference,
       partnerId: customerId,
       totalAmount: totalAmount,
