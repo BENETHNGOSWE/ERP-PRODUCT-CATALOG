@@ -451,45 +451,45 @@ app.post('/api/odoo/restock', async (req, res) => {
   }
 });
 
-// 10. WhatsApp Status & Test Endpoints
+// 10. WhatsApp Gateway Configuration & Live Test Endpoints
+app.get('/api/whatsapp/config', (req, res) => {
+  res.json({ success: true, config: whatsapp.getConfigSanitized() });
+});
+
+app.post('/api/whatsapp/config', (req, res) => {
+  try {
+    const updated = whatsapp.saveConfig(req.body);
+    res.json({
+      success: true,
+      message: 'WhatsApp Gateway settings saved successfully!',
+      config: updated.config
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/whatsapp/test-send', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+    if (!phone) {
+      return res.status(400).json({ success: false, error: 'Phone number is required' });
+    }
+    const result = await whatsapp.sendTestMessage(phone, message);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/whatsapp/status', async (req, res) => {
   try {
     const store = stores.getAllStores()[0];
     const status = await whatsapp.checkSessionStatus(store);
     res.json({
       success: true,
-      gateway: 'OpenWA Gateway Active',
       status: status,
-      logs: whatsapp.getLogs(10)
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-app.post('/api/whatsapp/test', async (req, res) => {
-  try {
-    const { storeSlug, phone } = req.body;
-    const store = stores.getStoreBySlug(storeSlug) || stores.getAllStores()[0];
-    
-    const sampleOrder = {
-      orderNumber: `TEST-${Date.now().toString().slice(-4)}`,
-      customer: {
-        name: 'Test Customer',
-        phone: phone || store.whatsapp,
-        deliveryAddress: 'Masaki, Dar es Salaam'
-      },
-      items: [
-        { name: 'Sample Store Product', quantity: 1, price: 5000 }
-      ],
-      totalAmount: 5000
-    };
-
-    const waRes = await whatsapp.sendOrderNotification(store, sampleOrder);
-    res.json({
-      success: true,
-      message: `Test WhatsApp message dispatched to ${store.whatsapp}!`,
-      result: waRes
+      logs: whatsapp.getLogs(20)
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

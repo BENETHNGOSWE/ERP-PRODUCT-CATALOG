@@ -1002,6 +1002,12 @@
             <span>Sync Odoo</span>
           </button>
 
+          <!-- WhatsApp Gateway Settings Button -->
+          <button class="btn-sync-odoo" style="background:#25D366; border-color:#22c55e; color:#ffffff;" onclick="openWhatsAppConfigModal()" title="WhatsApp Gateway & Dispatch Config">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.177.182-.076.355.101.173.448.74 1.025 1.254.746.665 1.374.871 1.569.968.195.097.311.082.427-.051.116-.133.491-.571.621-.767.13-.196.26-.163.433-.099.173.064 1.097.517 1.285.611.188.094.314.14.36.218.046.078.046.452-.098.857z"/></svg>
+            <span>📲 WhatsApp Gateway</span>
+          </button>
+
           <!-- Export Button -->
           <button class="btn-export-report" onclick="window.print()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1496,6 +1502,91 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- WhatsApp Gateway & Dispatch Settings Modal -->
+  <div class="restock-modal-overlay" id="whatsappConfigModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 580px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">📲</span>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #081735; margin:0;">WhatsApp Gateway Integration</h3>
+        </div>
+        <button style="border:none; background:transparent; font-size:1.6rem; cursor:pointer; color:#64748b;" onclick="closeWhatsAppConfigModal()">&times;</button>
+      </div>
+
+      <p style="font-size:0.82rem; color:#64748b; margin-bottom:16px;">
+        Connect your WhatsApp API Gateway to automatically send background order alerts directly to merchant numbers without any customer popups.
+      </p>
+
+      <div>
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">WhatsApp Provider / Engine</label>
+        <select id="waProviderSelect" class="modal-input" style="background:#ffffff;" onchange="updateWaProviderFields()">
+          <option value="ultramsg">UltraMsg API (Fastest &amp; Easiest Cloud Gateway)</option>
+          <option value="meta">Meta WhatsApp Cloud API (Official Business API)</option>
+          <option value="evolution">Evolution API (Self-Hosted)</option>
+          <option value="webhook">Custom HTTP Webhook / Wasender Gateway</option>
+          <option value="openwa">OpenWA Server</option>
+        </select>
+      </div>
+
+      <!-- UltraMsg Fields -->
+      <div id="waFieldsUltraMsg" style="margin-top:12px;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">UltraMsg Instance ID</label>
+        <input type="text" id="waUltraInstance" class="modal-input" placeholder="e.g. instance12345">
+        
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">UltraMsg Token</label>
+        <input type="password" id="waUltraToken" class="modal-input" placeholder="Enter UltraMsg Token">
+      </div>
+
+      <!-- Meta Cloud API Fields -->
+      <div id="waFieldsMeta" style="margin-top:12px; display:none;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Meta Phone Number ID</label>
+        <input type="text" id="waMetaPhoneId" class="modal-input" placeholder="e.g. 109823485723948">
+        
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">Permanent Access Token</label>
+        <input type="password" id="waMetaToken" class="modal-input" placeholder="EAABw...">
+      </div>
+
+      <!-- Evolution API Fields -->
+      <div id="waFieldsEvolution" style="margin-top:12px; display:none;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Evolution API URL</label>
+        <input type="text" id="waEvoUrl" class="modal-input" placeholder="https://whatsapp.yourdomain.com">
+        
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">API Key</label>
+        <input type="password" id="waEvoKey" class="modal-input" placeholder="Evolution API Key">
+
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">Instance Name</label>
+        <input type="text" id="waEvoInstance" class="modal-input" value="main">
+      </div>
+
+      <!-- Custom Webhook Fields -->
+      <div id="waFieldsWebhook" style="margin-top:12px; display:none;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Webhook / Gateway URL</label>
+        <input type="text" id="waCustomUrl" class="modal-input" placeholder="https://api.yourgateway.com/send">
+
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">Authorization Key (Optional)</label>
+        <input type="password" id="waCustomKey" class="modal-input" placeholder="Bearer Token / API Key">
+      </div>
+
+      <!-- Live Test Dispatch Box -->
+      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:14px; margin-top:18px;">
+        <strong style="color:#166534; font-size:0.88rem; display:block; margin-bottom:6px;">⚡ Live WhatsApp Message Tester</strong>
+        <p style="font-size:0.78rem; color:#15803d; margin-bottom:8px;">Enter your phone number to test direct delivery to your WhatsApp right now:</p>
+        <div style="display:flex; gap:8px;">
+          <input type="tel" id="waTestTargetPhone" class="modal-input" placeholder="+255 710 459 064" style="background:#ffffff;">
+          <button type="button" id="btnRunWaTest" onclick="runLiveWhatsAppTest()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+            Send Test
+          </button>
+        </div>
+        <div id="waTestResultBox" style="margin-top:8px; font-size:0.78rem; display:none;"></div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px; text-align:right;">
+        <button class="btn-modal-cancel" onclick="closeWhatsAppConfigModal()">Close</button>
+        <button class="btn-modal-confirm" id="btnSaveWaConfig" onclick="saveWhatsAppConfig()">Save Gateway Settings</button>
+      </div>
     </div>
   </div>
 
@@ -2472,6 +2563,127 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         alert('Error importing stock: ' + err.message);
       } finally {
         btn.textContent = '🚀 Import Inventory into Store';
+        btn.disabled = false;
+      }
+    }
+
+    // =========================================================================
+    // WHATSAPP GATEWAY CONFIGURATION & LIVE DISPATCH TESTER
+    // =========================================================================
+    async function openWhatsAppConfigModal() {
+      document.getElementById('whatsappConfigModal').style.display = 'flex';
+      try {
+        const res = await fetch('/api/whatsapp/config');
+        const data = await res.json();
+        if (data.success && data.config) {
+          const cfg = data.config;
+          document.getElementById('waProviderSelect').value = cfg.provider || 'ultramsg';
+          document.getElementById('waUltraInstance').value = cfg.ultramsgInstanceId || '';
+          document.getElementById('waMetaPhoneId').value = cfg.metaPhoneNumberId || '';
+          document.getElementById('waEvoUrl').value = cfg.evolutionUrl || '';
+          document.getElementById('waEvoInstance').value = cfg.evolutionInstance || 'main';
+          document.getElementById('waCustomUrl').value = cfg.gatewayUrl || '';
+          updateWaProviderFields();
+        }
+      } catch (e) {
+        console.warn('Could not load WA config:', e);
+      }
+    }
+
+    function closeWhatsAppConfigModal() {
+      document.getElementById('whatsappConfigModal').style.display = 'none';
+      document.getElementById('waTestResultBox').style.display = 'none';
+    }
+
+    function updateWaProviderFields() {
+      const provider = document.getElementById('waProviderSelect').value;
+      document.getElementById('waFieldsUltraMsg').style.display = (provider === 'ultramsg' ? 'block' : 'none');
+      document.getElementById('waFieldsMeta').style.display = (provider === 'meta' ? 'block' : 'none');
+      document.getElementById('waFieldsEvolution').style.display = (provider === 'evolution' ? 'block' : 'none');
+      document.getElementById('waFieldsWebhook').style.display = (provider === 'webhook' ? 'block' : 'none');
+    }
+
+    async function saveWhatsAppConfig() {
+      const provider = document.getElementById('waProviderSelect').value;
+      const payload = {
+        provider: provider,
+        ultramsgInstanceId: document.getElementById('waUltraInstance').value.trim(),
+        metaPhoneNumberId: document.getElementById('waMetaPhoneId').value.trim(),
+        evolutionUrl: document.getElementById('waEvoUrl').value.trim(),
+        evolutionInstance: document.getElementById('waEvoInstance').value.trim(),
+        gatewayUrl: document.getElementById('waCustomUrl').value.trim()
+      };
+
+      const ultraToken = document.getElementById('waUltraToken').value.trim();
+      if (ultraToken) payload.ultramsgToken = ultraToken;
+
+      const metaToken = document.getElementById('waMetaToken').value.trim();
+      if (metaToken) payload.metaToken = metaToken;
+
+      const evoKey = document.getElementById('waEvoKey').value.trim();
+      if (evoKey) payload.evolutionApiKey = evoKey;
+
+      const customKey = document.getElementById('waCustomKey').value.trim();
+      if (customKey) payload.gatewayApiKey = customKey;
+
+      const btn = document.getElementById('btnSaveWaConfig');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/whatsapp/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast('✅ WhatsApp Gateway settings saved successfully!');
+        closeWhatsAppConfigModal();
+      } catch (err) {
+        alert('Error saving WhatsApp settings: ' + err.message);
+      } finally {
+        btn.textContent = 'Save Gateway Settings';
+        btn.disabled = false;
+      }
+    }
+
+    async function runLiveWhatsAppTest() {
+      const phone = document.getElementById('waTestTargetPhone').value.trim();
+      if (!phone || phone.length < 8) {
+        alert('Please enter your WhatsApp Phone number (e.g. +255 710 459 064).');
+        return;
+      }
+
+      const btn = document.getElementById('btnRunWaTest');
+      const resBox = document.getElementById('waTestResultBox');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      resBox.style.display = 'block';
+      resBox.innerHTML = '<span style="color:#2563eb;">📡 Contacting WhatsApp Gateway...</span>';
+
+      try {
+        const res = await fetch('/api/whatsapp/test-send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: phone,
+            message: `🔔 *WhatsApp Gateway Test Connection*\n✅ Your store gateway is connected! Automated order alerts will be delivered directly here.`
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          resBox.innerHTML = `<span style="color:#16a34a; font-weight:700;">✅ Success! Test message dispatched via ${data.gateway || 'Gateway'} to ${data.recipient}! Check your WhatsApp.</span>`;
+          showDashToast(`✅ Message dispatched to ${phone}!`);
+        } else {
+          resBox.innerHTML = `<span style="color:#ef4444; font-weight:700;">⚠️ Delivery note: ${data.error || 'Gateway returned error. Please check your Instance ID / Token.'}</span>`;
+        }
+      } catch (err) {
+        resBox.innerHTML = `<span style="color:#ef4444;">❌ Error: ${err.message}</span>`;
+      } finally {
+        btn.textContent = 'Send Test';
         btn.disabled = false;
       }
     }
