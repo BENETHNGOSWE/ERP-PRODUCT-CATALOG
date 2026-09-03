@@ -1,86 +1,35 @@
 /**
- * NOVA MART — Core Shared State & Odoo POS Live Integration
- * High performance, sub-millisecond execution, real-time Odoo stock sync
+ * CORE SHARED STORE ENGINE & MULTI-CLIENT ODOO POS + WHATSAPP SYNC
+ * Pure native execution, sub-millisecond responsiveness, zero clutter
  */
 
 const NOVA = (function () {
   'use strict';
 
-  // Fallback initial catalog matching Odoo POS
-  const DEFAULT_PRODUCTS = [
-    {
-      id: 167,
-      odooId: 167,
-      name: 'Coca-Cola 500ml',
-      price: 1000,
-      qty_available: 46,
-      category: 'Drinks',
-      image: 'assets/products/coca_cola.png',
-      thumb: 'assets/products/coca_thumb.png',
-      unit: '500ml',
-      inStock: true
-    },
-    {
-      id: 168,
-      odooId: 168,
-      name: 'Azam Juice 500ml',
-      price: 1500,
-      qty_available: 39,
-      category: 'Drinks',
-      image: 'assets/products/azam_juice.png',
-      thumb: 'assets/products/azam_thumb.png',
-      unit: '500ml (Mango)',
-      inStock: true
-    },
-    {
-      id: 169,
-      odooId: 169,
-      name: 'Mineral Water 500ml',
-      price: 700,
-      qty_available: 60,
-      category: 'Drinks',
-      image: 'assets/products/mineral_water.png',
-      thumb: 'assets/products/mineral_water.png',
-      unit: '500ml (Uhai)',
-      inStock: true
-    },
-    {
-      id: 170,
-      odooId: 170,
-      name: 'Nivea Body Lotion',
-      price: 12000,
-      qty_available: 24,
-      category: 'Cosmetics',
-      image: 'assets/products/nivea_lotion.png',
-      thumb: 'assets/products/nivea_thumb.png',
-      unit: 'Soft Moisturizing',
-      inStock: true
-    },
-    {
-      id: 171,
-      odooId: 171,
-      name: 'Samsung Charger',
-      price: 25000,
-      qty_available: 30,
-      category: 'Electronics',
-      image: 'assets/products/samsung_charger.png',
-      thumb: 'assets/products/samsung_charger.png',
-      unit: 'Fast Adapter + Cable',
-      inStock: true
-    },
-    {
-      id: 172,
-      odooId: 172,
-      name: 'MWANZA RICE 1kg',
-      price: 3500,
-      qty_available: 45,
-      category: 'Food',
-      image: 'assets/products/mwanza_rice.png',
-      thumb: 'assets/products/mwanza_rice.png',
-      unit: '1kg Premium Grain',
-      inStock: true
+  // Helper to extract store slug from URL pathname (e.g., /abcstore -> abcstore)
+  function getActiveStoreSlug() {
+    const path = window.location.pathname.replace(/^\/|\/$/g, '');
+    const first = path.split('/')[0];
+    if (first && first !== 'index.html' && first !== 'cart.html' && first !== 'confirmation.html' && first !== 'dashboard.html' && first !== 'odoo_preview.html' && first !== 'admin.html') {
+      return first;
     }
-  ];
+    const params = new URLSearchParams(window.location.search);
+    return params.get('store') || 'novamart';
+  }
+
+  const currentSlug = getActiveStoreSlug();
+
+  let activeStore = {
+    name: 'NOVA MART',
+    slug: currentSlug,
+    logo: 'assets/products/logo.png',
+    tagline: 'Quality Products with Fast Delivery in Dar es Salaam',
+    address: 'Dar es Salaam',
+    whatsapp: '+255712345678'
+  };
+
+  let liveProducts = [];
+  let liveCategories = ['All'];
 
   // Default initial cart starts at ZERO items
   const DEFAULT_CART = {};
@@ -93,17 +42,22 @@ const NOVA = (function () {
     itemCount: 0,
     phone: '+255 7XX XXX XXX',
     items: [],
-    status: 'Order Placed',
+    status: 'Order Placed & Synced with Odoo',
     date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   };
 
-  let liveProducts = [...DEFAULT_PRODUCTS];
-  let liveCategories = ['All', 'Drinks', 'Food', 'Cosmetics', 'Electronics', 'Household'];
+  function getCartKey() {
+    return `nova_cart_${currentSlug}`;
+  }
+
+  function getOrderKey() {
+    return `nova_order_${currentSlug}`;
+  }
 
   // LocalStorage Cart
   function getCart() {
     try {
-      const stored = localStorage.getItem('nova_mart_cart');
+      const stored = localStorage.getItem(getCartKey()) || localStorage.getItem('nova_mart_cart');
       if (stored !== null) return JSON.parse(stored);
     } catch (e) {}
     return { ...DEFAULT_CART };
@@ -111,13 +65,14 @@ const NOVA = (function () {
 
   function saveCart(cart) {
     try {
+      localStorage.setItem(getCartKey(), JSON.stringify(cart));
       localStorage.setItem('nova_mart_cart', JSON.stringify(cart));
     } catch (e) {}
   }
 
   function getLatestOrder() {
     try {
-      const stored = localStorage.getItem('nova_mart_order');
+      const stored = localStorage.getItem(getOrderKey()) || localStorage.getItem('nova_mart_order');
       if (stored) return JSON.parse(stored);
     } catch (e) {}
     return { ...DEFAULT_ORDER };
@@ -125,6 +80,7 @@ const NOVA = (function () {
 
   function saveLatestOrder(order) {
     try {
+      localStorage.setItem(getOrderKey(), JSON.stringify(order));
       localStorage.setItem('nova_mart_order', JSON.stringify(order));
     } catch (e) {}
   }
@@ -154,7 +110,7 @@ const NOVA = (function () {
 
     for (const [id, qty] of Object.entries(cart)) {
       if (qty > 0) {
-        const prod = liveProducts.find(p => String(p.id) === String(id)) || DEFAULT_PRODUCTS.find(p => String(p.id) === String(id));
+        const prod = liveProducts.find(p => String(p.id) === String(id));
         if (prod) {
           subtotal += prod.price * qty;
           itemCount++;
@@ -181,23 +137,68 @@ const NOVA = (function () {
     };
   }
 
-  // Fetch Live Products from Odoo API
+  // Load Products for this Store from Server
   async function loadOdooProducts(force = false) {
     try {
-      const res = await fetch(`/api/odoo/products?force=${force}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.success && data.products && data.products.length > 0) {
-        liveProducts = data.products;
-        if (data.categories && data.categories.length > 0) {
+      // First try store-specific endpoint
+      let url = `/api/${currentSlug}/products?refresh=${force}`;
+      let res = await fetch(url);
+      
+      if (!res.ok) {
+        // Fallback to global products
+        res = await fetch(`/api/odoo/products?refresh=${force}`);
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.store) {
+          activeStore = { ...activeStore, ...data.store };
+          applyStoreBranding(activeStore);
+        }
+        if (data.products) {
+          liveProducts = data.products;
+        }
+        if (data.categories) {
           liveCategories = data.categories;
         }
-        return { products: liveProducts, categories: liveCategories };
+        return { products: liveProducts, categories: liveCategories, store: activeStore };
       }
     } catch (err) {
-      console.warn('[Odoo Live Fetch Note]: Using cached products', err.message);
+      console.warn('[Store Fetch Note]:', err.message);
     }
-    return { products: liveProducts, categories: liveCategories };
+    return { products: liveProducts, categories: liveCategories, store: activeStore };
+  }
+
+  // Apply Store Branding (Name, Logo, Location)
+  function applyStoreBranding(store) {
+    if (!store) return;
+    
+    // Title
+    document.title = `${store.name || 'Store'} — Online Catalog`;
+
+    // Brand Name Elements
+    document.querySelectorAll('.brand-name').forEach(el => {
+      el.textContent = store.name || 'Store';
+    });
+
+    // Modal Titles
+    document.querySelectorAll('.modal-title-group h3').forEach(el => {
+      el.textContent = store.name || 'Store';
+    });
+
+    // Location
+    if (store.address) {
+      document.querySelectorAll('.brand-location span:first-of-type').forEach(el => {
+        el.textContent = store.address.split(',')[0] || store.address;
+      });
+    }
+
+    // Logo
+    if (store.logo) {
+      document.querySelectorAll('.brand-logo-circle').forEach(circle => {
+        circle.innerHTML = `<img src="${store.logo}" alt="${store.name}" style="width:100%; height:100%; object-fit:contain; border-radius:50%;">`;
+      });
+    }
   }
 
   // Update Cart Quantity
@@ -205,7 +206,7 @@ const NOVA = (function () {
     const cart = getCart();
     const strId = String(id);
     const current = cart[strId] || 0;
-    const prod = liveProducts.find(p => String(p.id) === strId) || DEFAULT_PRODUCTS.find(p => String(p.id) === strId);
+    const prod = liveProducts.find(p => String(p.id) === strId);
 
     if (delta > 0 && prod && prod.qty_available !== undefined) {
       if (current + delta > prod.qty_available && prod.qty_available > 0) {
@@ -249,7 +250,6 @@ const NOVA = (function () {
     if (badgeCountEl) badgeCountEl.textContent = totals.itemCount;
     if (floatBadgeEl) floatBadgeEl.textContent = totals.itemCount;
 
-    // On mobile, show floating cart pill only when at least 1 item is selected
     if (mobileFloatingCart) {
       if (totals.itemCount > 0) {
         mobileFloatingCart.style.display = 'flex';
@@ -286,9 +286,10 @@ const NOVA = (function () {
     }, 2400);
   }
 
-  // Submit Order directly to Odoo POS
+  // Submit Order directly to Server -> Odoo POS + Direct WhatsApp Dispatch
   async function submitOrderToOdoo(orderPayload) {
     try {
+      orderPayload.storeSlug = currentSlug;
       const res = await fetch('/api/odoo/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -297,15 +298,18 @@ const NOVA = (function () {
       const data = await res.json();
       return data;
     } catch (err) {
-      console.error('[Odoo Order Error]:', err);
+      console.error('[Order Submission Error]:', err);
       return { success: false, error: err.message };
     }
   }
 
   return {
+    getStoreSlug: () => currentSlug,
+    getStore: () => activeStore,
     getProducts: () => liveProducts,
     getCategories: () => liveCategories,
     loadOdooProducts,
+    applyStoreBranding,
     getCart,
     saveCart,
     getLatestOrder,

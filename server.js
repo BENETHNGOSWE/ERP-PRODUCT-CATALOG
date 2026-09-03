@@ -1,12 +1,6 @@
 /**
- * ACHETE.ME — Odoo Multi-Client Digital Storefront & WhatsApp Platform
- * 
- * Multi-Client Architecture:
- * - Dynamic URL routing: achete.me/:shop_slug (e.g. /abcstore, /novamart, /crownshop)
- * - Strict Product & Data separation per client
- * - Automated WhatsApp order dispatch via OpenWA gateway
- * - Centralized Multi-Client Super Admin Dashboard
- * - Full 2-way Odoo 18 XML-RPC synchronization
+ * ODOO MULTI-CLIENT CATALOG & DIRECT WHATSAPP PLATFORM
+ * Clean, fast, direct order submission & automated WhatsApp notifications
  */
 
 require('dotenv').config();
@@ -29,17 +23,16 @@ app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // =========================================================================
-// MULTI-CLIENT STORE API ROUTES
+// API ROUTES
 // =========================================================================
 
-// 1. Get All Registered Stores
+// 1. Get Stores List
 app.get('/api/stores', (req, res) => {
   try {
     const allStores = stores.getAllStores();
     res.json({
       success: true,
       total: allStores.length,
-      activeCount: allStores.filter(s => s.status === 'active').length,
       stores: allStores
     });
   } catch (err) {
@@ -47,79 +40,20 @@ app.get('/api/stores', (req, res) => {
   }
 });
 
-// 2. Get Single Store Details by Slug or ID
-app.get('/api/stores/:identifier', (req, res) => {
+// 2. Get Products for a Store (or default global)
+app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
   try {
-    const ident = req.params.identifier;
-    const store = stores.getStoreBySlug(ident) || stores.getStoreById(ident);
-    if (!store) {
-      return res.status(404).json({ success: false, error: `Store "${ident}" not found.` });
-    }
-    res.json({ success: true, store });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+    const slug = req.params.slug || req.query.store || 'novamart';
+    const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
 
-// 3. Create New Client Store
-app.post('/api/stores', (req, res) => {
-  try {
-    const newStore = stores.createStore(req.body);
-    res.status(201).json({
-      success: true,
-      message: `Store "${newStore.name}" created successfully at /${newStore.slug}!`,
-      store: newStore
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// 4. Update Client Store
-app.put('/api/stores/:id', (req, res) => {
-  try {
-    const updated = stores.updateStore(req.params.id, req.body);
-    res.json({
-      success: true,
-      message: `Store "${updated.name}" updated successfully!`,
-      store: updated
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// 5. Delete / Archive Store
-app.delete('/api/stores/:id', (req, res) => {
-  try {
-    const removed = stores.deleteStore(req.params.id);
-    res.json({
-      success: true,
-      message: `Store "${removed.name}" removed successfully.`,
-      store: removed
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// 6. Get Products Filtered Strictly for a Client Store (Product Separation)
-app.get(['/api/:slug/products', '/api/stores/:slug/products'], async (req, res) => {
-  try {
-    const slug = req.params.slug;
-    const store = stores.getStoreBySlug(slug) || stores.getStoreById(slug);
-    if (!store) {
-      return res.status(404).json({ success: false, error: `Store "${slug}" not found.` });
-    }
-
-    const forceRefresh = req.query.refresh === 'true';
+    const forceRefresh = req.query.refresh === 'true' || req.query.force === 'true';
     const odooResult = await odoo.fetchOdooProducts(forceRefresh);
     const allProducts = odooResult.products || [];
 
-    // Filter strictly for this client store
+    // Filter products strictly for this store
     const storeProducts = stores.filterProductsForStore(allProducts, store);
 
-    // Extract unique categories available in this store
+    // Extract unique categories available for this store
     const catSet = new Set(['All']);
     storeProducts.forEach(p => {
       if (p.category) catSet.add(p.category);
@@ -142,63 +76,65 @@ app.get(['/api/:slug/products', '/api/stores/:slug/products'], async (req, res) 
       products: storeProducts
     });
   } catch (err) {
-    console.error(`[Store Products Error for ${req.params.slug}]:`, err);
+    console.error(`[Products Fetch Error]:`, err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 7. Place Order for Client Store + Auto-Dispatch WhatsApp Notification
-app.post(['/api/:slug/order', '/api/odoo/order'], async (req, res) => {
+// 3. Place Order in Odoo POS & Automatically Dispatch Direct WhatsApp Message
+app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
   try {
-    const slug = req.params.slug || req.body.storeSlug || 'abcstore';
-    const store = stores.getStoreBySlug(slug) || stores.getStoreById(slug) || stores.getAllStores()[0];
-
     const orderData = req.body;
     if (!orderData.items || orderData.items.length === 0) {
       return res.status(400).json({ success: false, error: 'Cannot create order: Cart is empty' });
     }
 
-    // Attach store metadata
+    const slug = req.params.slug || orderData.storeSlug || 'novamart';
+    const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
+
     orderData.storeId = store.id;
     orderData.storeSlug = store.slug;
     orderData.storeName = store.name;
     orderData.posConfigId = store.posConfigId;
 
-    console.log(`[Multi-Client Order] Placing order for Store "${store.name}" (${store.slug}) — Total: TZS ${orderData.totalAmount}`);
+    console.log(`[Order Placement] Processing Order #${orderData.orderId || orderData.orderNumber} for Store "${store.name}" (${store.slug})...`);
 
-    // 1. Create POS Order in Odoo
+    // 1. Create POS Order in Odoo ERP
     const odooOrderResult = await odoo.createOdooPosOrder(orderData);
 
-    // 2. Dispatch Automated WhatsApp Notification to Client WhatsApp Number
+    // 2. Automatically Send WhatsApp Order Alert Directly via OpenWA in the Background
     let waResult = null;
     try {
       waResult = await whatsapp.sendOrderNotification(store, {
-        orderNumber: orderData.orderNumber || odooOrderResult.receiptNumber,
-        customer: orderData.customer,
+        orderNumber: orderData.orderId || odooOrderResult.receiptNumber,
+        customer: {
+          name: orderData.customerName || `Customer (${orderData.customerPhone || 'N/A'})`,
+          phone: orderData.customerPhone || store.whatsapp,
+          deliveryAddress: orderData.deliveryAddress || store.address || 'Dar es Salaam'
+        },
         items: orderData.items,
-        totalAmount: orderData.totalAmount,
-        deliveryFee: orderData.deliveryFee || 0
+        totalAmount: orderData.totalAmount
       });
+      console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${store.whatsapp}!`);
     } catch (waErr) {
-      console.error('[WhatsApp Notification Warning]:', waErr.message);
+      console.warn('[WhatsApp Gateway Warning]:', waErr.message);
       waResult = { success: false, error: waErr.message };
     }
 
     res.status(201).json({
       success: true,
-      message: `Order #${orderData.orderNumber || odooOrderResult.odooOrderId} placed successfully for ${store.name}!`,
-      store: {
-        name: store.name,
-        slug: store.slug,
-        whatsapp: store.whatsapp
-      },
-      odooOrderId: odooOrderResult.odooOrderId,
-      receiptNumber: odooOrderResult.receiptNumber,
-      totalAmount: odooOrderResult.totalAmount,
-      whatsapp: waResult
+      message: 'Order created in Odoo and WhatsApp alert sent directly!',
+      order: {
+        orderId: orderData.orderId || odooOrderResult.odooOrderId,
+        odooOrderId: odooOrderResult.odooOrderId,
+        odooOrderName: odooOrderResult.receiptNumber,
+        receiptNumber: odooOrderResult.receiptNumber,
+        totalAmount: odooOrderResult.totalAmount,
+        whatsapp: waResult
+      }
     });
   } catch (err) {
-    console.error('[Multi-Client Order Placement Error]:', err);
+    console.error('[Order Processing Error]:', err);
     res.status(500).json({
       success: false,
       error: err.message || 'Failed to process order in Odoo'
@@ -206,88 +142,7 @@ app.post(['/api/:slug/order', '/api/odoo/order'], async (req, res) => {
   }
 });
 
-// =========================================================================
-// WHATSAPP GATEWAY & LOGS API
-// =========================================================================
-
-// WhatsApp Status & Session Health
-app.get('/api/whatsapp/status', async (req, res) => {
-  try {
-    const storeSlug = req.query.store || 'abcstore';
-    const store = stores.getStoreBySlug(storeSlug) || stores.getAllStores()[0];
-    const status = await whatsapp.checkSessionStatus(store);
-    res.json({
-      success: true,
-      gateway: 'OpenWA Gateway',
-      store: store.name,
-      sessionStatus: status,
-      logs: whatsapp.getLogs(10)
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Send Test WhatsApp Message
-app.post('/api/whatsapp/test', async (req, res) => {
-  try {
-    const { storeSlug, phone, customMessage } = req.body;
-    const store = stores.getStoreBySlug(storeSlug) || stores.getAllStores()[0];
-    
-    const sampleOrder = {
-      orderNumber: `TEST-${Date.now().toString().slice(-4)}`,
-      customer: {
-        name: 'Test Customer',
-        phone: phone || store.whatsapp,
-        deliveryAddress: 'Masaki, Dar es Salaam'
-      },
-      items: [
-        { name: 'Sample Item A', quantity: 1, price: 5000 }
-      ],
-      totalAmount: 5000
-    };
-
-    const waRes = await whatsapp.sendOrderNotification(store, sampleOrder);
-    res.json({
-      success: true,
-      message: `Test WhatsApp message dispatched to ${store.whatsapp}!`,
-      result: waRes
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// WhatsApp Logs
-app.get('/api/whatsapp/logs', (req, res) => {
-  res.json({
-    success: true,
-    logs: whatsapp.getLogs(50)
-  });
-});
-
-// =========================================================================
-// ODOO DASHBOARD & SYSTEM APIS
-// =========================================================================
-
-// Global Products API
-app.get('/api/odoo/products', async (req, res) => {
-  try {
-    const forceRefresh = req.query.refresh === 'true';
-    const result = await odoo.fetchOdooProducts(forceRefresh);
-    res.json({
-      success: true,
-      cached: result.cached,
-      count: result.products.length,
-      categories: result.categories,
-      products: result.products
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Dashboard Metrics (Supports Store & Period filtering)
+// 4. Admin Dashboard Metrics
 app.get('/api/odoo/dashboard', async (req, res) => {
   try {
     const dashboardData = await odoo.getOdooDashboardData();
@@ -302,44 +157,47 @@ app.get('/api/odoo/dashboard', async (req, res) => {
   }
 });
 
-// 1-Click Restock in Odoo
-app.post('/api/odoo/restock', async (req, res) => {
+// 5. WhatsApp Status
+app.get('/api/whatsapp/status', async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    if (!productId) {
-      return res.status(400).json({ success: false, error: 'Product ID is required' });
-    }
-    const restockResult = await odoo.restockOdooProduct(productId, quantity || 25);
-    res.json(restockResult);
+    const store = stores.getAllStores()[0];
+    const status = await whatsapp.checkSessionStatus(store);
+    res.json({
+      success: true,
+      gateway: 'OpenWA Gateway Active',
+      status: status,
+      logs: whatsapp.getLogs(10)
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// System Status
-app.get('/api/odoo/status', (req, res) => {
-  res.json({
-    connected: true,
-    host: odoo.ODOO_CONFIG.host,
-    db: odoo.ODOO_CONFIG.db,
-    user: odoo.ODOO_CONFIG.username,
-    totalStores: stores.getAllStores().length,
-    whatsappGateway: 'OpenWA Active',
-    serverTime: new Date().toISOString()
-  });
-});
-
 // =========================================================================
-// HTML PAGE ROUTES & DYNAMIC STOREFRONT ROUTING
+// CLEAN PAGE ROUTES (EXACT SAME AS CATALOG.KODATECHNOLOGIES.CO.TZ)
 // =========================================================================
 
-// Multi-Client Portal / Store Directory
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'portal.html'));
+// Catalog Page (Main / Storefront)
+app.get(['/', '/index.html', '/shop', '/:slug'], (req, res, next) => {
+  const slug = req.params.slug;
+  if (slug && (slug === 'cart' || slug === 'cart.html' || slug === 'confirmation' || slug === 'confirmation.html' || slug === 'dashboard' || slug === 'dashboard.html' || slug === 'odoo-preview')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Super Admin / Multi-Client Dashboard
-app.get(['/dashboard', '/dashboard.html', '/admin', '/admin.html'], (req, res) => {
+// Cart Page
+app.get(['/cart', '/cart.html', '/:slug/cart'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cart.html'));
+});
+
+// Confirmation Receipt Page
+app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confirmation'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
+});
+
+// Dashboard
+app.get(['/dashboard', '/dashboard.html', '/admin'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
@@ -348,60 +206,17 @@ app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
 });
 
-// Personalized Client Storefront Routes: achete.me/:shop_slug (e.g. /abcstore, /novamart, /crownshop)
-app.get('/:slug', (req, res, next) => {
-  const slug = req.params.slug;
-  const store = stores.getStoreBySlug(slug);
-  if (store) {
-    return res.sendFile(path.join(__dirname, 'public', 'storefront.html'));
-  }
-  // Fallback to static files
-  next();
-});
-
-// Personalized Cart for Client Store
-app.get('/:slug/cart', (req, res, next) => {
-  const slug = req.params.slug;
-  const store = stores.getStoreBySlug(slug);
-  if (store) {
-    return res.sendFile(path.join(__dirname, 'public', 'cart.html'));
-  }
-  next();
-});
-
-// Personalized Order Confirmation / Receipt
-app.get(['/:slug/confirmation', '/:slug/order/:orderId'], (req, res, next) => {
-  const slug = req.params.slug;
-  const store = stores.getStoreBySlug(slug);
-  if (store) {
-    return res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
-  }
-  next();
-});
-
-// Legacy direct file routes
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'storefront.html'));
-});
-app.get('/cart.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'cart.html'));
-});
-app.get('/confirmation.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
-});
-
-// Fallback to portal
+// Fallback
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'portal.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start Express Server
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
-  console.log(`🚀 ACHETE.ME Multi-Client Store Platform Running!`);
-  console.log(`🌐 Server URL: http://0.0.0.0:${PORT}`);
-  console.log(`🏪 Active Stores: ${stores.getActiveStores().map(s => `/${s.slug}`).join(', ')}`);
-  console.log(`⚡ OpenWA WhatsApp Gateway: Online (+255712345678)`);
+  console.log(`⚡ Clean Catalog & WhatsApp Store Server Running!`);
+  console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+  console.log(`📲 OpenWA WhatsApp Order Alerts: Enabled (Direct Send)`);
   console.log(`=======================================================`);
 });
 

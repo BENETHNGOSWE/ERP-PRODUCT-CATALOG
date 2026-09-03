@@ -290,6 +290,7 @@
       if (itemCountEl) itemCountEl.textContent = `${order.itemCount || 3} items`;
       if (phoneEl) phoneEl.textContent = order.phone || '+255 7XX XXX XXX';
 
+      NOVA.applyStoreBranding(NOVA.getStore());
       NOVA.updateHeaderCartBadge();
 
       // View Order Modal
