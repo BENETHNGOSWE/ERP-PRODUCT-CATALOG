@@ -539,6 +539,12 @@ img {
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .sort-wrapper {
+    display: none !important;
+  }
+}
+
 .sort-label {
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -1790,7 +1796,7 @@ img {
   padding: 18px 20px;
   margin-top: auto;
   width: 100%;
-  text-align: center;
+  box-sizing: border-box;
 }
 
 .footer-container {
@@ -1799,24 +1805,28 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  text-align: center;
   font-size: 0.85rem;
   color: var(--text-muted);
-  text-align: center;
   width: 100%;
 }
 
-.footer-copy {
-  margin: 0;
+.footer-container p {
+  width: 100%;
   text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 500;
 }
 
-.footer-copy strong {
-  color: var(--navy-dark);
-  font-weight: 700;
+@media (max-width: 768px) {
+  .footer-links {
+    display: none !important;
+  }
+  .app-footer {
+    padding: 16px 14px 80px; /* Leave space above sticky floating cart */
+  }
+  .footer-container {
+    justify-content: center !important;
+    text-align: center !important;
+  }
 }
 
 /* Modals */
