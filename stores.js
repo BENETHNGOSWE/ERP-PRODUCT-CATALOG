@@ -279,56 +279,242 @@ class StoreManager {
   }
 
   /**
-   * Filter Odoo Products strictly for this Client Store
-   * Enforces strict Product Separation & Stock Loading Guard
+   * Filter and resolve products strictly for this Client Store with isolated stock & pricing
+   * Enforces multi-client catalog separation, custom store stock, and store price overrides.
    */
-  filterProductsForStore(allProducts, store) {
-    if (!store || !allProducts || allProducts.length === 0) return [];
+  filterProductsForStore(allProducts = [], store) {
+    if (!store) return [];
+
+    let matched = [];
 
     // 1. Explicit Product IDs match (Highest precedence)
     if (Array.isArray(store.productIds) && store.productIds.length > 0) {
       const idSet = new Set(store.productIds.map(Number));
-      return allProducts.filter(p => idSet.has(p.id));
-    }
+      matched = (allProducts || []).filter(p => idSet.has(Number(p.id)));
+    } else {
+      // 2. Built-in default stores use curated keywords/categories
+      const isBuiltinStore = [1, 2, 3, 4].includes(store.id) || ['abcstore', 'novamart', 'crownshop', 'safaridiner'].includes(store.slug);
+      
+      if (isBuiltinStore) {
+        const storeCategories = (store.categories || []).map(c => c.toLowerCase());
+        const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
 
-    // 2. Built-in default stores use curated keywords/categories
-    const isBuiltinStore = [1, 2, 3, 4].includes(store.id) || ['abcstore', 'novamart', 'crownshop', 'safaridiner'].includes(store.slug);
-    
-    if (isBuiltinStore) {
-      const storeCategories = (store.categories || []).map(c => c.toLowerCase());
-      const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
-
-      return allProducts.filter(p => {
-        const pName = (p.name || '').toLowerCase();
-        const pCat = (p.category || '').toLowerCase();
-        const pSku = (p.default_code || '').toLowerCase();
-
-        const catMatch = storeCategories.some(sc => pCat.includes(sc) || sc.includes(pCat));
-        if (catMatch) return true;
-
-        const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
-        if (keyMatch) return true;
-
-        return false;
-      });
-    }
-
-    // 3. For newly created user stores:
-    // If the store has specific productKeywords configured by user, filter by those keywords
-    if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
-      const storeKeywords = store.productKeywords.map(k => k.toLowerCase().trim()).filter(Boolean);
-      if (storeKeywords.length > 0) {
-        return allProducts.filter(p => {
+        matched = (allProducts || []).filter(p => {
           const pName = (p.name || '').toLowerCase();
+          const pCat = (p.category || '').toLowerCase();
           const pSku = (p.default_code || '').toLowerCase();
-          return storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
+
+          const catMatch = storeCategories.some(sc => pCat.includes(sc) || sc.includes(pCat));
+          if (catMatch) return true;
+
+          const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
+          if (keyMatch) return true;
+
+          return false;
         });
+      } else if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
+        const storeKeywords = store.productKeywords.map(k => k.toLowerCase().trim()).filter(Boolean);
+        if (storeKeywords.length > 0) {
+          matched = (allProducts || []).filter(p => {
+            const pName = (p.name || '').toLowerCase();
+            const pSku = (p.default_code || '').toLowerCase();
+            return storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
+          });
+        }
       }
     }
 
-    // 4. If no products/stock are loaded yet for this new store, return empty array (0 products)
-    // Prevents unlinked new stores from displaying global/demo inventory unexpectedly!
-    return [];
+    // Clone matched list to avoid mutating shared Odoo cache
+    const finalProducts = matched.map(p => ({ ...p }));
+
+    // 3. Merge store's custom created products
+    if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
+      store.customProducts.forEach(cp => {
+        if (!finalProducts.some(p => Number(p.id) === Number(cp.id))) {
+          finalProducts.push({ ...cp });
+        }
+      });
+    }
+
+    // 4. Apply Store-Specific Isolated Stock & Pricing Overrides
+    const overrides = store.inventoryOverrides || {};
+    return finalProducts.map(prod => {
+      const pId = String(prod.id);
+      const ovr = overrides[pId];
+      if (ovr) {
+        const storeStock = ovr.qty_available !== undefined ? Number(ovr.qty_available) : Number(prod.qty_available || 0);
+        const storePrice = ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
+        return {
+          ...prod,
+          name: ovr.name || prod.name,
+          price: storePrice,
+          qty_available: storeStock,
+          inStock: storeStock > 0,
+          isStoreCustomized: true,
+          storeStock: storeStock,
+          storePrice: storePrice
+        };
+      }
+      return {
+        ...prod,
+        storeStock: Number(prod.qty_available || 0),
+        storePrice: Number(prod.price || 0),
+        inStock: Number(prod.qty_available || 0) > 0
+      };
+    });
+  }
+
+  /**
+   * Update stock and/or price specifically for this store
+   * Supports:
+   * - addQty (e.g. +10 received stock)
+   * - newQty (exact stock count)
+   * - price (store selling price)
+   */
+  updateStoreProductStock(idOrSlug, productId, { addQty, newQty, price, name }) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    if (!store.inventoryOverrides) store.inventoryOverrides = {};
+    if (!Array.isArray(store.productIds)) store.productIds = [];
+
+    const pIdStr = String(productId);
+    const pIdNum = Number(productId);
+
+    // If product is not yet in store.productIds, add it
+    if (!store.productIds.includes(pIdNum)) {
+      store.productIds.push(pIdNum);
+    }
+
+    // Check if it's in store.customProducts
+    if (Array.isArray(store.customProducts)) {
+      const customProd = store.customProducts.find(p => Number(p.id) === pIdNum);
+      if (customProd) {
+        if (addQty !== undefined && addQty !== null && !isNaN(Number(addQty))) {
+          customProd.qty_available = Math.max(0, (Number(customProd.qty_available) || 0) + Number(addQty));
+        } else if (newQty !== undefined && newQty !== null && !isNaN(Number(newQty))) {
+          customProd.qty_available = Math.max(0, Number(newQty));
+        }
+        if (price !== undefined && price !== null && !isNaN(Number(price))) {
+          customProd.price = Number(price);
+        }
+        if (name) customProd.name = name.trim();
+        customProd.inStock = (Number(customProd.qty_available) || 0) > 0;
+        customProd.updatedAt = new Date().toISOString();
+
+        this.saveStores();
+        return { store, product: customProd };
+      }
+    }
+
+    // Otherwise update or create entry in inventoryOverrides
+    const existing = store.inventoryOverrides[pIdStr] || {};
+    let finalQty = existing.qty_available !== undefined ? Number(existing.qty_available) : 0;
+
+    if (addQty !== undefined && addQty !== null && !isNaN(Number(addQty))) {
+      finalQty = Math.max(0, finalQty + Number(addQty));
+    } else if (newQty !== undefined && newQty !== null && !isNaN(Number(newQty))) {
+      finalQty = Math.max(0, Number(newQty));
+    }
+
+    let finalPrice = existing.price !== undefined ? Number(existing.price) : undefined;
+    if (price !== undefined && price !== null && !isNaN(Number(price))) {
+      finalPrice = Number(price);
+    }
+
+    store.inventoryOverrides[pIdStr] = {
+      ...existing,
+      qty_available: finalQty,
+      ...(finalPrice !== undefined ? { price: finalPrice } : {}),
+      ...(name ? { name: name.trim() } : {}),
+      updatedAt: new Date().toISOString()
+    };
+
+    this.saveStores();
+    return {
+      store,
+      override: store.inventoryOverrides[pIdStr],
+      productId: pIdNum
+    };
+  }
+
+  /**
+   * Add a brand new custom product directly to this client's store
+   */
+  addCustomProductToStore(idOrSlug, data) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    if (!Array.isArray(store.customProducts)) store.customProducts = [];
+    if (!Array.isArray(store.productIds)) store.productIds = [];
+
+    const nextId = Math.max(
+      1000,
+      ...store.customProducts.map(p => Number(p.id) || 0),
+      ...store.productIds.map(Number)
+    ) + 1;
+
+    const initialStock = Number(data.initialStock || data.qty_available || data.stock || 0);
+    const newProd = {
+      id: nextId,
+      name: (data.name || 'New Store Product').trim(),
+      category: (data.category || 'General').trim(),
+      price: Number(data.price) || 0,
+      qty_available: initialStock,
+      inStock: initialStock > 0,
+      image: data.image || '/assets/products/samsung_charger.png',
+      thumb: data.thumb || data.image || '/assets/products/samsung_charger.png',
+      default_code: (data.sku || data.default_code || `SKU-${nextId}`).trim(),
+      barcode: data.barcode || '',
+      type: 'consu',
+      rating: 5.0,
+      reviews: 1,
+      createdAt: new Date().toISOString()
+    };
+
+    store.customProducts.push(newProd);
+    if (!store.productIds.includes(nextId)) {
+      store.productIds.push(nextId);
+    }
+
+    this.saveStores();
+    return { store, product: newProd };
+  }
+
+  /**
+   * Deduct store-specific stock when an order is placed for this store
+   */
+  deductStoreStock(idOrSlug, items = []) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store || !items || items.length === 0) return;
+
+    if (!store.inventoryOverrides) store.inventoryOverrides = {};
+    if (!Array.isArray(store.customProducts)) store.customProducts = [];
+
+    items.forEach(item => {
+      const pIdNum = Number(item.id || item.productId);
+      const pIdStr = String(pIdNum);
+      const qtyToDeduct = Number(item.quantity || item.qty || 1);
+
+      // 1. Check customProducts
+      const customProd = store.customProducts.find(p => Number(p.id) === pIdNum);
+      if (customProd) {
+        customProd.qty_available = Math.max(0, (Number(customProd.qty_available) || 0) - qtyToDeduct);
+        customProd.inStock = customProd.qty_available > 0;
+        return;
+      }
+
+      // 2. Check or initialize inventoryOverrides
+      const existing = store.inventoryOverrides[pIdStr] || { qty_available: 0 };
+      const current = Number(existing.qty_available || 0);
+      store.inventoryOverrides[pIdStr] = {
+        ...existing,
+        qty_available: Math.max(0, current - qtyToDeduct),
+        updatedAt: new Date().toISOString()
+      };
+    });
+
+    this.saveStores();
   }
 }
 

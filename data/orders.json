@@ -1,5 +1,41 @@
 [
   {
+    "id": 8,
+    "orderId": "ORD-7496",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-1788542825999",
+    "receiptNumber": "Order WEB-1788542825999",
+    "storeId": 8,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255712999888",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Sarah Juma",
+      "phone": "+255713445566",
+      "deliveryAddress": "Oysterbay, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 1001,
+        "name": "iPhone 15 Pro Max 256GB",
+        "price": 2850000,
+        "qty": 1,
+        "subtotal": 2850000
+      }
+    ],
+    "itemCount": 1,
+    "subtotal": 2850000,
+    "discount": 0,
+    "totalAmount": 2850000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": null,
+    "createdAt": "2026-09-04T17:27:07.525Z",
+    "dateFormatted": "4 Sept 2026, 17:27"
+  },
+  {
     "id": 7,
     "orderId": "ORD-6900",
     "odooOrderId": 113,

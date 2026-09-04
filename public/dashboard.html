@@ -1167,6 +1167,55 @@
         </div>
       </section>
 
+      <!-- Store Client Dedicated Inventory & Stock Management Section -->
+      <section class="dash-card" id="clientInventorySection" style="display:none; margin-bottom: 24px;">
+        <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 class="card-title" style="display:flex; align-items:center; gap:8px;">
+              <span>🏪 Store Catalog & Stock Management</span>
+              <span id="clientProdCountBadge" style="font-size:0.75rem; background:#ede9fe; color:#6d28d9; padding:2px 8px; border-radius:12px; font-weight:700;">0 products</span>
+            </h2>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
+              Manage your store's stock received, set your custom selling prices, and add new products. Stock is strictly isolated to your shop.
+            </p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" onclick="openClientStockReceiveModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,71,187,0.25);">
+              <span>📦 Load / Receive Stock</span>
+            </button>
+            <button type="button" onclick="openClientAddProductModal()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>➕ Add Product</span>
+            </button>
+            <button type="button" onclick="openClientSheetImportModal()" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:0.82rem; padding:8px 14px; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>📄 Import Sheet</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search / Filter Bar -->
+        <div style="margin: 14px 0 16px; display:flex; gap:10px;">
+          <input type="text" id="clientInvSearchInput" placeholder="🔍 Search your products by name, category or SKU..." oninput="filterClientInventoryTable()" style="flex:1; padding:9px 14px; font-size:0.84rem; border:1.5px solid #e2e8f0; border-radius:8px; outline:none;">
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th style="min-width: 140px;">My Selling Price (TZS)</th>
+                <th style="text-align: center;">Current Stock</th>
+                <th style="min-width: 180px;">Receive Stock (+Units)</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="clientInventoryTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Bottom Grid: Out of Stock Table + Recent Orders -->
       <section class="bottom-grid" id="outOfStockSection">
         <!-- Out of Stock Products Table -->
@@ -1197,7 +1246,7 @@
         <!-- Recent Orders -->
         <div class="dash-card">
           <div class="card-header-row">
-            <h2 class="card-title">Recent Odoo Orders</h2>
+            <h2 class="card-title">Recent Orders</h2>
             <a href="#" style="font-size: 0.8rem; font-weight: 700; color: #0047bb; text-decoration: none;" onclick="fetchLiveDashboardData(true); return false;">Sync Now</a>
           </div>
 
@@ -1208,6 +1257,137 @@
       </section>
 
     </main>
+
+  </div>
+
+  <!-- Client Store Receive Stock Modal -->
+  <div class="restock-modal-overlay" id="clientStockReceiveModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 480px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+        <h3 class="modal-title" style="margin:0;">📦 Receive Stock Delivery</h3>
+        <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientStockReceiveModal()">&times;</button>
+      </div>
+      <p style="font-size:0.84rem; color:#64748b; margin-bottom:14px;">
+        Add newly received shipment inventory to your store. Stock will be instantly updated in your catalog.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Select Product:</label>
+          <select id="clientReceiveProdSelect" class="modal-input" style="font-size:0.86rem; padding:8px 10px;" onchange="onClientReceiveProductChange()">
+            <!-- Populated dynamically with store products -->
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Stock Received (+Qty):</label>
+            <input type="number" id="clientReceiveQtyInput" class="modal-input" value="10" min="1" max="10000" style="font-size:0.95rem; font-weight:700; color:#0047bb;">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Current Stock Level:</label>
+            <input type="text" id="clientCurrentStockDisplay" class="modal-input" value="0 units" readonly style="background:#f1f5f9; color:#475569; font-weight:700;">
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Selling Price (TZS): <span style="font-weight:400; color:#64748b;">(Leave blank to keep current)</span></label>
+          <input type="number" id="clientReceivePriceInput" class="modal-input" placeholder="e.g. 65000">
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:18px;">
+        <button type="button" class="btn-modal-cancel" onclick="closeClientStockReceiveModal()">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btnConfirmClientReceive" onclick="submitClientStockReceive()">
+          ✅ Save Received Stock
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Add New Product Modal -->
+  <div class="restock-modal-overlay" id="clientAddProductModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 500px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+        <h3 class="modal-title" style="margin:0;">➕ Add Product to My Store</h3>
+        <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientAddProductModal()">&times;</button>
+      </div>
+      <p style="font-size:0.84rem; color:#64748b; margin-bottom:14px;">
+        Create a new product specifically for your shop. You control your stock and price independently.
+      </p>
+
+      <form id="clientAddProductForm" onsubmit="submitClientAddProduct(event)" style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Title / Name *</label>
+          <input type="text" id="clientNewProdName" class="modal-input" required placeholder="e.g. iPhone 15 Pro Max 256GB">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Category</label>
+            <input type="text" id="clientNewProdCategory" class="modal-input" placeholder="e.g. Smartphones" value="General">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">SKU / Code</label>
+            <input type="text" id="clientNewProdSku" class="modal-input" placeholder="e.g. IPH15-PRO">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Selling Price (TZS) *</label>
+            <input type="number" id="clientNewProdPrice" class="modal-input" required placeholder="e.g. 2450000" min="0">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Initial Stock (Units) *</label>
+            <input type="number" id="clientNewProdStock" class="modal-input" required value="20" min="0">
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Image (Icon)</label>
+          <select id="clientNewProdImage" class="modal-input" style="font-size:0.84rem;">
+            <option value="/assets/products/samsung_charger.png">📱 Smartphone & Accessories</option>
+            <option value="/assets/products/coca_cola.png">🥤 Drinks & Beverages</option>
+            <option value="/assets/products/nivea_lotion.png">🧴 Cosmetics & Care</option>
+            <option value="/assets/products/redbull.png">⚡ Energy & Food</option>
+            <option value="/assets/products/logo.png">🛍️ General Product</option>
+          </select>
+        </div>
+
+        <div class="modal-actions" style="margin-top:14px;">
+          <button type="button" class="btn-modal-cancel" onclick="closeClientAddProductModal()">Cancel</button>
+          <button type="submit" class="btn-modal-confirm" id="btnSubmitClientNewProd">
+            ➕ Add to Store Catalog
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Client Spreadsheet / Batch Import Modal -->
+  <div class="restock-modal-overlay" id="clientSheetImportModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 540px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+        <h3 class="modal-title" style="margin:0;">📄 Import Stock from Sheet / CSV</h3>
+        <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientSheetImportModal()">&times;</button>
+      </div>
+      <p style="font-size:0.84rem; color:#64748b; margin-bottom:10px;">
+        Paste your inventory lines or table from Excel/Google Sheets below. Format: <code>Product Name, Category, Price, Stock Received, SKU</code>
+      </p>
+
+      <textarea id="clientSheetCsvText" style="width:100%; height:130px; font-family:monospace; font-size:0.82rem; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; resize:vertical; box-sizing:border-box;" placeholder="iPhone 15 128GB, Smartphones, 2100000, 15, IP15-128
+Samsung Galaxy S24, Smartphones, 2300000, 10, SGS24
+USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
+
+      <div class="modal-actions" style="margin-top:16px;">
+        <button type="button" class="btn-modal-cancel" onclick="closeClientSheetImportModal()">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btnSubmitClientSheetImport" onclick="submitClientSheetImport()">
+          📥 Import All Stock to Store
+        </button>
+      </div>
+    </div>
+  </div>
 
   </div>
 
@@ -1806,9 +1986,12 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
     }
 
+    let currentClientProducts = [];
+
     function applyStoreClientMode(data) {
       const store = data.store || {};
       const kpi = data.kpi || {};
+      currentClientProducts = data.products || [];
 
       // 1. Page Header & Branding
       document.title = `${store.name} — Store Management Portal`;
@@ -1825,7 +2008,14 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const waBtn = document.querySelector('button[onclick="openWhatsAppConfigModal()"]');
       if (waBtn) waBtn.style.display = 'none';
 
-      // 3. Update KPI Cards
+      // 3. Show Dedicated Client Store Inventory Section & hide generic Out of Stock table
+      const clientInvSec = document.getElementById('clientInventorySection');
+      if (clientInvSec) clientInvSec.style.display = 'block';
+
+      const outOfStockDashCard = document.querySelector('#outOfStockSection .dash-card:first-child');
+      if (outOfStockDashCard) outOfStockDashCard.style.display = 'none';
+
+      // 4. Update KPI Cards
       document.getElementById('kpiCompleted').textContent = kpi.todayOrders || 0;
       document.getElementById('kpiProgress').textContent = kpi.weekOrders || 0;
       document.getElementById('kpiSales').textContent = formatTZS(kpi.todaySales);
@@ -1834,14 +2024,345 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const sbStock = document.getElementById('sidebarStockBadge');
       if (sbStock) sbStock.textContent = kpi.outOfStock || 0;
 
-      const tableOutCount = document.getElementById('tableOutStockCount');
-      if (tableOutCount) tableOutCount.textContent = kpi.outOfStock || 0;
+      const prodCountBadge = document.getElementById('clientProdCountBadge');
+      if (prodCountBadge) prodCountBadge.textContent = `${currentClientProducts.length} products`;
 
-      // 4. Populate Store Inventory
-      renderOutOfStockTable(data.products || []);
+      // 5. Render Client Store Inventory Table
+      renderClientInventoryTable(currentClientProducts);
 
-      // 5. Populate Store Orders
+      // 6. Populate Store Orders
       renderRecentOrders(data.recentOrders || []);
+    }
+
+    function renderClientInventoryTable(products) {
+      const tbody = document.getElementById('clientInventoryTableBody');
+      if (!tbody) return;
+
+      if (!products || products.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:36px 16px; color:#64748b;">
+              <div style="font-size:2.2rem; margin-bottom:8px;">📦</div>
+              <strong style="color:#081735; font-size:1.05rem; display:block; margin-bottom:4px;">No products in your catalog yet</strong>
+              <p style="font-size:0.84rem; margin-bottom:14px;">Start by adding your first product or receiving a shipment delivery!</p>
+              <div style="display:flex; justify-content:center; gap:8px;">
+                <button type="button" onclick="openClientAddProductModal()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
+                  ➕ Add First Product
+                </button>
+                <button type="button" onclick="openClientSheetImportModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
+                  📄 Import from Excel / CSV
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = products.map((prod, idx) => {
+        const stock = prod.qty_available !== undefined ? Number(prod.qty_available) : (Number(prod.storeStock) || 0);
+        const price = prod.price !== undefined ? Number(prod.price) : (Number(prod.storePrice) || 0);
+        const badgeColor = stock <= 0 ? '#ef4444' : (stock <= 5 ? '#f59e0b' : '#16a34a');
+        const badgeBg = stock <= 0 ? '#fee2e2' : (stock <= 5 ? '#fef3c7' : '#dcfce7');
+        const statusText = stock <= 0 ? 'Out of Stock (0)' : (stock <= 5 ? `Low (${stock})` : `In Stock (${stock})`);
+
+        return `
+          <tr id="client-prod-row-${prod.id}">
+            <td>
+              <div class="table-prod-cell">
+                <img src="${prod.image || prod.thumb || '/assets/products/samsung_charger.png'}" alt="" class="table-prod-img" onerror="this.src='/assets/products/samsung_charger.png'">
+                <div class="table-prod-info">
+                  <span class="table-prod-name" style="font-weight:700; color:#0f172a;">${prod.name}</span>
+                  <span class="table-prod-sku" style="font-size:0.75rem; color:#64748b;">SKU: ${prod.default_code || prod.sku || '---'}</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="cat-badge furniture">${prod.category || 'General'}</span></td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input type="number" id="client-price-${prod.id}" value="${price}" min="0" step="100" style="width:105px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; color:#0047bb;" title="Change selling price">
+                <button type="button" onclick="quickUpdatePriceInline(${prod.id})" title="Save Price" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:0.76rem; font-weight:700;">
+                  💾
+                </button>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <span style="font-size:0.8rem; font-weight:700; color:${badgeColor}; background:${badgeBg}; padding:4px 10px; border-radius:8px; display:inline-block;">
+                ${statusText}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input type="number" id="client-receive-input-${prod.id}" value="10" min="1" max="5000" style="width:65px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1.5px solid #93c5fd; border-radius:6px; color:#081735; text-align:center;" title="Number of units received">
+                <button type="button" onclick="quickAddStockInline(${prod.id})" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.78rem; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px rgba(0,71,187,0.2);">
+                  + Receive
+                </button>
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <div style="display:flex; gap:6px; justify-content:flex-end;">
+                <button type="button" onclick="openClientStockReceiveModal(${prod.id})" title="Full Restock" style="background:#f8fafc; color:#0047bb; border:1px solid #cbd5e1; font-weight:700; font-size:0.78rem; padding:5px 9px; border-radius:6px; cursor:pointer;">
+                  📦 Load
+                </button>
+                <button type="button" onclick="removeClientProduct(${prod.id})" title="Remove Product" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:5px 8px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.8rem;">
+                  ✕
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterClientInventoryTable() {
+      const q = (document.getElementById('clientInvSearchInput').value || '').toLowerCase().trim();
+      if (!q) {
+        renderClientInventoryTable(currentClientProducts);
+        return;
+      }
+      const filtered = currentClientProducts.filter(p => {
+        const name = (p.name || '').toLowerCase();
+        const cat = (p.category || '').toLowerCase();
+        const sku = (p.default_code || p.sku || '').toLowerCase();
+        return name.includes(q) || cat.includes(q) || sku.includes(q);
+      });
+      renderClientInventoryTable(filtered);
+    }
+
+    // Direct Inline Actions
+    async function quickAddStockInline(productId) {
+      const input = document.getElementById(`client-receive-input-${productId}`);
+      const addQty = parseInt(input ? input.value : '10', 10) || 10;
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/stock/receive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, addQty })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast(`📦 Added +${addQty} stock units!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Stock update error: ' + err.message);
+      }
+    }
+
+    async function quickUpdatePriceInline(productId) {
+      const input = document.getElementById(`client-price-${productId}`);
+      const newPrice = parseFloat(input ? input.value : '0') || 0;
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/stock/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, price: newPrice })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        showDashToast(`💾 Price updated to ${formatTZS(newPrice)}!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Price update error: ' + err.message);
+      }
+    }
+
+    // Receive Stock Delivery Modal Handlers
+    function openClientStockReceiveModal(preselectedId = null) {
+      const modal = document.getElementById('clientStockReceiveModal');
+      const select = document.getElementById('clientReceiveProdSelect');
+      const qtyInput = document.getElementById('clientReceiveQtyInput');
+      const priceInput = document.getElementById('clientReceivePriceInput');
+
+      if (!select || !modal) return;
+
+      select.innerHTML = currentClientProducts.map(p => `
+        <option value="${p.id}" ${preselectedId && Number(preselectedId) === Number(p.id) ? 'selected' : ''}>
+          ${p.name} (Current Stock: ${p.qty_available || 0})
+        </option>
+      `).join('');
+
+      qtyInput.value = '10';
+      priceInput.value = '';
+      onClientReceiveProductChange();
+      modal.style.display = 'flex';
+    }
+
+    function onClientReceiveProductChange() {
+      const select = document.getElementById('clientReceiveProdSelect');
+      const disp = document.getElementById('clientCurrentStockDisplay');
+      const priceInput = document.getElementById('clientReceivePriceInput');
+      const pId = select ? select.value : null;
+
+      const prod = currentClientProducts.find(p => String(p.id) === String(pId));
+      if (prod) {
+        if (disp) disp.value = `${prod.qty_available || 0} units`;
+        if (priceInput && !priceInput.value) priceInput.placeholder = `Current: ${formatTZS(prod.price)}`;
+      }
+    }
+
+    function closeClientStockReceiveModal() {
+      document.getElementById('clientStockReceiveModal').style.display = 'none';
+    }
+
+    async function submitClientStockReceive() {
+      const select = document.getElementById('clientReceiveProdSelect');
+      const qtyInput = document.getElementById('clientReceiveQtyInput');
+      const priceInput = document.getElementById('clientReceivePriceInput');
+      const btn = document.getElementById('btnConfirmClientReceive');
+
+      const productId = select ? select.value : null;
+      const addQty = parseInt(qtyInput ? qtyInput.value : '10', 10) || 10;
+      const price = priceInput && priceInput.value ? parseFloat(priceInput.value) : undefined;
+
+      if (!productId) {
+        alert('Please select a product');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Saving Stock...';
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/stock/receive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, addQty, price })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+
+        closeClientStockReceiveModal();
+        showDashToast(`✅ Successfully received +${addQty} stock units!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error saving stock: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✅ Save Received Stock';
+      }
+    }
+
+    // Add Product Modal Handlers
+    function openClientAddProductModal() {
+      document.getElementById('clientAddProductModal').style.display = 'flex';
+    }
+
+    function closeClientAddProductModal() {
+      document.getElementById('clientAddProductModal').style.display = 'none';
+      document.getElementById('clientAddProductForm').reset();
+    }
+
+    async function submitClientAddProduct(e) {
+      if (e) e.preventDefault();
+      const btn = document.getElementById('btnSubmitClientNewProd');
+      btn.disabled = true;
+      btn.textContent = 'Creating Product...';
+
+      const payload = {
+        name: document.getElementById('clientNewProdName').value,
+        category: document.getElementById('clientNewProdCategory').value || 'General',
+        sku: document.getElementById('clientNewProdSku').value || '',
+        price: parseFloat(document.getElementById('clientNewProdPrice').value) || 0,
+        initialStock: parseInt(document.getElementById('clientNewProdStock').value, 10) || 0,
+        image: document.getElementById('clientNewProdImage').value || '/assets/products/samsung_charger.png'
+      };
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/products/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to create product');
+
+        closeClientAddProductModal();
+        showDashToast(`🎉 Product "${payload.name}" added with ${payload.initialStock} units!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error creating product: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '➕ Add to Store Catalog';
+      }
+    }
+
+    // Sheet / CSV Import Handlers
+    function openClientSheetImportModal() {
+      document.getElementById('clientSheetImportModal').style.display = 'flex';
+    }
+
+    function closeClientSheetImportModal() {
+      document.getElementById('clientSheetImportModal').style.display = 'none';
+    }
+
+    async function submitClientSheetImport() {
+      const text = document.getElementById('clientSheetCsvText').value.trim();
+      const btn = document.getElementById('btnSubmitClientSheetImport');
+
+      if (!text) {
+        alert('Please paste at least one product row.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Importing Rows...';
+
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const items = [];
+
+      lines.forEach(line => {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 1 && parts[0]) {
+          items.push({
+            name: parts[0],
+            category: parts[1] || 'General',
+            price: parseFloat(parts[2]) || 0,
+            stock: parseInt(parts[3], 10) || 10,
+            sku: parts[4] || ''
+          });
+        }
+      });
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/import-stock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to import stock');
+
+        closeClientSheetImportModal();
+        showDashToast(`📥 Imported ${data.importedCount || items.length} products to your store!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Import error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📥 Import All Stock to Store';
+      }
+    }
+
+    async function removeClientProduct(productId) {
+      if (!confirm('Are you sure you want to remove this product from your store catalog?')) return;
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to remove');
+
+        showDashToast('Product removed from store.');
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        alert('Error removing product: ' + err.message);
+      }
     }
 
     function renderCurrentPeriod() {

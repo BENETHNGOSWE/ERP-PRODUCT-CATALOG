@@ -196,29 +196,132 @@ app.delete('/api/stores/:id/products/:productId', (req, res) => {
 });
 
 // 5f. Bulk Import Products and Stock for a Store
-app.post('/api/stores/:id/import-stock', async (req, res) => {
+app.post(['/api/stores/:id/import-stock', '/api/:id/import-stock'], async (req, res) => {
   try {
     const { items } = req.body;
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, error: 'No items provided for import' });
     }
 
+    const targetStore = stores.getStoreById(req.params.id) || stores.getStoreBySlug(req.params.id);
+    if (!targetStore) return res.status(404).json({ success: false, error: 'Store not found' });
+
     const addedIds = [];
     for (const item of items) {
-      const created = await odoo.createOdooProduct(item, item.stock || 50);
-      if (created.productId) {
-        addedIds.push(created.productId);
-        stores.addProductToStore(req.params.id, created.productId);
+      if (item.name) {
+        const added = stores.addCustomProductToStore(targetStore.id, {
+          name: item.name,
+          category: item.category || 'General',
+          price: Number(item.price) || 0,
+          initialStock: Number(item.stock || item.qty || 0),
+          sku: item.sku || item.code || '',
+          image: item.image || '/assets/products/samsung_charger.png'
+        });
+        addedIds.push(added.product.id);
       }
     }
 
     res.json({
       success: true,
       importedCount: addedIds.length,
-      message: `Successfully imported ${addedIds.length} products to store!`
+      message: `Successfully imported ${addedIds.length} products to store "${targetStore.name}"!`
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5g. Client Store Stock Receiving (Add received quantity e.g. +10)
+app.post(['/api/:slug/stock/receive', '/api/stores/:slug/stock/receive'], async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const { productId, addQty, price, name } = req.body;
+    if (!productId) return res.status(400).json({ success: false, error: 'Product ID is required' });
+
+    const result = stores.updateStoreProductStock(slug, productId, {
+      addQty: Number(addQty) || 0,
+      price: price !== undefined ? Number(price) : undefined,
+      name
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully received +${addQty} stock units for store!`,
+      ...result
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 5h. Client Store Direct Stock & Price Update (Set exact stock/price)
+app.post(['/api/:slug/stock/update', '/api/stores/:slug/stock/update'], async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const { productId, newQty, price, name } = req.body;
+    if (!productId) return res.status(400).json({ success: false, error: 'Product ID is required' });
+
+    const result = stores.updateStoreProductStock(slug, productId, {
+      newQty: newQty !== undefined ? Number(newQty) : undefined,
+      price: price !== undefined ? Number(price) : undefined,
+      name
+    });
+
+    res.json({
+      success: true,
+      message: 'Store stock & price updated successfully!',
+      ...result
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 5i. Client Store Batch Stock Receive (Multiple items received at once)
+app.post(['/api/:slug/stock/batch-receive', '/api/stores/:slug/stock/batch-receive'], async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: 'No restock items provided' });
+    }
+
+    for (const item of items) {
+      if (item.productId) {
+        stores.updateStoreProductStock(slug, item.productId, {
+          addQty: item.addQty !== undefined ? Number(item.addQty) : undefined,
+          newQty: item.newQty !== undefined ? Number(item.newQty) : undefined,
+          price: item.price !== undefined ? Number(item.price) : undefined
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Updated stock levels for ${items.length} items in store!`
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 5j. Client Store Create Brand New Custom Product
+app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const productData = req.body;
+    if (!productData.name) {
+      return res.status(400).json({ success: false, error: 'Product name is required' });
+    }
+
+    const result = stores.addCustomProductToStore(slug, productData);
+    res.status(201).json({
+      success: true,
+      message: `Product "${productData.name}" created and added to your store!`,
+      product: result.product
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 
@@ -301,6 +404,13 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       console.warn('[Odoo POS Order Notice]:', odooErr.message);
       // Fallback stock deduction in memory
       odoo.deductStock(orderData.items).catch(() => {});
+    }
+
+    // Deduct stock isolated strictly for this store's inventory
+    try {
+      stores.deductStoreStock(store.id, orderData.items);
+    } catch (deductErr) {
+      console.warn('[Store Stock Deduct Warning]:', deductErr.message);
     }
 
     const finalOrderId = orderData.orderId || `ORD-${Date.now().toString().slice(-4)}`;
