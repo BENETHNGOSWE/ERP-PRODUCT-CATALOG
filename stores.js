@@ -175,6 +175,7 @@ class StoreManager {
       id: nextId,
       name: (data.name || 'New Client Store').trim(),
       slug: slugCheck.slug,
+      pin: data.pin || '1234',
       tagline: (data.tagline || 'Official Online Store').trim(),
       logo: logo,
       whatsapp: (data.whatsapp || '+255712345678').trim(),
@@ -216,6 +217,7 @@ class StoreManager {
     }
 
     if (data.name) store.name = data.name.trim();
+    if (data.pin) store.pin = String(data.pin).trim();
     if (data.tagline !== undefined) store.tagline = data.tagline.trim();
     if (data.logo) store.logo = data.logo;
     if (data.whatsapp) store.whatsapp = data.whatsapp.trim();

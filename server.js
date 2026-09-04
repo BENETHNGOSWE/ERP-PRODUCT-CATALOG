@@ -264,7 +264,7 @@ app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/product
 });
 
 // 7. Place Order in Odoo POS & Automatically Dispatch Direct WhatsApp Message in Background
-app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
+app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res) => {
   try {
     const orderData = req.body;
     if (!orderData.items || orderData.items.length === 0) {
@@ -274,13 +274,24 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
     const slug = req.params.slug || orderData.storeSlug || 'novamart';
     const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
 
+    const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || 'Store Customer';
+    const customerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || store.whatsapp;
+    const deliveryAddress = (orderData.customer && (orderData.customer.address || orderData.customer.deliveryAddress)) || orderData.deliveryAddress || store.address || 'Dar es Salaam';
+
+    const calculatedTotal = (orderData.items || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0);
+    const finalTotal = Number(orderData.totalAmount || orderData.total || calculatedTotal);
+
     orderData.storeId = store.id;
     orderData.storeSlug = store.slug;
     orderData.storeName = store.name;
     orderData.storeWhatsapp = store.whatsapp;
     orderData.posConfigId = store.posConfigId;
+    orderData.customerName = customerName;
+    orderData.customerPhone = customerPhone;
+    orderData.deliveryAddress = deliveryAddress;
+    orderData.totalAmount = finalTotal;
 
-    console.log(`[Order Processing] Store "${store.name}" (${store.slug}) — Total: TZS ${orderData.totalAmount}`);
+    console.log(`[Order Processing] Store "${store.name}" (${store.slug}) — Total: TZS ${finalTotal}`);
 
     // 1. Create POS Order in Odoo ERP & Deduct Stock
     let odooOrderResult = { odooOrderId: null, receiptNumber: `Order WEB-${Date.now()}` };
@@ -302,12 +313,12 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
         orderNumber: finalOrderId,
         receiptNumber: finalReceipt,
         customer: {
-          name: orderData.customerName || `Customer (${orderData.customerPhone || 'N/A'})`,
-          phone: orderData.customerPhone || store.whatsapp,
-          deliveryAddress: orderData.deliveryAddress || store.address || 'Dar es Salaam'
+          name: customerName,
+          phone: customerPhone,
+          deliveryAddress: deliveryAddress
         },
         items: orderData.items,
-        totalAmount: orderData.totalAmount
+        totalAmount: finalTotal
       });
       console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${store.whatsapp}!`);
     } catch (waErr) {
@@ -325,13 +336,13 @@ app.post(['/api/odoo/order', '/api/:slug/order'], async (req, res) => {
       storeName: store.name,
       storeWhatsapp: store.whatsapp,
       posConfigId: store.posConfigId,
-      customerName: orderData.customerName || `Customer (${orderData.customerPhone || 'POS'})`,
-      customerPhone: orderData.customerPhone || store.whatsapp,
-      deliveryAddress: orderData.deliveryAddress || store.address || 'Masaki, Dar es Salaam',
+      customerName: customerName,
+      customerPhone: customerPhone,
+      deliveryAddress: deliveryAddress,
       items: orderData.items,
-      subtotal: orderData.subtotal || orderData.totalAmount,
+      subtotal: orderData.subtotal || finalTotal,
       discount: orderData.discount || 0,
-      totalAmount: orderData.totalAmount,
+      totalAmount: finalTotal,
       whatsappStatus: waResult && waResult.success ? 'Sent' : 'Dispatched',
       waLink: waResult ? waResult.waLink : null
     });
@@ -517,8 +528,105 @@ app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confir
   res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
 });
 
-// Executive Admin Dashboard
-app.get(['/dashboard', '/dashboard.html', '/admin', '/admin.html'], (req, res) => {
+// Store PIN Verification Endpoint
+app.post(['/api/stores/:idOrSlug/verify-pin', '/api/:idOrSlug/verify-pin'], (req, res) => {
+  try {
+    const { idOrSlug } = req.params;
+    const { pin, whatsapp } = req.body;
+    const store = stores.getStoreBySlug(idOrSlug) || stores.getStoreById(idOrSlug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const expectedPin = store.pin || '1234';
+    const cleanWa = String(whatsapp || '').replace(/[^0-9]/g, '');
+    const storeWa = String(store.whatsapp || '').replace(/[^0-9]/g, '');
+
+    if (pin && String(pin).trim() === expectedPin) {
+      return res.json({ success: true, message: 'PIN verified successfully!', store });
+    }
+    if (cleanWa && storeWa && (cleanWa.endsWith(storeWa) || storeWa.endsWith(cleanWa))) {
+      return res.json({ success: true, message: 'WhatsApp verified successfully!', store });
+    }
+
+    return res.status(401).json({ success: false, error: 'Invalid PIN. Default PIN is 1234.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Store-Specific Isolated Dashboard Data
+app.get('/api/:slug/dashboard-data', async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const store = stores.getStoreBySlug(slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    // 1. Get Store Products
+    const odooRes = await odoo.fetchOdooProducts();
+    const allOdooProducts = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
+    const storeProducts = stores.filterProductsForStore(allOdooProducts, store);
+
+    // 2. Get Store Orders
+    const storeOrders = orders.getOrdersByStore(slug);
+
+    // 3. Calculate Period Metrics for this store
+    const now = new Date();
+    const todayOrders = storeOrders.filter(o => new Date(o.createdAt).toDateString() === now.toDateString());
+    const weekOrders = storeOrders.filter(o => (now - new Date(o.createdAt)) <= (7 * 24 * 60 * 60 * 1000));
+    const monthOrders = storeOrders.filter(o => (now - new Date(o.createdAt)) <= (30 * 24 * 60 * 60 * 1000));
+
+    const calcSum = (arr) => arr.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+
+    const outOfStockCount = storeProducts.filter(p => (p.qty_available || 0) <= 0).length;
+    const lowStockCount = storeProducts.filter(p => (p.qty_available || 0) > 0 && (p.qty_available || 0) <= 5).length;
+
+    res.json({
+      success: true,
+      store: {
+        id: store.id,
+        name: store.name,
+        slug: store.slug,
+        logo: store.logo,
+        whatsapp: store.whatsapp,
+        address: store.address,
+        status: store.status
+      },
+      kpi: {
+        totalRevenue: calcSum(storeOrders),
+        totalOrders: storeOrders.length,
+        todaySales: calcSum(todayOrders),
+        todayOrders: todayOrders.length,
+        weekSales: calcSum(weekOrders),
+        weekOrders: weekOrders.length,
+        monthSales: calcSum(monthOrders),
+        monthOrders: monthOrders.length,
+        totalProducts: storeProducts.length,
+        outOfStock: outOfStockCount,
+        lowStock: lowStockCount
+      },
+      products: storeProducts,
+      orders: storeOrders.slice(0, 50),
+      recentOrders: storeOrders.slice(0, 15).map(ro => ({
+        id: ro.odooOrderId || ro.id,
+        orderNumber: ro.orderId,
+        posRef: ro.receiptNumber || `Order ${ro.orderId}`,
+        customerName: (ro.customer && ro.customer.name) || 'Store Customer',
+        phone: (ro.customer && ro.customer.phone) || ro.storeWhatsapp,
+        storeName: ro.storeName,
+        storeSlug: ro.storeSlug,
+        total: ro.totalAmount,
+        itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
+        status: ro.status || 'Paid',
+        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+      }))
+    });
+  } catch (err) {
+    console.error('Error fetching store dashboard data:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Executive Admin Dashboard (Supports /dashboard, /admin, /:slug/dashboard, /:slug/admin)
+app.get(['/dashboard', '/dashboard.html', '/admin', '/admin.html', '/:slug/dashboard', '/:slug/admin'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 

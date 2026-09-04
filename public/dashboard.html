@@ -1505,6 +1505,32 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     </div>
   </div>
 
+  <!-- Store Client Login / PIN Modal -->
+  <div class="restock-modal-overlay" id="storeLoginModal" style="display:none; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 9999;">
+    <div class="restock-modal" style="max-width: 420px; width: 92%; text-align: center; padding: 28px 24px; border-radius: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.35);">
+      <div id="storeLoginLogoCircle" style="width: 60px; height: 60px; border-radius: 50%; background: #7c3aed; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35); border: 2px solid #ede9fe;">
+        <!-- Dynamically filled -->
+      </div>
+      <h3 id="storeLoginTitle" style="font-size: 1.25rem; font-weight: 800; color: #081735; margin-bottom: 4px;">Store Admin Portal</h3>
+      <p id="storeLoginSubtitle" style="font-size: 0.82rem; color: #64748b; margin-bottom: 20px; line-height: 1.45;">
+        Enter your store PIN to unlock your private dashboard, stock manager, and order tracking.
+      </p>
+      
+      <div style="margin-bottom: 16px; text-align: left;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 6px;">Store Admin PIN (Default: 1234)</label>
+        <input type="password" id="storeLoginPinInput" class="modal-input" placeholder="••••" maxlength="10" style="font-size: 1.2rem; text-align: center; letter-spacing: 6px; padding: 12px; font-weight: 800;" onkeydown="if(event.key==='Enter') submitStoreLogin()">
+      </div>
+      <div id="storeLoginError" style="color: #ef4444; font-size: 0.82rem; margin-bottom: 12px; display: none; font-weight: 600;"></div>
+
+      <button type="button" class="btn-modal-confirm" id="btnSubmitStoreLogin" style="width: 100%; padding: 13px; font-size: 0.95rem; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border-radius: 10px; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);" onclick="submitStoreLogin()">
+        Unlock Store Dashboard &rarr;
+      </button>
+      <div style="margin-top: 14px;">
+        <a href="index.html" id="storeLoginStorefrontLink" style="font-size: 0.82rem; color: #7c3aed; font-weight: 600; text-decoration: none;">&larr; Return to Customer Storefront</a>
+      </div>
+    </div>
+  </div>
+
   <!-- WhatsApp Gateway & Dispatch Settings Modal -->
   <div class="restock-modal-overlay" id="whatsappConfigModal" style="display:none;">
     <div class="restock-modal" style="max-width: 580px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px;">
@@ -1612,6 +1638,110 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
     }
 
+    // Helper to detect store slug from URL (e.g. /benstore/dashboard -> benstore)
+    function getActiveStoreSlug() {
+      const path = window.location.pathname.replace(/^\/|\/$/g, '');
+      const parts = path.split('/');
+      if (parts.length >= 2 && (parts[1] === 'dashboard' || parts[1] === 'admin')) {
+        return parts[0];
+      }
+      const params = new URLSearchParams(window.location.search);
+      return params.get('store') || null;
+    }
+
+    const currentStoreSlug = getActiveStoreSlug();
+
+    function checkStoreAuthentication() {
+      if (!currentStoreSlug) return true; // Super admin view
+
+      const isAuthed = sessionStorage.getItem('store_auth_' + currentStoreSlug) === 'true';
+      if (!isAuthed) {
+        openStoreLoginModal();
+        return false;
+      }
+      return true;
+    }
+
+    async function openStoreLoginModal() {
+      const modal = document.getElementById('storeLoginModal');
+      const titleEl = document.getElementById('storeLoginTitle');
+      const subtitleEl = document.getElementById('storeLoginSubtitle');
+      const logoCircle = document.getElementById('storeLoginLogoCircle');
+      const linkEl = document.getElementById('storeLoginStorefrontLink');
+      const errBox = document.getElementById('storeLoginError');
+
+      if (errBox) errBox.style.display = 'none';
+      if (modal) modal.style.display = 'flex';
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/products`);
+        const data = await res.json();
+        const store = data.store || { name: 'Store Admin', slug: currentStoreSlug };
+
+        if (titleEl) titleEl.textContent = `${store.name} — Admin Portal`;
+        if (subtitleEl) subtitleEl.textContent = `Enter PIN for ${store.name} (${store.whatsapp || '+255...'}) to manage your stock, view orders, and see sales.`;
+        if (linkEl) linkEl.href = `/${currentStoreSlug}`;
+        
+        if (logoCircle) {
+          if (store.logo) {
+            logoCircle.innerHTML = '';
+            const img = document.createElement('img');
+            img.className = 'brand-logo-img';
+            img.src = store.logo;
+            logoCircle.appendChild(img);
+          } else {
+            logoCircle.innerHTML = `<span style="color:#ffffff; font-weight:800; font-size:1.4rem;">${store.name.charAt(0)}</span>`;
+          }
+        }
+      } catch (e) {
+        if (titleEl) titleEl.textContent = `${currentStoreSlug.toUpperCase()} — Admin Portal`;
+      }
+    }
+
+    async function submitStoreLogin() {
+      const pinInput = document.getElementById('storeLoginPinInput');
+      const errBox = document.getElementById('storeLoginError');
+      const btn = document.getElementById('btnSubmitStoreLogin');
+      const pin = pinInput ? pinInput.value.trim() : '';
+
+      if (!pin) {
+        if (errBox) {
+          errBox.textContent = 'Please enter your 4-digit PIN (Default: 1234)';
+          errBox.style.display = 'block';
+        }
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying PIN...';
+
+      try {
+        const res = await fetch(`/api/${currentStoreSlug}/verify-pin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Invalid PIN');
+        }
+
+        sessionStorage.setItem('store_auth_' + currentStoreSlug, 'true');
+        document.getElementById('storeLoginModal').style.display = 'none';
+        showDashToast(`👋 Welcome to ${data.store ? data.store.name : currentStoreSlug} Admin Dashboard!`);
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        if (errBox) {
+          errBox.textContent = err.message || 'Invalid PIN. Try default PIN 1234.';
+          errBox.style.display = 'block';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Unlock Store Dashboard →';
+      }
+    }
+
     function setPeriod(period) {
       currentPeriod = period;
       document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1638,32 +1768,80 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     }
 
     async function fetchLiveDashboardData(isManual = false) {
+      if (!checkStoreAuthentication()) return;
+
       const syncBtn = document.getElementById('btnSyncOdoo');
       if (syncBtn && isManual) syncBtn.classList.add('rotating');
 
       try {
-        const [dashRes, storesRes] = await Promise.all([
-          fetch('/api/odoo/dashboard'),
-          fetch('/api/stores')
-        ]);
+        if (currentStoreSlug) {
+          // Store Client Mode (Isolated)
+          const res = await fetch(`/api/${currentStoreSlug}/dashboard-data`);
+          const storeData = await res.json();
+          if (!storeData.success) throw new Error(storeData.error);
 
-        rawDashboardPayload = await dashRes.json();
-        const storesData = await storesRes.json();
-        storesList = storesData.stores || [];
+          applyStoreClientMode(storeData);
+        } else {
+          // Global Super-Admin Mode
+          const [dashRes, storesRes] = await Promise.all([
+            fetch('/api/odoo/dashboard'),
+            fetch('/api/stores')
+          ]);
 
-        renderCurrentPeriod();
-        renderStoresTable();
+          rawDashboardPayload = await dashRes.json();
+          const storesData = await storesRes.json();
+          storesList = storesData.stores || [];
+
+          renderCurrentPeriod();
+          renderStoresTable();
+        }
 
         if (isManual) {
-          const count = (rawDashboardPayload.periods && rawDashboardPayload.periods.today && rawDashboardPayload.periods.today.kpi.totalOrders) || 14;
-          const sales = (rawDashboardPayload.periods && rawDashboardPayload.periods.today && rawDashboardPayload.periods.today.kpi.totalSales) || 2423850;
-          showDashToast(`✅ Live Odoo 18 synced: ${count} orders today (${formatTZS(sales)})!`);
+          showDashToast(`✅ Live data synced successfully!`);
         }
       } catch (err) {
         console.error('Error loading dashboard data:', err);
       } finally {
         if (syncBtn) syncBtn.classList.remove('rotating');
       }
+    }
+
+    function applyStoreClientMode(data) {
+      const store = data.store || {};
+      const kpi = data.kpi || {};
+
+      // 1. Page Header & Branding
+      document.title = `${store.name} — Store Management Portal`;
+      const titleEl = document.querySelector('.dash-page-title');
+      if (titleEl) titleEl.textContent = `${store.name} Dashboard`;
+      
+      const syncPill = document.querySelector('.odoo-sync-pill span:last-child');
+      if (syncPill) syncPill.textContent = `Store Portal • ${store.name} (${store.whatsapp || ''})`;
+
+      // 2. Hide Competitor Stores section & Global Config from Store Client
+      const storesSec = document.getElementById('storesTableSection');
+      if (storesSec) storesSec.style.display = 'none';
+
+      const waBtn = document.querySelector('button[onclick="openWhatsAppConfigModal()"]');
+      if (waBtn) waBtn.style.display = 'none';
+
+      // 3. Update KPI Cards
+      document.getElementById('kpiCompleted').textContent = kpi.todayOrders || 0;
+      document.getElementById('kpiProgress').textContent = kpi.weekOrders || 0;
+      document.getElementById('kpiSales').textContent = formatTZS(kpi.todaySales);
+      document.getElementById('kpiOutStock').textContent = kpi.outOfStock || 0;
+
+      const sbStock = document.getElementById('sidebarStockBadge');
+      if (sbStock) sbStock.textContent = kpi.outOfStock || 0;
+
+      const tableOutCount = document.getElementById('tableOutStockCount');
+      if (tableOutCount) tableOutCount.textContent = kpi.outOfStock || 0;
+
+      // 4. Populate Store Inventory
+      renderOutOfStockTable(data.products || []);
+
+      // 5. Populate Store Orders
+      renderRecentOrders(data.recentOrders || []);
     }
 
     function renderCurrentPeriod() {
