@@ -889,13 +889,13 @@
     
     <!-- LEFT SIDEBAR -->
     <aside class="dash-sidebar">
-      <a href="index.html" class="sidebar-brand">
-        <div class="brand-logo-dash">
+      <a href="index.html" class="sidebar-brand" id="sidebarBrandLink">
+        <div class="brand-logo-dash" id="sidebarBrandLogo">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <div class="brand-title-wrap">
-          <span class="brand-title">NOVA MART</span>
-          <span class="brand-sub">
+          <span class="brand-title" id="sidebarBrandTitle">NOVA MART</span>
+          <span class="brand-sub" id="sidebarBrandSub">
             <span class="status-dot-green"></span>
             Dar es Salaam &bull; Odoo 18 Synced
           </span>
@@ -903,14 +903,14 @@
       </a>
 
       <nav class="dash-nav">
-        <a href="dashboard.html" class="dash-nav-item active">
+        <a href="dashboard.html" class="dash-nav-item active" id="sidebarDashLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             <span>Dashboard</span>
           </div>
         </a>
 
-        <a href="odoo_preview.html" class="dash-nav-item">
+        <a href="odoo_preview.html" class="dash-nav-item" id="sidebarOdooLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             <span>Odoo ERP View</span>
@@ -918,14 +918,14 @@
           <span class="nav-badge-blue">LIVE</span>
         </a>
 
-        <a href="index.html" class="dash-nav-item">
+        <a href="index.html" class="dash-nav-item" id="sidebarCatalogLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            <span>POS Catalog</span>
+            <span id="sidebarCatalogText">Storefront</span>
           </div>
         </a>
 
-        <a href="#storesTableSection" class="dash-nav-item">
+        <a href="#storesTableSection" class="dash-nav-item" id="sidebarStoresLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>Client Stores</span>
@@ -933,12 +933,12 @@
           <span class="nav-badge-blue" id="sidebarStoresBadge">4</span>
         </a>
 
-        <a href="#outOfStockSection" class="dash-nav-item">
+        <a href="#clientInventorySection" class="dash-nav-item" id="sidebarStockLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             <span>Inventory</span>
           </div>
-          <span class="nav-badge-red" id="sidebarStockBadge">15</span>
+          <span class="nav-badge-red" id="sidebarStockBadge">0</span>
         </a>
 
         <a href="#" class="dash-nav-item" onclick="window.print(); return false;">
@@ -950,19 +950,19 @@
       </nav>
 
       <div class="sidebar-bottom">
-        <a href="index.html" class="btn-sidebar-shop">
+        <a href="index.html" class="btn-sidebar-shop" id="sidebarStorefrontBtn">
           <div style="display:flex; flex-direction:column;">
-            <span style="font-weight:700; font-size:0.84rem;">Storefront</span>
-            <span style="font-size:0.72rem; color:#64748b;">Live POS Catalog</span>
+            <span style="font-weight:700; font-size:0.84rem;" id="sidebarStorefrontBtnTitle">Open Storefront</span>
+            <span style="font-size:0.72rem; color:#64748b;" id="sidebarStorefrontBtnSub">Live Catalog</span>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
 
-        <div class="admin-profile-card">
-          <div class="admin-avatar">B</div>
+        <div class="admin-profile-card" id="sidebarAdminProfile">
+          <div class="admin-avatar" id="sidebarAdminAvatar">B</div>
           <div class="admin-info">
-            <span class="admin-name">Beneth Emmanuel</span>
-            <span class="admin-email">developerbeneth@gmail.com</span>
+            <span class="admin-name" id="sidebarAdminName">Beneth Emmanuel</span>
+            <span class="admin-email" id="sidebarAdminEmail">developerbeneth@gmail.com</span>
           </div>
         </div>
       </div>
@@ -975,9 +975,9 @@
       <div class="dash-topbar">
         <div class="dash-header-left">
           <h1 class="dash-page-title">Executive Dashboard</h1>
-          <div class="odoo-sync-pill">
+          <div class="odoo-sync-pill" id="headerStatusPill">
             <span class="status-dot-green"></span>
-            <span>Live Connected: Odoo 18 (KODADEMOS)</span>
+            <span id="headerStatusText">Live Connected: Odoo 18 (KODADEMOS)</span>
           </div>
         </div>
         
@@ -997,13 +997,13 @@
           </div>
 
           <!-- Sync Odoo Button -->
-          <button class="btn-sync-odoo" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Force Odoo XML-RPC Sync">
+          <button class="btn-sync-odoo" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Force Sync Data">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-            <span>Sync Odoo</span>
+            <span id="btnSyncOdooText">Sync Odoo</span>
           </button>
 
-          <!-- WhatsApp Gateway Settings Button -->
-          <button class="btn-sync-odoo" style="background:#25D366; border-color:#22c55e; color:#ffffff;" onclick="openWhatsAppConfigModal()" title="WhatsApp Gateway & Dispatch Config">
+          <!-- WhatsApp Gateway Settings Button (Super-Admin Only) -->
+          <button class="btn-sync-odoo" id="btnWaGatewayHeader" style="background:#25D366; border-color:#22c55e; color:#ffffff;" onclick="openWhatsAppConfigModal()" title="WhatsApp Gateway & Dispatch Config">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.177.182-.076.355.101.173.448.74 1.025 1.254.746.665 1.374.871 1.569.968.195.097.311.082.427-.051.116-.133.491-.571.621-.767.13-.196.26-.163.433-.099.173.064 1.097.517 1.285.611.188.094.314.14.36.218.046.078.046.452-.098.857z"/></svg>
             <span>📲 WhatsApp Gateway</span>
           </button>
@@ -1345,14 +1345,29 @@
         </div>
 
         <div>
-          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Image (Icon)</label>
-          <select id="clientNewProdImage" class="modal-input" style="font-size:0.84rem;">
-            <option value="/assets/products/samsung_charger.png">📱 Smartphone & Accessories</option>
-            <option value="/assets/products/coca_cola.png">🥤 Drinks & Beverages</option>
-            <option value="/assets/products/nivea_lotion.png">🧴 Cosmetics & Care</option>
-            <option value="/assets/products/redbull.png">⚡ Energy & Food</option>
-            <option value="/assets/products/logo.png">🛍️ General Product</option>
-          </select>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:6px;">Product Image / Photo</label>
+          <div style="display:flex; align-items:center; gap:12px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:10px; padding:10px 14px;">
+            <div style="width:56px; height:56px; border-radius:8px; background:#ffffff; border:1.5px solid #cbd5e1; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <img id="clientNewProdImgPreview" src="/assets/products/samsung_charger.png" alt="Preview" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div style="flex:1;">
+              <input type="file" id="clientProductImageFileInput" accept="image/*" style="display:none;" onchange="handleClientProductImgSelect(event)">
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <button type="button" onclick="document.getElementById('clientProductImageFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  📁 Upload Photo
+                </button>
+                <select id="clientNewProdImagePresets" class="modal-input" style="width:auto; font-size:0.78rem; padding:5px 8px;" onchange="setClientProductPresetImage(this.value)">
+                  <option value="">Or choose preset...</option>
+                  <option value="/assets/products/samsung_charger.png">📱 Smartphone & Tech</option>
+                  <option value="/assets/products/coca_cola.png">🥤 Drinks & Beverages</option>
+                  <option value="/assets/products/nivea_lotion.png">🧴 Cosmetics & Care</option>
+                  <option value="/assets/products/redbull.png">⚡ Energy & Food</option>
+                  <option value="/assets/products/logo.png">🛍️ General Goods</option>
+                </select>
+              </div>
+              <input type="hidden" id="clientNewProdImageData" value="/assets/products/samsung_charger.png">
+            </div>
+          </div>
         </div>
 
         <div class="modal-actions" style="margin-top:14px;">
@@ -1992,46 +2007,112 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const store = data.store || {};
       const kpi = data.kpi || {};
       currentClientProducts = data.products || [];
+      rawDashboardPayload = data;
 
-      // 1. Page Header & Branding
+      // 1. Page Header & Branding (Remove all Odoo references for Client)
       document.title = `${store.name} — Store Management Portal`;
       const titleEl = document.querySelector('.dash-page-title');
       if (titleEl) titleEl.textContent = `${store.name} Dashboard`;
       
-      const syncPill = document.querySelector('.odoo-sync-pill span:last-child');
-      if (syncPill) syncPill.textContent = `Store Portal • ${store.name} (${store.whatsapp || ''})`;
+      const headerStatusText = document.getElementById('headerStatusText');
+      if (headerStatusText) headerStatusText.textContent = `🟢 Store Online • ${store.name} (${store.whatsapp || ''})`;
 
-      // 2. Hide Competitor Stores section & Global Config from Store Client
+      const btnSyncText = document.getElementById('btnSyncOdooText');
+      if (btnSyncText) btnSyncText.textContent = 'Refresh';
+
+      // 2. Hide Odoo ERP link, Client Stores link, and Global WhatsApp Config from Sidebar & Header
+      const odooLink = document.getElementById('sidebarOdooLink');
+      if (odooLink) odooLink.style.display = 'none';
+
+      const storesLink = document.getElementById('sidebarStoresLink');
+      if (storesLink) storesLink.style.display = 'none';
+
       const storesSec = document.getElementById('storesTableSection');
       if (storesSec) storesSec.style.display = 'none';
 
-      const waBtn = document.querySelector('button[onclick="openWhatsAppConfigModal()"]');
+      const waBtn = document.getElementById('btnWaGatewayHeader');
       if (waBtn) waBtn.style.display = 'none';
 
-      // 3. Show Dedicated Client Store Inventory Section & hide generic Out of Stock table
+      // 3. Customize Sidebar for Client Store
+      const brandLink = document.getElementById('sidebarBrandLink');
+      if (brandLink) brandLink.href = `/${currentStoreSlug}`;
+
+      const brandTitle = document.getElementById('sidebarBrandTitle');
+      if (brandTitle) brandTitle.textContent = store.name;
+
+      const brandSub = document.getElementById('sidebarBrandSub');
+      if (brandSub) brandSub.innerHTML = `<span class="status-dot-green"></span> ${store.address || 'Dar es Salaam'} &bull; Active Store`;
+
+      const brandLogo = document.getElementById('sidebarBrandLogo');
+      if (brandLogo && store.logo) {
+        brandLogo.innerHTML = `<img src="${store.logo}" style="width:100%; height:100%; object-fit:contain; border-radius:6px;">`;
+      }
+
+      const catLink = document.getElementById('sidebarCatalogLink');
+      if (catLink) catLink.href = `/${currentStoreSlug}`;
+
+      const sfBtn = document.getElementById('sidebarStorefrontBtn');
+      if (sfBtn) sfBtn.href = `/${currentStoreSlug}`;
+
+      const sfTitle = document.getElementById('sidebarStorefrontBtnTitle');
+      if (sfTitle) sfTitle.textContent = `${store.name} Storefront`;
+
+      const sfSub = document.getElementById('sidebarStorefrontBtnSub');
+      if (sfSub) sfSub.textContent = `achete.me/${store.slug}`;
+
+      const adminName = document.getElementById('sidebarAdminName');
+      if (adminName) adminName.textContent = store.name;
+
+      const adminEmail = document.getElementById('sidebarAdminEmail');
+      if (adminEmail) adminEmail.textContent = store.whatsapp || 'Registered Merchant';
+
+      const adminAvatar = document.getElementById('sidebarAdminAvatar');
+      if (adminAvatar) adminAvatar.textContent = (store.name || 'S').charAt(0).toUpperCase();
+
+      // 4. Show Dedicated Client Store Inventory Section & hide generic Out of Stock table
       const clientInvSec = document.getElementById('clientInventorySection');
       if (clientInvSec) clientInvSec.style.display = 'block';
 
       const outOfStockDashCard = document.querySelector('#outOfStockSection .dash-card:first-child');
       if (outOfStockDashCard) outOfStockDashCard.style.display = 'none';
 
-      // 4. Update KPI Cards
-      document.getElementById('kpiCompleted').textContent = kpi.todayOrders || 0;
-      document.getElementById('kpiProgress').textContent = kpi.weekOrders || 0;
-      document.getElementById('kpiSales').textContent = formatTZS(kpi.todaySales);
-      document.getElementById('kpiOutStock').textContent = kpi.outOfStock || 0;
+      const prodCountBadge = document.getElementById('clientProdCountBadge');
+      if (prodCountBadge) prodCountBadge.textContent = `${currentClientProducts.length} products`;
 
       const sbStock = document.getElementById('sidebarStockBadge');
       if (sbStock) sbStock.textContent = kpi.outOfStock || 0;
 
-      const prodCountBadge = document.getElementById('clientProdCountBadge');
-      if (prodCountBadge) prodCountBadge.textContent = `${currentClientProducts.length} products`;
-
-      // 5. Render Client Store Inventory Table
+      // 5. Render Isolated Period Charts & Tables
+      renderCurrentPeriod();
       renderClientInventoryTable(currentClientProducts);
+    }
 
-      // 6. Populate Store Orders
-      renderRecentOrders(data.recentOrders || []);
+    function handleClientProductImgSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        const preview = document.getElementById('clientNewProdImgPreview');
+        const hidden = document.getElementById('clientNewProdImageData');
+        if (preview) preview.src = dataUrl;
+        if (hidden) hidden.value = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setClientProductPresetImage(val) {
+      if (!val) return;
+      const preview = document.getElementById('clientNewProdImgPreview');
+      const hidden = document.getElementById('clientNewProdImageData');
+      if (preview) preview.src = val;
+      if (hidden) hidden.value = val;
     }
 
     function renderClientInventoryTable(products) {
@@ -2262,13 +2343,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       btn.disabled = true;
       btn.textContent = 'Creating Product...';
 
+      const imgData = document.getElementById('clientNewProdImageData') ? document.getElementById('clientNewProdImageData').value : '';
+
       const payload = {
         name: document.getElementById('clientNewProdName').value,
         category: document.getElementById('clientNewProdCategory').value || 'General',
         sku: document.getElementById('clientNewProdSku').value || '',
         price: parseFloat(document.getElementById('clientNewProdPrice').value) || 0,
         initialStock: parseInt(document.getElementById('clientNewProdStock').value, 10) || 0,
-        image: document.getElementById('clientNewProdImage').value || '/assets/products/samsung_charger.png'
+        image: imgData || '/assets/products/samsung_charger.png'
       };
 
       try {

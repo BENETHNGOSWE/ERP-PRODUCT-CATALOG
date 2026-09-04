@@ -663,6 +663,168 @@ app.post(['/api/stores/:idOrSlug/verify-pin', '/api/:idOrSlug/verify-pin'], (req
   }
 });
 
+// Helper: Build completely isolated store dashboard payload
+function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
+  const now = new Date();
+  const calcSum = (arr) => arr.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+
+  const filterOrdersByTime = (days) => {
+    if (days === 0) {
+      return storeOrders.filter(o => new Date(o.createdAt).toDateString() === now.toDateString());
+    }
+    const cutoff = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+    return storeOrders.filter(o => new Date(o.createdAt) >= cutoff);
+  };
+
+  const todayOrders = filterOrdersByTime(0);
+  const weekOrders = filterOrdersByTime(7);
+  const monthOrders = filterOrdersByTime(30);
+  const allOrders = storeOrders;
+
+  const buildPeriodData = (periodOrders, periodLabel) => {
+    const totalSales = calcSum(periodOrders);
+    const completed = periodOrders.filter(o => o.status !== 'Cancelled').length;
+    const inProgress = periodOrders.filter(o => o.status === 'On Progress' || o.status === 'Processing').length;
+    const cancelled = periodOrders.filter(o => o.status === 'Cancelled').length;
+
+    // Top Selling products for this period
+    const itemMap = {};
+    periodOrders.forEach(o => {
+      (o.items || []).forEach(it => {
+        const id = it.id || it.productId || it.name;
+        if (!itemMap[id]) {
+          itemMap[id] = {
+            id: it.id || it.productId,
+            name: it.name,
+            sku: it.sku || `SKU-${id}`,
+            category: it.category || 'General',
+            image: it.image || '/assets/products/samsung_charger.png',
+            soldUnits: 0,
+            revenue: 0,
+            profit: 0,
+            price: Number(it.price) || 0
+          };
+        }
+        const qty = Number(it.quantity || it.qty || 1);
+        itemMap[id].soldUnits += qty;
+        const lineTotal = qty * (Number(it.price) || 0);
+        itemMap[id].revenue += lineTotal;
+        itemMap[id].profit += lineTotal * 0.28;
+      });
+    });
+
+    const topSelling = Object.values(itemMap).sort((a, b) => b.soldUnits - a.soldUnits).slice(0, 5);
+
+    // Sales Chart Series
+    let series = [];
+    if (periodLabel === 'today') {
+      const hours = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+      series = hours.map((h, i) => ({
+        label: h,
+        value: Math.round(totalSales * ((i + 1) / (hours.length * 1.5))) || (i === hours.length - 1 ? totalSales : 0)
+      }));
+    } else if (periodLabel === 'week') {
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      series = days.map((d, i) => ({
+        label: d,
+        value: Math.round(totalSales / days.length)
+      }));
+    } else {
+      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      series = weeks.map((w, i) => ({
+        label: w,
+        value: Math.round(totalSales / weeks.length)
+      }));
+    }
+
+    return {
+      kpi: {
+        totalSales,
+        orderCompleted: completed,
+        orderInProgress: inProgress,
+        totalOrders: periodOrders.length,
+        outOfStock: storeProducts.filter(p => (Number(p.qty_available) || 0) <= 0).length
+      },
+      ordersSummary: {
+        total: periodOrders.length,
+        completed,
+        inProgress,
+        cancelled,
+        successRate: periodOrders.length > 0 ? `${Math.round((completed / periodOrders.length) * 100)}%` : '100%'
+      },
+      topSelling: topSelling.length > 0 ? topSelling : storeProducts.slice(0, 3).map(p => ({
+        id: p.id,
+        name: p.name,
+        sku: p.default_code || p.sku || 'SKU-01',
+        category: p.category || 'General',
+        image: p.image || '/assets/products/samsung_charger.png',
+        soldUnits: 0,
+        revenue: 0,
+        profit: 0,
+        price: p.price || 0
+      })),
+      salesChart: { series },
+      recentOrders: periodOrders.slice(0, 10).map(ro => ({
+        id: ro.odooOrderId || ro.id,
+        ref: ro.receiptNumber || `Order ${ro.orderId}`,
+        fullRef: ro.receiptNumber || `Order ${ro.orderId}`,
+        customer: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
+        phone: (ro.customer && ro.customer.phone) || ro.customerPhone || ro.storeWhatsapp,
+        amount: Number(ro.totalAmount) || 0,
+        status: ro.status || 'Completed',
+        statusClass: 'completed',
+        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+      }))
+    };
+  };
+
+  const outOfStockProducts = storeProducts.filter(p => (Number(p.qty_available) || 0) <= 0);
+
+  return {
+    success: true,
+    store: {
+      id: store.id,
+      name: store.name,
+      slug: store.slug,
+      logo: store.logo,
+      whatsapp: store.whatsapp,
+      address: store.address,
+      status: store.status
+    },
+    periods: {
+      today: buildPeriodData(todayOrders, 'today'),
+      week: buildPeriodData(weekOrders, 'week'),
+      month: buildPeriodData(monthOrders, 'month'),
+      all: buildPeriodData(allOrders, 'all')
+    },
+    kpi: {
+      totalRevenue: calcSum(storeOrders),
+      totalOrders: storeOrders.length,
+      todaySales: calcSum(todayOrders),
+      todayOrders: todayOrders.length,
+      weekSales: calcSum(weekOrders),
+      weekOrders: weekOrders.length,
+      monthSales: calcSum(monthOrders),
+      monthOrders: monthOrders.length,
+      totalProducts: storeProducts.length,
+      outOfStock: outOfStockProducts.length
+    },
+    products: storeProducts,
+    outOfStock: outOfStockProducts,
+    recentOrders: storeOrders.slice(0, 15).map(ro => ({
+      id: ro.odooOrderId || ro.id,
+      ref: ro.receiptNumber || `Order ${ro.orderId}`,
+      fullRef: ro.receiptNumber || `Order ${ro.orderId}`,
+      customer: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
+      phone: (ro.customer && ro.customer.phone) || ro.customerPhone || ro.storeWhatsapp,
+      amount: Number(ro.totalAmount) || 0,
+      status: ro.status || 'Completed',
+      statusClass: 'completed',
+      date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+    }))
+  };
+}
+
 // Store-Specific Isolated Dashboard Data
 app.get('/api/:slug/dashboard-data', async (req, res) => {
   try {
@@ -670,65 +832,17 @@ app.get('/api/:slug/dashboard-data', async (req, res) => {
     const store = stores.getStoreBySlug(slug);
     if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
 
-    // 1. Get Store Products
+    // 1. Get Store Products strictly isolated
     const odooRes = await odoo.fetchOdooProducts();
     const allOdooProducts = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
     const storeProducts = stores.filterProductsForStore(allOdooProducts, store);
 
-    // 2. Get Store Orders
+    // 2. Get Store Orders strictly isolated
     const storeOrders = orders.getOrdersByStore(slug);
 
-    // 3. Calculate Period Metrics for this store
-    const now = new Date();
-    const todayOrders = storeOrders.filter(o => new Date(o.createdAt).toDateString() === now.toDateString());
-    const weekOrders = storeOrders.filter(o => (now - new Date(o.createdAt)) <= (7 * 24 * 60 * 60 * 1000));
-    const monthOrders = storeOrders.filter(o => (now - new Date(o.createdAt)) <= (30 * 24 * 60 * 60 * 1000));
-
-    const calcSum = (arr) => arr.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
-
-    const outOfStockCount = storeProducts.filter(p => (p.qty_available || 0) <= 0).length;
-    const lowStockCount = storeProducts.filter(p => (p.qty_available || 0) > 0 && (p.qty_available || 0) <= 5).length;
-
-    res.json({
-      success: true,
-      store: {
-        id: store.id,
-        name: store.name,
-        slug: store.slug,
-        logo: store.logo,
-        whatsapp: store.whatsapp,
-        address: store.address,
-        status: store.status
-      },
-      kpi: {
-        totalRevenue: calcSum(storeOrders),
-        totalOrders: storeOrders.length,
-        todaySales: calcSum(todayOrders),
-        todayOrders: todayOrders.length,
-        weekSales: calcSum(weekOrders),
-        weekOrders: weekOrders.length,
-        monthSales: calcSum(monthOrders),
-        monthOrders: monthOrders.length,
-        totalProducts: storeProducts.length,
-        outOfStock: outOfStockCount,
-        lowStock: lowStockCount
-      },
-      products: storeProducts,
-      orders: storeOrders.slice(0, 50),
-      recentOrders: storeOrders.slice(0, 15).map(ro => ({
-        id: ro.odooOrderId || ro.id,
-        orderNumber: ro.orderId,
-        posRef: ro.receiptNumber || `Order ${ro.orderId}`,
-        customerName: (ro.customer && ro.customer.name) || 'Store Customer',
-        phone: (ro.customer && ro.customer.phone) || ro.storeWhatsapp,
-        storeName: ro.storeName,
-        storeSlug: ro.storeSlug,
-        total: ro.totalAmount,
-        itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
-        status: ro.status || 'Paid',
-        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
-      }))
-    });
+    // 3. Build Isolated Store Dashboard Response
+    const payload = buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders);
+    res.json(payload);
   } catch (err) {
     console.error('Error fetching store dashboard data:', err);
     res.status(500).json({ success: false, error: err.message });
