@@ -36,12 +36,7 @@
     "createdDate": "2026-08-15",
     "pin": "1234",
     "productIds": [],
-    "inventoryOverrides": {
-      "139": {
-        "qty_available": 0,
-        "updatedAt": "2026-09-05T22:34:01.929Z"
-      }
-    },
+    "inventoryOverrides": {},
     "customProducts": []
   },
   {
