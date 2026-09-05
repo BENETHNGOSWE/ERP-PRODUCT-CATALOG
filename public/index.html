@@ -512,10 +512,10 @@
             <article class="product-item-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
               <div class="product-item-left">
                 <div class="product-item-thumb-wrap" title="Click to add to cart">
-                  <img src="${p.thumb || p.image}" alt="${p.name}" class="product-item-thumb" loading="lazy">
+                  <img src="${p.thumb || p.image}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
                 </div>
                 <div class="product-item-meta">
-                  <h3 class="product-item-title" title="${p.name}">${p.name}</h3>
+                  <h3 class="product-item-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
                   <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
                   <div class="product-item-price">${NOVA.formatTZS(p.price)}</div>
                 </div>
@@ -736,7 +736,8 @@
 
           // Smooth transition to confirmation receipt
           const slug = NOVA.getStoreSlug();
-          window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
+          const targetUrl = (slug && slug !== 'novamart' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
+          window.location.href = `${targetUrl}?orderId=${encodeURIComponent(confirmedOrder.orderId)}`;
         });
       }
 

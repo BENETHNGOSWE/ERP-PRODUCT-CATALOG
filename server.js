@@ -522,23 +522,30 @@ app.get('/api/odoo/dashboard', async (req, res) => {
     // Merge recorded store orders into recent orders list
     const recordedOrders = orders.getAllOrders();
     if (recordedOrders.length > 0) {
-      const mappedRecent = recordedOrders.slice(0, 10).map(ro => ({
+      const mappedRecent = recordedOrders.slice(0, 15).map(ro => ({
         id: ro.odooOrderId || ro.id,
-        orderNumber: ro.orderId,
-        posRef: ro.receiptNumber,
-        customerName: ro.customer ? ro.customer.name : 'Web Customer',
-        phone: ro.customer ? ro.customer.phone : ro.storeWhatsapp,
+        orderId: ro.orderId,
+        ref: ro.receiptNumber || `Order ${ro.orderId}`,
+        fullRef: ro.receiptNumber || `Order ${ro.orderId}`,
+        customer: (ro.customer && ro.customer.name) || ro.customerName || 'Web Customer',
+        customerName: (ro.customer && ro.customer.name) || ro.customerName || 'Web Customer',
+        phone: (ro.customer && ro.customer.phone) || ro.customerPhone || ro.storeWhatsapp,
+        deliveryAddress: (ro.customer && ro.customer.deliveryAddress) || ro.deliveryAddress || 'Dar es Salaam',
         storeName: ro.storeName,
         storeSlug: ro.storeSlug,
-        total: ro.totalAmount,
+        amount: Number(ro.totalAmount) || 0,
+        total: Number(ro.totalAmount) || 0,
         itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
-        status: ro.status || 'Paid',
-        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+        items: ro.items || [],
+        status: ro.status || 'Paid & Confirmed',
+        statusClass: 'completed',
+        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString(),
+        createdAt: ro.createdAt
       }));
 
       // Combine with existing recent orders, avoiding duplicates
-      const existingRefs = new Set(mappedRecent.map(r => r.posRef));
-      const filteredOdooRecent = (dashboardData.recentOrders || []).filter(o => !existingRefs.has(o.posRef));
+      const existingRefs = new Set(mappedRecent.map(r => r.ref));
+      const filteredOdooRecent = (dashboardData.recentOrders || []).filter(o => !existingRefs.has(o.ref));
       dashboardData.recentOrders = [...mappedRecent, ...filteredOdooRecent].slice(0, 15);
       
       // Update today KPI count
@@ -548,8 +555,10 @@ app.get('/api/odoo/dashboard', async (req, res) => {
           const now = new Date();
           return d.toDateString() === now.toDateString();
         });
-        const extraSales = todayRecorded.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
         dashboardData.periods.today.kpi.totalOrders = Math.max(dashboardData.periods.today.kpi.totalOrders, dashboardData.periods.today.kpi.totalOrders + todayRecorded.length);
+        if (dashboardData.periods.today.recentOrders) {
+          dashboardData.periods.today.recentOrders = dashboardData.recentOrders;
+        }
       }
     }
 
@@ -769,16 +778,25 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
         price: p.price || 0
       })),
       salesChart: { series },
-      recentOrders: periodOrders.slice(0, 10).map(ro => ({
+      recentOrders: periodOrders.slice(0, 15).map(ro => ({
         id: ro.odooOrderId || ro.id,
+        orderId: ro.orderId,
         ref: ro.receiptNumber || `Order ${ro.orderId}`,
         fullRef: ro.receiptNumber || `Order ${ro.orderId}`,
         customer: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
+        customerName: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
         phone: (ro.customer && ro.customer.phone) || ro.customerPhone || ro.storeWhatsapp,
+        deliveryAddress: (ro.customer && ro.customer.deliveryAddress) || ro.deliveryAddress || store.address || 'Dar es Salaam',
         amount: Number(ro.totalAmount) || 0,
-        status: ro.status || 'Completed',
+        total: Number(ro.totalAmount) || 0,
+        itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
+        items: ro.items || [],
+        status: ro.status || 'Paid & Confirmed',
         statusClass: 'completed',
-        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+        whatsappStatus: ro.whatsappStatus || 'Sent',
+        waLink: ro.waLink || null,
+        date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString(),
+        createdAt: ro.createdAt
       }))
     };
   };
@@ -818,14 +836,23 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
     outOfStock: outOfStockProducts,
     recentOrders: storeOrders.slice(0, 15).map(ro => ({
       id: ro.odooOrderId || ro.id,
+      orderId: ro.orderId,
       ref: ro.receiptNumber || `Order ${ro.orderId}`,
       fullRef: ro.receiptNumber || `Order ${ro.orderId}`,
       customer: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
+      customerName: (ro.customer && ro.customer.name) || ro.customerName || 'Store Customer',
       phone: (ro.customer && ro.customer.phone) || ro.customerPhone || ro.storeWhatsapp,
+      deliveryAddress: (ro.customer && ro.customer.deliveryAddress) || ro.deliveryAddress || store.address || 'Dar es Salaam',
       amount: Number(ro.totalAmount) || 0,
-      status: ro.status || 'Completed',
+      total: Number(ro.totalAmount) || 0,
+      itemCount: ro.itemCount || (ro.items ? ro.items.length : 1),
+      items: ro.items || [],
+      status: ro.status || 'Paid & Confirmed',
       statusClass: 'completed',
-      date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString()
+      whatsappStatus: ro.whatsappStatus || 'Sent',
+      waLink: ro.waLink || null,
+      date: ro.dateFormatted || new Date(ro.createdAt).toLocaleDateString(),
+      createdAt: ro.createdAt
     }))
   };
 }

@@ -1404,6 +1404,54 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
     </div>
   </div>
 
+  <!-- Order Details & Tracking Modal -->
+  <div class="restock-modal-overlay" id="orderDetailModal" style="display:none;">
+    <div class="restock-modal" style="max-width: 520px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🧾</span>
+          <div>
+            <h3 class="modal-title" id="orderModalRef" style="margin:0; font-size:1.08rem; color:#081735;">Order Details</h3>
+            <span id="orderModalDate" style="font-size:0.75rem; color:#64748b;">Today</span>
+          </div>
+        </div>
+        <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeOrderDetailModal()">&times;</button>
+      </div>
+
+      <!-- Customer Info Card -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <strong id="orderModalCustomer" style="color:#081735; font-size:0.92rem; display:block;">Customer Name</strong>
+            <span id="orderModalPhone" style="font-size:0.82rem; color:#475569; display:block;">+255 7XX XXX XXX</span>
+            <span id="orderModalAddress" style="font-size:0.78rem; color:#64748b; display:block; margin-top:2px;">Dar es Salaam</span>
+          </div>
+          <a id="orderModalWaBtn" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:5px; background:#25D366; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border-radius:6px; text-decoration:none;">
+            WhatsApp &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Items List -->
+      <div style="margin-bottom:14px;">
+        <span style="font-size:0.8rem; font-weight:700; color:#334155; display:block; margin-bottom:6px;">Items Ordered:</span>
+        <div id="orderModalItemsList" style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; max-height:220px; overflow-y:auto;">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div style="background:#f1f5f9; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700; color:#1e293b; font-size:0.9rem;">Total Amount:</span>
+        <strong id="orderModalTotal" style="font-size:1.15rem; color:#0047bb;">TZS 0</strong>
+      </div>
+
+      <div class="modal-actions" style="margin-top:16px;">
+        <button type="button" class="btn-modal-cancel" onclick="closeOrderDetailModal()" style="width:100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
   </div>
 
   <!-- Restock Modal -->
@@ -2337,21 +2385,31 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       document.getElementById('clientAddProductForm').reset();
     }
 
+    function generateProductPlaceholder(name) {
+      const initial = (name || 'P').trim().charAt(0).toUpperCase();
+      const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+      const colorIndex = (name || 'P').charCodeAt(0) % bgColors.length;
+      const bgColor = bgColors[colorIndex];
+      return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+    }
+
     async function submitClientAddProduct(e) {
       if (e) e.preventDefault();
       const btn = document.getElementById('btnSubmitClientNewProd');
       btn.disabled = true;
       btn.textContent = 'Creating Product...';
 
-      const imgData = document.getElementById('clientNewProdImageData') ? document.getElementById('clientNewProdImageData').value : '';
+      const prodName = document.getElementById('clientNewProdName').value.trim();
+      const rawImgData = document.getElementById('clientNewProdImageData') ? document.getElementById('clientNewProdImageData').value : '';
+      const finalImage = (rawImgData && rawImgData !== '/assets/products/samsung_charger.png') ? rawImgData : generateProductPlaceholder(prodName);
 
       const payload = {
-        name: document.getElementById('clientNewProdName').value,
+        name: prodName,
         category: document.getElementById('clientNewProdCategory').value || 'General',
         sku: document.getElementById('clientNewProdSku').value || '',
         price: parseFloat(document.getElementById('clientNewProdPrice').value) || 0,
         initialStock: parseInt(document.getElementById('clientNewProdStock').value, 10) || 0,
-        image: imgData || '/assets/products/samsung_charger.png'
+        image: finalImage
       };
 
       try {
@@ -2732,27 +2790,81 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       `).join('');
     }
 
+    let currentDashboardOrders = [];
+
     function renderRecentOrders(recentOrders) {
+      currentDashboardOrders = recentOrders || [];
       const container = document.getElementById('recentOrdersList');
       if (!container) return;
 
       if (!recentOrders || recentOrders.length === 0) {
-        container.innerHTML = '<p style="font-size:0.84rem; color:#64748b; padding:10px 0;">No orders found.</p>';
+        container.innerHTML = '<p style="font-size:0.84rem; color:#64748b; padding:12px 0; text-align:center;">No orders recorded yet.<br><span style="font-size:0.75rem;">Orders placed will appear here live!</span></p>';
         return;
       }
 
-      container.innerHTML = recentOrders.slice(0, 5).map(o => `
-        <div class="recent-order-item">
+      container.innerHTML = recentOrders.slice(0, 8).map((o, idx) => `
+        <div class="recent-order-item" onclick="openOrderDetailModal(${idx})" style="cursor:pointer; transition:background 0.15s ease; border-radius:6px; padding:8px 6px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'" title="Click to view full order details">
           <div class="order-item-left">
-            <span class="order-item-id" title="${o.fullRef}">${o.ref}</span>
-            <span class="order-item-date">${o.customer} &bull; ${o.date}</span>
+            <span class="order-item-id" style="color:#0047bb;" title="${o.fullRef || o.ref}">${o.ref || ('#' + (o.orderId || o.id))} &nearr;</span>
+            <span class="order-item-date">${o.customer || o.customerName || 'Store Customer'} &bull; ${o.date || ''}</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <span class="status-pill ${o.statusClass || 'completed'}">${o.status}</span>
-            <span style="font-size:0.82rem; font-weight:700; color:#081735;">${formatTZS(o.amount)}</span>
+            <span class="status-pill ${o.statusClass || 'completed'}">${o.status || 'Paid'}</span>
+            <span style="font-size:0.84rem; font-weight:700; color:#081735;">${formatTZS(o.amount || o.total)}</span>
           </div>
         </div>
       `).join('');
+    }
+
+    function openOrderDetailModal(orderIndex) {
+      const order = currentDashboardOrders[orderIndex];
+      if (!order) return;
+
+      document.getElementById('orderModalRef').textContent = order.ref || ('Order #' + (order.orderId || order.id));
+      document.getElementById('orderModalDate').textContent = `${order.date || ''} • ${order.storeName || (rawDashboardPayload?.store?.name) || 'Store'}`;
+      document.getElementById('orderModalCustomer').textContent = order.customer || order.customerName || 'Store Customer';
+      
+      const phone = order.phone || '+255 7XX XXX XXX';
+      document.getElementById('orderModalPhone').textContent = `📞 ${phone}`;
+      document.getElementById('orderModalAddress').textContent = `📍 ${order.deliveryAddress || 'Dar es Salaam'}`;
+
+      let cleanWa = String(phone).replace(/[^0-9]/g, '');
+      if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
+      else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
+      const waLink = `https://wa.me/${cleanWa}?text=${encodeURIComponent(`Hello ${order.customer || ''}, regarding your order ${order.ref || ''}: `)}`;
+      document.getElementById('orderModalWaBtn').href = waLink;
+
+      // Render Items
+      const itemsContainer = document.getElementById('orderModalItemsList');
+      if (order.items && order.items.length > 0) {
+        itemsContainer.innerHTML = order.items.map(it => {
+          const qty = Number(it.qty || it.quantity) || 1;
+          const price = Number(it.price) || 0;
+          const sub = Number(it.subtotal) || (qty * price);
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #f1f5f9; font-size:0.84rem;">
+              <div>
+                <strong style="color:#0f172a;">${it.name || 'Store Item'}</strong>
+                <span style="color:#64748b; font-size:0.75rem; display:block;">${qty} &times; ${formatTZS(price)}</span>
+              </div>
+              <strong style="color:#081735;">${formatTZS(sub)}</strong>
+            </div>
+          `;
+        }).join('');
+      } else {
+        itemsContainer.innerHTML = `
+          <div style="padding:10px; text-align:center; color:#64748b; font-size:0.82rem;">
+            ${order.itemCount ? `${order.itemCount} items ordered` : 'Store Order'}
+          </div>
+        `;
+      }
+
+      document.getElementById('orderModalTotal').textContent = formatTZS(order.amount || order.total || 0);
+      document.getElementById('orderDetailModal').style.display = 'flex';
+    }
+
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').style.display = 'none';
     }
 
     function openRestockModal(productId, productName, productSku) {
@@ -3217,7 +3329,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         return;
       }
 
-      const image = activeInvNewProdImg || urlImg || '/assets/products/samsung_charger.png';
+      const image = activeInvNewProdImg || urlImg || generateProductPlaceholder(name);
 
       const btn = document.getElementById('btnSubmitAddProd');
       btn.textContent = 'Saving to Odoo ERP...';

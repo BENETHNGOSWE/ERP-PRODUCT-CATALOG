@@ -457,7 +457,8 @@
 
           // Direct clean transition to order confirmation (WhatsApp alert dispatched by backend)
           const slug = NOVA.getStoreSlug();
-          window.location.href = (slug && slug !== 'novamart') ? `/${slug}/confirmation` : 'confirmation.html';
+          const targetUrl = (slug && slug !== 'novamart' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
+          window.location.href = `${targetUrl}?orderId=${encodeURIComponent(confirmedOrder.orderId)}`;
         });
       }
 

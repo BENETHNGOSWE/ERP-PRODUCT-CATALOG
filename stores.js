@@ -325,22 +325,30 @@ class StoreManager {
           ...prod,
           name: ovr?.name || prod.name,
           price: storePrice,
+          image: ovr?.image || prod.image,
+          thumb: ovr?.image || prod.thumb || prod.image,
           qty_available: storeStock,
           inStock: storeStock > 0,
           storeStock: storeStock,
           storePrice: storePrice
         };
       } else {
-        // Client store: Stock starts at 0 UNTIL loaded/restocked by the store owner!
-        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : 0;
+        // Client store: If it's a custom product created for this store with initial stock, use it.
+        // For master ERP assigned products, stock starts at 0 UNTIL loaded/restocked by the store owner!
+        const isCustomStoreProd = Array.isArray(store.customProducts) && store.customProducts.some(cp => Number(cp.id) === Number(prod.id));
+        const defaultClientStock = isCustomStoreProd ? Number(prod.qty_available || 0) : 0;
+
+        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : defaultClientStock;
         const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
         return {
           ...prod,
           name: ovr?.name || prod.name,
           price: storePrice,
+          image: ovr?.image || prod.image,
+          thumb: ovr?.image || prod.thumb || prod.image,
           qty_available: storeStock,
           inStock: storeStock > 0,
-          isStoreCustomized: Boolean(ovr),
+          isStoreCustomized: Boolean(ovr) || isCustomStoreProd,
           storeStock: storeStock,
           storePrice: storePrice
         };

@@ -70,37 +70,28 @@ function callModel(model, method, args, kwargs = {}) {
 
 // Map Odoo Product to Catalog Format
 function mapProduct(p, categMap) {
-  let category = 'All';
+  let category = 'General';
   if (p.pos_categ_ids && p.pos_categ_ids.length > 0) {
     category = categMap[p.pos_categ_ids[0]] || 'Other';
   } else if (p.categ_id && p.categ_id[1]) {
     category = p.categ_id[1].split('/').pop().trim();
   }
 
-  // Image handling
-  let image = 'assets/products/coca_cola.png';
-  if (p.image_128) {
-    image = `data:image/png;base64,${p.image_128}`;
-  } else if (p.name.toLowerCase().includes('coca-cola') || p.name.toLowerCase().includes('coca')) {
-    image = 'assets/products/coca_cola.png';
-  } else if (p.name.toLowerCase().includes('azam') || p.name.toLowerCase().includes('juice')) {
-    image = 'assets/products/azam_juice.png';
-  } else if (p.name.toLowerCase().includes('water') || p.name.toLowerCase().includes('afya')) {
-    image = 'assets/products/mineral_water.png';
-  } else if (p.name.toLowerCase().includes('nivea') || p.name.toLowerCase().includes('lotion')) {
-    image = 'assets/products/nivea_lotion.png';
-  } else if (p.name.toLowerCase().includes('samsung') || p.name.toLowerCase().includes('charger')) {
-    image = 'assets/products/samsung_charger.png';
-  } else if (p.name.toLowerCase().includes('rice')) {
-    image = 'assets/products/mwanza_rice.png';
-  } else if (p.name.toLowerCase().includes('oil')) {
-    image = 'assets/products/cooking_oil.png';
-  } else if (p.name.toLowerCase().includes('soap') || p.name.toLowerCase().includes('dettol')) {
-    image = 'assets/products/dettol_soap.png';
-  } else if (p.name.toLowerCase().includes('bread')) {
-    image = 'assets/products/azam_bread.png';
-  } else if (p.name.toLowerCase().includes('flour') || p.name.toLowerCase().includes('unga')) {
-    image = 'assets/products/azam_flour.png';
+  // Exact image from Odoo or custom uploaded data
+  let image = '';
+  if (p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20) {
+    image = p.image_1920.startsWith('data:') ? p.image_1920 : `data:image/png;base64,${p.image_1920}`;
+  } else if (p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20) {
+    image = p.image_128.startsWith('data:') ? p.image_128 : `data:image/png;base64,${p.image_128}`;
+  } else if (p.image && typeof p.image === 'string' && p.image.length > 5) {
+    image = p.image;
+  } else {
+    // Generate an elegant SVG placeholder badge with initial letter and product name
+    const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
+    const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+    const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
+    const bgColor = bgColors[colorIndex];
+    image = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
   }
 
   const inStock = p.qty_available > 0;
@@ -113,6 +104,7 @@ function mapProduct(p, categMap) {
     rating: 4.8,
     reviews: 24,
     image: image,
+    thumb: image,
     qty_available: p.qty_available || 0,
     inStock: inStock,
     barcode: p.barcode || '',
@@ -166,6 +158,7 @@ async function fetchOdooProducts(forceRefresh = false) {
         'pos_categ_ids',
         'categ_id',
         'image_128',
+        'image_1920',
         'barcode',
         'default_code',
         'type'
@@ -209,35 +202,67 @@ async function fetchOdooProducts(forceRefresh = false) {
 
 // Helper to resolve Product to Odoo integer ID
 async function resolveOdooProductId(item) {
-  if (item.odooId && typeof item.odooId === 'number' && item.odooId > 0) {
-    return item.odooId;
-  }
-  if (item.id && typeof item.id === 'number' && item.id > 0) {
-    return item.id;
-  }
-  if (typeof item.id === 'string' && !isNaN(parseInt(item.id, 10)) && !item.id.includes('prod-')) {
-    return parseInt(item.id, 10);
-  }
+  if (!item) return null;
 
+  // 1. Search by exact name
   const cleanName = (item.name || '').replace(/^\[.*?\]\s*/, '').trim();
   if (cleanName) {
-    const foundByName = await callModel('product.product', 'search_read', [
-      [['name', 'ilike', cleanName]]
-    ], { fields: ['id', 'name', 'type'], limit: 1 });
-    if (foundByName && foundByName.length > 0) {
-      return foundByName[0].id;
+    try {
+      const foundByName = await callModel('product.product', 'search_read', [
+        [['name', 'ilike', cleanName]]
+      ], { fields: ['id', 'name'], limit: 1 });
+      if (foundByName && foundByName.length > 0) {
+        return foundByName[0].id;
+      }
+    } catch (e) {}
+  }
+
+  // 2. Search by SKU / barcode
+  if (item.sku || item.default_code || item.barcode) {
+    const code = item.sku || item.default_code || item.barcode;
+    try {
+      const foundByCode = await callModel('product.product', 'search_read', [
+        ['|', ['default_code', '=', code], ['barcode', '=', code]]
+      ], { fields: ['id'], limit: 1 });
+      if (foundByCode && foundByCode.length > 0) {
+        return foundByCode[0].id;
+      }
+    } catch (e) {}
+  }
+
+  // 3. Verify if raw integer ID exists in Odoo
+  const rawId = Number(item.odooId || item.id);
+  if (rawId > 0 && rawId < 1000) {
+    try {
+      const exists = await callModel('product.product', 'search_count', [[['id', '=', rawId]]]);
+      if (exists > 0) return rawId;
+    } catch (e) {}
+  }
+
+  // 4. If product does not exist in Odoo yet, create it on-the-fly in Odoo
+  if (cleanName) {
+    try {
+      const newProdId = await callModel('product.product', 'create', [{
+        name: cleanName,
+        list_price: Number(item.price) || 0,
+        default_code: item.sku || item.default_code || `SKU-${Date.now().toString().slice(-4)}`,
+        available_in_pos: true,
+        type: 'consu'
+      }]);
+      console.log(`[Odoo] Auto-created product in Odoo for line item: "${cleanName}" (ID: ${newProdId})`);
+      return newProdId;
+    } catch (e) {
+      console.warn(`[Odoo] Auto-creation failed for "${cleanName}":`, e.message);
     }
   }
 
-  if (item.sku || item.default_code) {
-    const code = item.sku || item.default_code;
-    const foundByCode = await callModel('product.product', 'search_read', [
-      [['default_code', '=', code]]
-    ], { fields: ['id', 'name', 'type'], limit: 1 });
-    if (foundByCode && foundByCode.length > 0) {
-      return foundByCode[0].id;
-    }
-  }
+  // 5. Fallback to any active POS product
+  try {
+    const fallback = await callModel('product.product', 'search_read', [
+      [['available_in_pos', '=', true]]
+    ], { fields: ['id'], limit: 1 });
+    if (fallback && fallback.length > 0) return fallback[0].id;
+  } catch (e) {}
 
   return null;
 }
@@ -831,9 +856,14 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
     const price = Number(productData.price) || 1000;
     const barcode = productData.sku || productData.barcode || `SKU-${Date.now().toString().slice(-6)}`;
     const categoryName = productData.category || 'General';
-    const image128 = productData.image && productData.image.startsWith('data:image') 
-      ? productData.image.split(',')[1] 
-      : false;
+    let rawImageBase64 = false;
+    if (productData.image && typeof productData.image === 'string') {
+      if (productData.image.startsWith('data:image')) {
+        rawImageBase64 = productData.image.split(',')[1];
+      } else if (productData.image.length > 50 && !productData.image.startsWith('http')) {
+        rawImageBase64 = productData.image;
+      }
+    }
 
     // 1. Find or create POS category
     let posCategId = false;
@@ -862,12 +892,13 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       if (posCategId) {
         createPayload.pos_categ_ids = [[6, 0, [posCategId]]];
       }
-      if (image128) {
-        createPayload.image_128 = image128;
+      if (rawImageBase64) {
+        createPayload.image_1920 = rawImageBase64;
+        createPayload.image_128 = rawImageBase64;
       }
 
       newProductId = await callModel('product.product', 'create', [createPayload]);
-      console.log(`[Odoo] ✅ Created product "${name}" (ID: ${newProductId})`);
+      console.log(`[Odoo] ✅ Created product "${name}" (ID: ${newProductId}) with custom image`);
     } catch (createErr) {
       console.warn(`[Odoo Create Product Warning]:`, createErr.message);
       newProductId = Math.floor(1000 + Math.random() * 9000);

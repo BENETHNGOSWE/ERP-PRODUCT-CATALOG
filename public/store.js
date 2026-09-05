@@ -76,6 +76,8 @@ const NOVA = (function () {
     try {
       const stored = localStorage.getItem(getOrderKey());
       if (stored) return JSON.parse(stored);
+      const globalStored = localStorage.getItem('nova_latest_order');
+      if (globalStored) return JSON.parse(globalStored);
     } catch (e) {}
     return { ...DEFAULT_ORDER };
   }
@@ -83,6 +85,7 @@ const NOVA = (function () {
   function saveLatestOrder(order) {
     try {
       localStorage.setItem(getOrderKey(), JSON.stringify(order));
+      localStorage.setItem('nova_latest_order', JSON.stringify(order));
     } catch (e) {}
   }
 

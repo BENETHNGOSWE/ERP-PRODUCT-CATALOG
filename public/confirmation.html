@@ -275,8 +275,25 @@
   <!-- Scripts -->
   <script src="/store.js"></script>
   <script>
-    (function() {
-      const order = NOVA.getLatestOrder();
+    (async function() {
+      // 1. Resolve Order from query param (?orderId=...) or localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryOrderId = urlParams.get('orderId') || urlParams.get('id');
+
+      let order = NOVA.getLatestOrder();
+
+      if (queryOrderId) {
+        try {
+          const res = await fetch(`/api/orders/${encodeURIComponent(queryOrderId)}`);
+          const data = await res.json();
+          if (data && data.success && data.order) {
+            order = data.order;
+            NOVA.saveLatestOrder(order);
+          }
+        } catch (e) {
+          console.warn('Could not fetch order by ID:', e);
+        }
+      }
 
       const orderIdEl = document.getElementById('orderIdVal');
       const odooRefRow = document.getElementById('odooRefRow');
@@ -286,14 +303,17 @@
       const phoneEl = document.getElementById('phoneVal');
       const btnViewOrder = document.getElementById('btnViewOrder');
 
-      if (orderIdEl) orderIdEl.textContent = order.orderId || 'NM-1048';
-      if (order.odooOrderName && odooRefRow && odooRefVal) {
+      if (orderIdEl) orderIdEl.textContent = order.orderId || order.receiptNumber || 'NM-1048';
+      if ((order.odooOrderName || order.receiptNumber) && odooRefRow && odooRefVal) {
         odooRefRow.style.display = 'flex';
-        odooRefVal.textContent = order.odooOrderName;
+        odooRefVal.textContent = order.odooOrderName || order.receiptNumber;
       }
-      if (totalPaidEl) totalPaidEl.textContent = NOVA.formatTZS(order.totalPaid || 14000);
-      if (itemCountEl) itemCountEl.textContent = `${order.itemCount || 3} items`;
-      if (phoneEl) phoneEl.textContent = order.phone || '+255 7XX XXX XXX';
+      const finalAmount = order.totalAmount || order.totalPaid || 0;
+      if (totalPaidEl) totalPaidEl.textContent = NOVA.formatTZS(finalAmount);
+      
+      const count = order.itemCount || (order.items ? order.items.reduce((s, it) => s + (Number(it.qty) || 1), 0) : 1);
+      if (itemCountEl) itemCountEl.textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+      if (phoneEl) phoneEl.textContent = (order.customer && order.customer.phone) || order.phone || '+255 7XX XXX XXX';
 
       const btnWhatsAppDirect = document.getElementById('btnWhatsAppDirect');
       if (btnWhatsAppDirect) {
@@ -304,14 +324,14 @@
           let cleanWa = String(storeWa).replace(/[^0-9]/g, '');
           if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
           else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
-          const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\nTotal: TZS ${NOVA.formatTZS(order.totalPaid || 0)}\nPhone: ${order.phone || ''}`;
+          const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\nTotal: TZS ${NOVA.formatTZS(finalAmount)}\nPhone: ${(order.customer && order.customer.phone) || order.phone || ''}`;
           btnWhatsAppDirect.href = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(msg)}`;
         }
       }
 
       const btnContinue = document.getElementById('btnContinueShopping');
       if (btnContinue) {
-        const slug = NOVA.getStoreSlug();
+        const slug = order.storeSlug || NOVA.getStoreSlug();
         btnContinue.href = (slug && slug !== 'novamart' && slug !== 'shop') ? `/${slug}` : '/';
       }
 
@@ -326,38 +346,96 @@
           const title = document.getElementById('receiptModalTitle');
           const body = document.getElementById('receiptModalBody');
 
-          if (title) title.textContent = `Order Receipt #${order.orderId}`;
+          if (title) title.textContent = `Order Receipt #${order.orderId || 'Order'}`;
           if (body) {
             let itemsHtml = '';
             if (order.items && order.items.length > 0) {
               order.items.forEach(it => {
+                const itemQty = Number(it.qty || it.quantity) || 1;
+                const itemPrice = Number(it.price) || 0;
+                const itemSub = Number(it.subtotal) || (itemPrice * itemQty);
                 itemsHtml += `
                   <tr>
-                    <td>${it.name} &times; ${it.qty}</td>
-                    <td style="text-align:right;">${NOVA.formatTZS(it.subtotal || it.price * it.qty)}</td>
+                    <td>${it.name} &times; ${itemQty}</td>
+                    <td style="text-align:right;">${NOVA.formatTZS(itemSub)}</td>
                   </tr>
                 `;
               });
             } else {
               itemsHtml = `
-                <tr><td>Coca-Cola 500ml &times; 2</td><td style="text-align:right;">TZS 2,000</td></tr>
-                <tr><td>Azam Juice 500ml &times; 1</td><td style="text-align:right;">TZS 1,500</td></tr>
-                <tr><td>Nivea Body Lotion &times; 1</td><td style="text-align:right;">TZS 12,000</td></tr>
+                <tr>
+                  <td colspan="2" style="text-align:center; color:#64748b; padding:12px;">No individual item details recorded.</td>
+                </tr>
               `;
             }
+
+            const storeTitle = order.storeName || (NOVA.getStore() && NOVA.getStore().name) || 'Store';
+            const storeLoc = (order.customer && order.customer.deliveryAddress) || (NOVA.getStore() && NOVA.getStore().address) || 'Dar es Salaam';
 
             body.innerHTML = `
               <div style="font-size:0.88rem; line-height: 1.5;">
                 <div style="display:flex; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:10px;">
                   <div>
-                    <strong>NOVA MART</strong><br>
-                    <span style="color:#64748b;">Mikocheni Store &bull; Dar es Salaam</span>
+                    <strong>${storeTitle}</strong><br>
+                    <span style="color:#64748b;">${storeLoc}</span>
                   </div>
                   <div style="text-align:right;">
-                    <strong>${order.orderId}</strong><br>
-                    <span style="color:#64748b;">${order.date || new Date().toLocaleDateString()}</span>
+                    <strong>${order.orderId || 'ORD'}</strong><br>
+                    <span style="color:#64748b;">${order.dateFormatted || order.date || new Date().toLocaleDateString()}</span>
                   </div>
                 </div>
+
+                <table class="receipt-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th style="text-align:right;">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                  </tbody>
+                </table>
+
+                <div class="receipt-totals">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#64748b;">Subtotal:</span>
+                    <strong>${NOVA.formatTZS(order.subtotal || finalAmount)}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; color:#16a34a;">
+                    <span>Discount:</span>
+                    <strong>- ${NOVA.formatTZS(order.discount || 0)}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid #cbd5e1; padding-top:6px; margin-top:4px;">
+                    <span>Total Paid:</span>
+                    <strong style="color:#0047bb;">${NOVA.formatTZS(finalAmount)}</strong>
+                  </div>
+                </div>
+
+                <div style="margin-top:14px; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:0.82rem; color:#334155;">
+                  📞 <strong>Contact Number:</strong> ${(order.customer && order.customer.phone) || order.phone || '+255 7XX XXX XXX'}<br>
+                  📦 <strong>Status:</strong> ${order.status || 'Order Placed & Confirmed'}
+                </div>
+
+                <div class="receipt-barcode">
+                  ||| | |||| || | ||||| |||| | |||
+                </div>
+              </div>
+            `;
+          }
+
+          if (modal) modal.classList.add('active');
+        });
+      }
+
+      // Modal helpers
+      window.openShopModal = function() {
+        document.getElementById('shopModal').classList.add('active');
+      };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+      };
+    })();
 
                 <table class="receipt-table">
                   <thead>
