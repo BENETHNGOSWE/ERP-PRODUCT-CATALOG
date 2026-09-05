@@ -283,7 +283,7 @@ class StoreManager {
    * Enforces multi-client catalog separation, custom store stock, and store price overrides.
    */
   filterProductsForStore(allProducts = [], store) {
-    if (!store) return [];
+    if (!store) return allProducts;
 
     let matched = [];
 
@@ -291,20 +291,21 @@ class StoreManager {
     if (Array.isArray(store.productIds) && store.productIds.length > 0) {
       const idSet = new Set(store.productIds.map(Number));
       matched = (allProducts || []).filter(p => idSet.has(Number(p.id)));
+    } else if (store.slug === 'novamart' || !store.id) {
+      // Main store shows all live products available in Odoo POS
+      matched = (allProducts || []);
     } else {
-      // 2. Built-in default stores use curated keywords/categories
-      const isBuiltinStore = [1, 2, 3, 4].includes(store.id) || ['abcstore', 'novamart', 'crownshop', 'safaridiner'].includes(store.slug);
-      
-      if (isBuiltinStore) {
-        const storeCategories = (store.categories || []).map(c => c.toLowerCase());
-        const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
+      // Client store with specific categories/keywords
+      const storeCategories = (store.categories || []).map(c => c.toLowerCase());
+      const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
 
+      if (storeCategories.length > 0 || storeKeywords.length > 0) {
         matched = (allProducts || []).filter(p => {
           const pName = (p.name || '').toLowerCase();
           const pCat = (p.category || '').toLowerCase();
           const pSku = (p.default_code || '').toLowerCase();
 
-          const catMatch = storeCategories.some(sc => pCat.includes(sc) || sc.includes(pCat));
+          const catMatch = storeCategories.some(sc => sc === 'all' || sc === 'general' || pCat.includes(sc) || sc.includes(pCat));
           if (catMatch) return true;
 
           const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
@@ -312,15 +313,8 @@ class StoreManager {
 
           return false;
         });
-      } else if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
-        const storeKeywords = store.productKeywords.map(k => k.toLowerCase().trim()).filter(Boolean);
-        if (storeKeywords.length > 0) {
-          matched = (allProducts || []).filter(p => {
-            const pName = (p.name || '').toLowerCase();
-            const pSku = (p.default_code || '').toLowerCase();
-            return storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
-          });
-        }
+      } else {
+        matched = allProducts || [];
       }
     }
 

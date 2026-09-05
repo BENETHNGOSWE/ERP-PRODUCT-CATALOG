@@ -36,7 +36,12 @@
     "createdDate": "2026-08-15",
     "pin": "1234",
     "productIds": [],
-    "inventoryOverrides": {},
+    "inventoryOverrides": {
+      "139": {
+        "qty_available": 0,
+        "updatedAt": "2026-09-05T22:34:01.929Z"
+      }
+    },
     "customProducts": []
   },
   {
@@ -122,7 +127,7 @@
     "name": "Safari Diner & Cafe",
     "slug": "safaridiner",
     "tagline": "Fresh Chef Dishes, Local BBQ & Refreshing Beverages",
-    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23d97706\"/><circle cx=\"40\" cy=\"40\" r=\"22\" fill=\"%23ffffff\"/><text x=\"50%\" y=\"54%\" font-size=\"22\" text-anchor=\"middle\" dominant-baseline=\"middle\">\ud83c\udf7d\ufe0f</text></svg>",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23d97706\"/><circle cx=\"40\" cy=\"40\" r=\"22\" fill=\"%23ffffff\"/><text x=\"50%\" y=\"54%\" font-size=\"22\" text-anchor=\"middle\" dominant-baseline=\"middle\">🍽️</text></svg>",
     "whatsapp": "+255688554433",
     "status": "active",
     "themeColor": "#d97706",

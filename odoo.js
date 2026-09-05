@@ -355,27 +355,45 @@ async function createOdooPosOrder(orderData) {
       fields: ['id', 'name', 'current_session_id', 'payment_method_ids']
     });
 
-    let targetConfig = posConfigs.find(c => c.name && c.name.toLowerCase().includes('website')) || posConfigs[0];
+    let targetConfig = null;
+    if (orderData.posConfigId) {
+      targetConfig = posConfigs.find(c => Number(c.id) === Number(orderData.posConfigId));
+    }
+    if (!targetConfig) {
+      targetConfig = posConfigs.find(c => c.name && c.name.toLowerCase().includes('website')) || posConfigs[0];
+    }
     let sessionId = false;
 
     if (targetConfig && targetConfig.current_session_id) {
       sessionId = targetConfig.current_session_id[0];
     } else {
-      const openSessions = await callModel('pos.session', 'search_read', [
-        [['state', '=', 'opened']]
-      ], { fields: ['id', 'name', 'config_id'], limit: 1 });
+      const availableSessions = await callModel('pos.session', 'search_read', [
+        [['state', 'in', ['opened', 'opening_control']]]
+      ], { fields: ['id', 'name', 'config_id', 'state'], limit: 1 });
 
-      if (openSessions && openSessions.length > 0) {
-        sessionId = openSessions[0].id;
+      if (availableSessions && availableSessions.length > 0) {
+        sessionId = availableSessions[0].id;
+      } else {
+        try {
+          const configIdToUse = targetConfig ? targetConfig.id : 1;
+          const authUser = await authenticate();
+          sessionId = await callModel('pos.session', 'create', [{
+            user_id: authUser,
+            config_id: configIdToUse
+          }]);
+          console.log(`[Odoo] Auto-opened new POS session #${sessionId} for config "${targetConfig ? targetConfig.name : 'Default'}"`);
+        } catch (sessErr) {
+          console.warn('[Session Auto-Creation Note]:', sessErr.message);
+        }
       }
     }
 
     const totalAmount = Number(orderData.totalAmount) || 0;
-    const posReference = `Order WEB-${orderData.orderNumber || Date.now()}`;
+    const posReference = `Order WEB-${orderData.orderNumber || orderData.orderId || Date.now()}`;
 
     const newPosOrderId = await callModel('pos.order', 'create', [{
-      name: `Website Orders/${orderData.orderNumber || Date.now().toString().slice(-4)}`,
-      session_id: sessionId || 36,
+      name: `Website Orders/${orderData.orderNumber || orderData.orderId || Date.now().toString().slice(-4)}`,
+      session_id: sessionId,
       partner_id: customerId,
       pos_reference: posReference,
       amount_total: totalAmount,
