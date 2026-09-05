@@ -32,7 +32,7 @@ const DEFAULT_STORES = [
     themeColor: '#0047bb',
     currency: 'TZS',
     address: 'Masaki, Dar es Salaam, Tanzania',
-    posConfigId: 3, // Mangi shop in Odoo
+    posConfigId: 4, // Mangi shop in Odoo
     posConfigName: 'Mangi shop',
     categories: ['Food', 'Drinks', 'Household', 'Cosmetics', 'Electronics'],
     productKeywords: ['coca', 'azam', 'water', 'nivea', 'soap', 'dettol', 'rice', 'oil', 'charger', 'flour', 'bread', 'juice'],
@@ -49,7 +49,7 @@ const DEFAULT_STORES = [
     themeColor: '#081735',
     currency: 'TZS',
     address: 'Kariakoo Commercial Hub, Dar es Salaam',
-    posConfigId: 26, // Website Orders in Odoo
+    posConfigId: 1, // Website Orders in Odoo
     posConfigName: 'Website Orders',
     categories: ['Safety Gear', 'Head Protection', 'Eye Protection', 'Foot Protection', 'Body Protection', 'Respiratory Protection', 'Hand Protection'],
     productKeywords: ['boot', 'titanstep', 'helmet', 'arcguard', 'glasses', 'clearvision', 'respirator', 'forcefield', 'coverall', 'chembarrier', 'harness', 'glove'],
@@ -66,7 +66,7 @@ const DEFAULT_STORES = [
     themeColor: '#7c3aed',
     currency: 'TZS',
     address: 'Posta City Centre, Dar es Salaam',
-    posConfigId: 4, // Min Market in Odoo
+    posConfigId: 5, // Min Market in Odoo
     posConfigName: 'Min Market',
     categories: ['Office Furniture', 'Kitchen materials', 'Equipments', 'Electronics'],
     productKeywords: ['desk', 'chair', 'cabinet', 'storage', 'utensils', 'mouse', 'lamp', 'stand', 'organizer'],
@@ -83,7 +83,7 @@ const DEFAULT_STORES = [
     themeColor: '#d97706',
     currency: 'TZS',
     address: 'Oysterbay Peninsula, Dar es Salaam',
-    posConfigId: 1, // Restaurant in Odoo
+    posConfigId: 6, // Restaurant in Odoo
     posConfigName: 'Restaurant',
     categories: ['Food', 'Drinks', 'BULLY Menu', 'GGM Menu', 'Northmara Menu'],
     productKeywords: ['chicken', 'chips', 'mayai', 'juice', 'water', 'coca', 'food'],

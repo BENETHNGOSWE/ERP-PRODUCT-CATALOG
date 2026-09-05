@@ -10,7 +10,7 @@
     "themeColor": "#0047bb",
     "currency": "TZS",
     "address": "Masaki, Dar es Salaam, Tanzania",
-    "posConfigId": 3,
+    "posConfigId": 4,
     "posConfigName": "Mangi shop",
     "categories": [
       "Food",
@@ -47,7 +47,7 @@
     "themeColor": "#081735",
     "currency": "TZS",
     "address": "Kariakoo Commercial Hub, Dar es Salaam",
-    "posConfigId": 26,
+    "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "Safety Gear",
@@ -73,7 +73,14 @@
       "glove"
     ],
     "createdDate": "2026-08-01",
-    "pin": "1234"
+    "pin": "1234",
+    "inventoryOverrides": {
+      "1": {
+        "qty_available": 0,
+        "updatedAt": "2026-09-05T21:21:03.524Z"
+      }
+    },
+    "customProducts": []
   },
   {
     "id": 3,
@@ -86,7 +93,7 @@
     "themeColor": "#7c3aed",
     "currency": "TZS",
     "address": "Posta City Centre, Dar es Salaam",
-    "posConfigId": 4,
+    "posConfigId": 5,
     "posConfigName": "Min Market",
     "categories": [
       "Office Furniture",
@@ -119,7 +126,7 @@
     "themeColor": "#d97706",
     "currency": "TZS",
     "address": "Oysterbay Peninsula, Dar es Salaam",
-    "posConfigId": 1,
+    "posConfigId": 6,
     "posConfigName": "Restaurant",
     "categories": [
       "Food",
@@ -151,7 +158,7 @@
     "themeColor": "#059669",
     "currency": "TZS",
     "address": "Dar es Salaam, Tanzania",
-    "posConfigId": 26,
+    "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "Electronics",
@@ -179,7 +186,7 @@
     "themeColor": "#0047bb",
     "currency": "TZS",
     "address": "Dar es Salaam, Tanzania",
-    "posConfigId": 26,
+    "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "Food"
@@ -204,7 +211,7 @@
     "themeColor": "#0047bb",
     "currency": "TZS",
     "address": "Dar es Salaam, Tanzania",
-    "posConfigId": 26,
+    "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "General"
@@ -225,7 +232,7 @@
     "themeColor": "#0047bb",
     "currency": "TZS",
     "address": "Dar es Salaam, Tanzania",
-    "posConfigId": 26,
+    "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "General"

@@ -1,5 +1,41 @@
 [
   {
+    "id": 9,
+    "orderId": "ORD-3524",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-1788643262015",
+    "receiptNumber": "Order WEB-1788643262015",
+    "storeId": 2,
+    "storeSlug": "novamart",
+    "storeName": "NOVA MART",
+    "storeWhatsapp": "+255784112233",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Production Test Customer",
+      "phone": "+255784112233",
+      "deliveryAddress": "Kariakoo, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 1,
+        "name": "ArcGuard Premium Welding Helmet",
+        "price": 662500,
+        "qty": 1,
+        "subtotal": 662500
+      }
+    ],
+    "itemCount": 1,
+    "subtotal": 662500,
+    "discount": 0,
+    "totalAmount": 662500,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": null,
+    "createdAt": "2026-09-05T21:21:03.666Z",
+    "dateFormatted": "5 Sept 2026, 21:21"
+  },
+  {
     "id": 8,
     "orderId": "ORD-7496",
     "odooOrderId": null,
