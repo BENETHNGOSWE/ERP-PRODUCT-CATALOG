@@ -34,7 +34,10 @@
       "juice"
     ],
     "createdDate": "2026-08-15",
-    "pin": "1234"
+    "pin": "1234",
+    "productIds": [],
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 2,
@@ -74,13 +77,9 @@
     ],
     "createdDate": "2026-08-01",
     "pin": "1234",
-    "inventoryOverrides": {
-      "1": {
-        "qty_available": 0,
-        "updatedAt": "2026-09-05T21:21:03.524Z"
-      }
-    },
-    "customProducts": []
+    "inventoryOverrides": {},
+    "customProducts": [],
+    "productIds": []
   },
   {
     "id": 3,
@@ -113,14 +112,17 @@
       "organizer"
     ],
     "createdDate": "2026-08-20",
-    "pin": "1234"
+    "pin": "1234",
+    "productIds": [],
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 4,
     "name": "Safari Diner & Cafe",
     "slug": "safaridiner",
     "tagline": "Fresh Chef Dishes, Local BBQ & Refreshing Beverages",
-    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23d97706\"/><circle cx=\"40\" cy=\"40\" r=\"22\" fill=\"%23ffffff\"/><text x=\"50%\" y=\"54%\" font-size=\"22\" text-anchor=\"middle\" dominant-baseline=\"middle\">🍽️</text></svg>",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23d97706\"/><circle cx=\"40\" cy=\"40\" r=\"22\" fill=\"%23ffffff\"/><text x=\"50%\" y=\"54%\" font-size=\"22\" text-anchor=\"middle\" dominant-baseline=\"middle\">\ud83c\udf7d\ufe0f</text></svg>",
     "whatsapp": "+255688554433",
     "status": "active",
     "themeColor": "#d97706",
@@ -145,7 +147,10 @@
       "food"
     ],
     "createdDate": "2026-08-25",
-    "pin": "1234"
+    "pin": "1234",
+    "productIds": [],
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 5,
@@ -173,7 +178,9 @@
     ],
     "productIds": [],
     "createdDate": "2026-09-03",
-    "pin": "1234"
+    "pin": "1234",
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 6,
@@ -198,7 +205,9 @@
     ],
     "productIds": [],
     "createdDate": "2026-09-03",
-    "pin": "1234"
+    "pin": "1234",
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 7,
@@ -219,7 +228,9 @@
     "productKeywords": [],
     "productIds": [],
     "createdDate": "2026-09-03",
-    "pin": "1234"
+    "pin": "1234",
+    "inventoryOverrides": {},
+    "customProducts": []
   },
   {
     "id": 8,
@@ -238,70 +249,10 @@
       "General"
     ],
     "productKeywords": [],
-    "productIds": [
-      183,
-      1001,
-      1002,
-      1003
-    ],
+    "productIds": [],
     "createdDate": "2026-09-03",
     "pin": "1234",
-    "inventoryOverrides": {
-      "183": {
-        "qty_available": 20,
-        "price": 68000,
-        "updatedAt": "2026-09-04T17:26:51.997Z"
-      }
-    },
-    "customProducts": [
-      {
-        "id": 1001,
-        "name": "iPhone 15 Pro Max 256GB",
-        "category": "Smartphones",
-        "price": 2850000,
-        "qty_available": 11,
-        "inStock": true,
-        "image": "/assets/products/samsung_charger.png",
-        "thumb": "/assets/products/samsung_charger.png",
-        "default_code": "IPH-15PM",
-        "barcode": "",
-        "type": "consu",
-        "rating": 5,
-        "reviews": 1,
-        "createdAt": "2026-09-04T17:26:56.185Z"
-      },
-      {
-        "id": 1002,
-        "name": "MagSafe PowerBank 10000mAh",
-        "category": "Accessories",
-        "price": 85000,
-        "qty_available": 30,
-        "inStock": true,
-        "image": "/assets/products/samsung_charger.png",
-        "thumb": "/assets/products/samsung_charger.png",
-        "default_code": "PB-MAG10",
-        "barcode": "",
-        "type": "consu",
-        "rating": 5,
-        "reviews": 1,
-        "createdAt": "2026-09-04T17:26:56.187Z"
-      },
-      {
-        "id": 1003,
-        "name": "USB-C Braided Cable 2M",
-        "category": "Accessories",
-        "price": 25000,
-        "qty_available": 50,
-        "inStock": true,
-        "image": "/assets/products/samsung_charger.png",
-        "thumb": "/assets/products/samsung_charger.png",
-        "default_code": "CBL-2M",
-        "barcode": "",
-        "type": "consu",
-        "rating": 5,
-        "reviews": 1,
-        "createdAt": "2026-09-04T17:26:56.187Z"
-      }
-    ]
+    "inventoryOverrides": {},
+    "customProducts": []
   }
 ]
