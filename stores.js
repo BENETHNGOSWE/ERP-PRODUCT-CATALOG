@@ -285,76 +285,66 @@ class StoreManager {
   filterProductsForStore(allProducts = [], store) {
     if (!store) return allProducts;
 
+    const isMasterStore = store.slug === 'novamart' || !store.id;
     let matched = [];
 
-    // 1. Explicit Product IDs match (Highest precedence)
-    if (Array.isArray(store.productIds) && store.productIds.length > 0) {
-      const idSet = new Set(store.productIds.map(Number));
-      matched = (allProducts || []).filter(p => idSet.has(Number(p.id)));
-    } else if (store.slug === 'novamart' || !store.id) {
-      // Main store shows all live products available in Odoo POS
-      matched = (allProducts || []);
+    // 1. Catalog Isolation
+    if (isMasterStore) {
+      // Master platform store shows all live products available in Odoo POS
+      matched = (allProducts || []).map(p => ({ ...p }));
     } else {
-      // Client store with specific categories/keywords
-      const storeCategories = (store.categories || []).map(c => c.toLowerCase());
-      const storeKeywords = (store.productKeywords || []).map(k => k.toLowerCase());
-
-      if (storeCategories.length > 0 || storeKeywords.length > 0) {
-        matched = (allProducts || []).filter(p => {
-          const pName = (p.name || '').toLowerCase();
-          const pCat = (p.category || '').toLowerCase();
-          const pSku = (p.default_code || '').toLowerCase();
-
-          const catMatch = storeCategories.some(sc => sc === 'all' || sc === 'general' || pCat.includes(sc) || sc.includes(pCat));
-          if (catMatch) return true;
-
-          const keyMatch = storeKeywords.some(kw => pName.includes(kw) || pSku.includes(kw));
-          if (keyMatch) return true;
-
-          return false;
-        });
+      // Client store: Strictly show ONLY products explicitly assigned to this store
+      if (Array.isArray(store.productIds) && store.productIds.length > 0) {
+        const idSet = new Set(store.productIds.map(Number));
+        matched = (allProducts || []).filter(p => idSet.has(Number(p.id))).map(p => ({ ...p }));
       } else {
-        matched = allProducts || [];
+        matched = [];
       }
     }
 
-    // Clone matched list to avoid mutating shared Odoo cache
-    const finalProducts = matched.map(p => ({ ...p }));
-
-    // 3. Merge store's custom created products
+    // 2. Merge store's custom created products
     if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
       store.customProducts.forEach(cp => {
-        if (!finalProducts.some(p => Number(p.id) === Number(cp.id))) {
-          finalProducts.push({ ...cp });
+        if (!matched.some(p => Number(p.id) === Number(cp.id))) {
+          matched.push({ ...cp });
         }
       });
     }
 
-    // 4. Apply Store-Specific Isolated Stock & Pricing Overrides
+    // 3. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
-    return finalProducts.map(prod => {
+    return matched.map(prod => {
       const pId = String(prod.id);
       const ovr = overrides[pId];
-      if (ovr) {
-        const storeStock = ovr.qty_available !== undefined ? Number(ovr.qty_available) : Number(prod.qty_available || 0);
-        const storePrice = ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
+
+      if (isMasterStore) {
+        // Master store: uses live Odoo stock unless overridden
+        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : Number(prod.qty_available || 0);
+        const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
         return {
           ...prod,
-          name: ovr.name || prod.name,
+          name: ovr?.name || prod.name,
           price: storePrice,
           qty_available: storeStock,
           inStock: storeStock > 0,
-          isStoreCustomized: true,
+          storeStock: storeStock,
+          storePrice: storePrice
+        };
+      } else {
+        // Client store: Stock starts at 0 UNTIL loaded/restocked by the store owner!
+        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : 0;
+        const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
+        return {
+          ...prod,
+          name: ovr?.name || prod.name,
+          price: storePrice,
+          qty_available: storeStock,
+          inStock: storeStock > 0,
+          isStoreCustomized: Boolean(ovr),
           storeStock: storeStock,
           storePrice: storePrice
         };
       }
-      return {
-        ...prod,
-        storeStock: Number(prod.qty_available || 0),
-        storePrice: Number(prod.price || 0),
-        inStock: Number(prod.qty_available || 0) > 0
-      };
     });
   }
 

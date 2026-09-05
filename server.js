@@ -167,6 +167,11 @@ app.post('/api/stores/:id/quick-add-product', async (req, res) => {
 
     if (createResult.productId) {
       stores.addProductToStore(req.params.id, createResult.productId);
+      stores.updateStoreProductStock(req.params.id, createResult.productId, {
+        newQty: initialStock,
+        price: Number(productData.price) || 0,
+        name: productData.name
+      });
     }
 
     res.status(201).json({

@@ -2772,25 +2772,38 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (!selectedProductIdForRestock) return;
       const qty = parseInt(document.getElementById('restockQtyInput').value, 10) || 50;
       const btn = document.getElementById('btnConfirmRestock');
-      btn.textContent = 'Updating Odoo...';
+      btn.textContent = 'Updating...';
       btn.disabled = true;
 
       try {
-        const res = await fetch('/api/odoo/restock', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId: selectedProductIdForRestock, quantity: qty })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Failed');
-
+        if (activeInvStoreId) {
+          // Restock strictly for this client store
+          const res = await fetch(`/api/stores/${activeInvStoreId}/stock/receive`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: selectedProductIdForRestock, addQty: qty })
+          });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error || 'Failed');
+          showDashToast(`✅ Loaded +${qty} units into store inventory!`);
+          await loadStoreInventoryData();
+        } else {
+          // Restock in master Odoo ERP
+          const res = await fetch('/api/odoo/restock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: selectedProductIdForRestock, quantity: qty })
+          });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error || 'Failed');
+          showDashToast(`✅ Restocked ${qty} units in Odoo ERP!`);
+          fetchLiveDashboardData(false);
+        }
         closeRestockModal();
-        showDashToast(`✅ Restocked ${qty} units in Odoo ERP!`);
-        fetchLiveDashboardData(false);
       } catch (err) {
         alert('Could not restock: ' + err.message);
       } finally {
-        btn.textContent = 'Confirm Restock in Odoo';
+        btn.textContent = 'Confirm Restock';
         btn.disabled = false;
       }
     }
