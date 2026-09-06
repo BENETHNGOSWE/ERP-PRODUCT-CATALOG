@@ -95,12 +95,14 @@ function mapProduct(p, categMap) {
   }
 
   const inStock = p.qty_available > 0;
+  const description = (p.description_sale || p.description || '').replace(/<[^>]*>?/gm, '').trim();
 
   return {
     id: p.id,
     name: p.name,
     category: category,
     price: p.list_price || 0,
+    description: description,
     rating: 4.8,
     reviews: 24,
     image: image,
@@ -157,6 +159,8 @@ async function fetchOdooProducts(forceRefresh = false) {
         'qty_available',
         'pos_categ_ids',
         'categ_id',
+        'description',
+        'description_sale',
         'image_128',
         'image_1920',
         'barcode',

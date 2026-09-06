@@ -331,6 +331,12 @@ const NOVA = (function () {
     }
   }
 
+  function setItemQty(productId, targetQty) {
+    const current = getCart()[String(productId)] || 0;
+    const delta = Number(targetQty) - current;
+    return updateItemQty(productId, delta);
+  }
+
   return {
     getStoreSlug: () => currentSlug,
     getStore: () => activeStore,
@@ -348,6 +354,7 @@ const NOVA = (function () {
     formatTZS,
     calculateTotals,
     updateItemQty,
+    setItemQty,
     removeItem,
     resetCart,
     updateHeaderCartBadge,
