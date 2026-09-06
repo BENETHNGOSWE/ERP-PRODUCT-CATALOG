@@ -1,5 +1,5 @@
-# Production Dockerfile for Coolify
-FROM node:20-alpine AS builder
+# Production Dockerfile for Coolify & Docker Deployments
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -13,6 +13,11 @@ COPY . .
 # Set environment
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV DATA_DIR=/app/data
+
+# Declare persistent data storage volume
+RUN mkdir -p /app/data
+VOLUME ["/app/data"]
 
 # Expose container port
 EXPOSE 3000

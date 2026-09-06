@@ -12,11 +12,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const STORES_FILE = path.join(__dirname, 'data', 'stores.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const STORES_FILE = path.join(DATA_DIR, 'stores.json');
 
 // Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 // Default Client Stores
