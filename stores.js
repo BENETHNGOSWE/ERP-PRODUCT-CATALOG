@@ -365,7 +365,7 @@ class StoreManager {
    * - newQty (exact stock count)
    * - price (store selling price)
    */
-  updateStoreProductStock(idOrSlug, productId, { addQty, newQty, price, name }) {
+  updateStoreProductStock(idOrSlug, productId, { addQty, newQty, price, name, description }) {
     const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
     if (!store) throw new Error(`Store not found: ${idOrSlug}`);
 
@@ -393,6 +393,7 @@ class StoreManager {
           customProd.price = Number(price);
         }
         if (name) customProd.name = name.trim();
+        if (description !== undefined) customProd.description = description.trim();
         customProd.inStock = (Number(customProd.qty_available) || 0) > 0;
         customProd.updatedAt = new Date().toISOString();
 
@@ -421,6 +422,7 @@ class StoreManager {
       qty_available: finalQty,
       ...(finalPrice !== undefined ? { price: finalPrice } : {}),
       ...(name ? { name: name.trim() } : {}),
+      ...(description !== undefined ? { description: description.trim() } : {}),
       updatedAt: new Date().toISOString()
     };
 

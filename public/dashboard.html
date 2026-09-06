@@ -1345,6 +1345,11 @@
         </div>
 
         <div>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Description &amp; Details <span style="font-weight:400; color:#64748b;">(Optional)</span></label>
+          <textarea id="clientNewProdDesc" class="modal-input" style="height:65px; resize:vertical; font-family:inherit;" placeholder="Add specs, key features, warranty details, or special notes for your customers..."></textarea>
+        </div>
+
+        <div>
           <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:6px;">Product Image / Photo</label>
           <div style="display:flex; align-items:center; gap:12px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:10px; padding:10px 14px;">
             <div style="width:56px; height:56px; border-radius:8px; background:#ffffff; border:1.5px solid #cbd5e1; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
@@ -1662,6 +1667,11 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
               <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">SKU / Barcode</label>
               <input type="text" id="newProdSku" class="modal-input" placeholder="e.g. BAG-001">
             </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Product Description &amp; Details <span style="font-weight:400; color:#64748b;">(Optional)</span></label>
+            <textarea id="newProdDesc" class="modal-input" style="height:60px; resize:vertical; font-family:inherit;" placeholder="Enter product details, specifications, warranty, or delivery notes..."></textarea>
           </div>
 
           <div style="margin-top:12px;">
@@ -2402,6 +2412,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const prodName = document.getElementById('clientNewProdName').value.trim();
       const rawImgData = document.getElementById('clientNewProdImageData') ? document.getElementById('clientNewProdImageData').value : '';
       const finalImage = (rawImgData && rawImgData !== '/assets/products/samsung_charger.png') ? rawImgData : generateProductPlaceholder(prodName);
+      const descText = document.getElementById('clientNewProdDesc') ? document.getElementById('clientNewProdDesc').value.trim() : '';
 
       const payload = {
         name: prodName,
@@ -2409,6 +2420,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         sku: document.getElementById('clientNewProdSku').value || '',
         price: parseFloat(document.getElementById('clientNewProdPrice').value) || 0,
         initialStock: parseInt(document.getElementById('clientNewProdStock').value, 10) || 0,
+        description: descText,
         image: finalImage
       };
 
@@ -3323,6 +3335,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const category = document.getElementById('newProdCat').value.trim() || 'General';
       const sku = document.getElementById('newProdSku').value.trim();
       const urlImg = document.getElementById('newProdImageUrl').value.trim();
+      const descText = document.getElementById('newProdDesc') ? document.getElementById('newProdDesc').value.trim() : '';
 
       if (!name || isNaN(price) || price <= 0) {
         alert('Please enter a valid Product Name and Sales Price.');
@@ -3339,7 +3352,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const res = await fetch(`/api/stores/${activeInvStoreId}/quick-add-product`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, price, initialStock: stock, category, sku, image })
+          body: JSON.stringify({ name, price, initialStock: stock, category, sku, description: descText, image })
         });
 
         const data = await res.json();
@@ -3353,6 +3366,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         document.getElementById('newProdStock').value = '50';
         document.getElementById('newProdCat').value = '';
         document.getElementById('newProdSku').value = '';
+        if (document.getElementById('newProdDesc')) document.getElementById('newProdDesc').value = '';
         document.getElementById('newProdImageUrl').value = '';
         document.getElementById('newProdImageFile').value = '';
         document.getElementById('newProdImageThumb').style.display = 'none';

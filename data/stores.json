@@ -78,8 +78,28 @@
     "createdDate": "2026-08-01",
     "pin": "1234",
     "inventoryOverrides": {},
-    "customProducts": [],
-    "productIds": []
+    "customProducts": [
+      {
+        "id": 1001,
+        "name": "Pro Headphones X100",
+        "category": "Audio",
+        "price": 120000,
+        "description": "High fidelity active noise cancelling wireless headphones with 40-hour battery life.",
+        "qty_available": 15,
+        "inStock": true,
+        "image": "/assets/products/samsung_charger.png",
+        "thumb": "/assets/products/samsung_charger.png",
+        "default_code": "HP-X100",
+        "barcode": "",
+        "type": "consu",
+        "rating": 5,
+        "reviews": 1,
+        "createdAt": "2026-09-06T11:37:05.168Z"
+      }
+    ],
+    "productIds": [
+      1001
+    ]
   },
   {
     "id": 3,

@@ -170,7 +170,8 @@ app.post('/api/stores/:id/quick-add-product', async (req, res) => {
       stores.updateStoreProductStock(req.params.id, createResult.productId, {
         newQty: initialStock,
         price: Number(productData.price) || 0,
-        name: productData.name
+        name: productData.name,
+        description: productData.description
       });
     }
 
