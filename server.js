@@ -334,7 +334,7 @@ app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], as
 // 6. Get Products Filtered Strictly for a Client Store (Product Separation)
 app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
   try {
-    const slug = req.params.slug || req.query.store || 'novamart';
+    const slug = req.params.slug || req.query.store || 'achete';
     const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
 
     const forceRefresh = req.query.refresh === 'true' || req.query.force === 'true';
@@ -380,7 +380,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       return res.status(400).json({ success: false, error: 'Cannot create order: Cart is empty' });
     }
 
-    const slug = req.params.slug || orderData.storeSlug || 'novamart';
+    const slug = req.params.slug || orderData.storeSlug || 'achete';
     const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
 
     const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || 'Store Customer';
@@ -905,8 +905,8 @@ app.get('*', (req, res) => {
 // Start Express Server
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
-  console.log(`⚡ Clean Multi-Client Catalog & WhatsApp Server Running!`);
-  console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+  console.log(`⚡ ACHETE.ME Multi-Client Digital Storefront & WhatsApp Platform`);
+  console.log(`🌐 URL: http://0.0.0.0:${PORT} (Domain: achete.me)`);
   console.log(`📲 OpenWA WhatsApp Order Alerts: Enabled (Direct Send)`);
   console.log(`=======================================================`);
 });

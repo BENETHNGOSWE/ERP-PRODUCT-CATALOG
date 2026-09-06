@@ -1,5 +1,5 @@
 /**
- * NOVA MART — Ultra-Fast Single Page Web App
+ * ACHETE.ME — Ultra-Fast Single Page Digital Storefront & Catalog
  * Pure native ES6+ with sub-millisecond execution & zero framework overhead
  */
 
@@ -735,7 +735,7 @@
         <div style="font-size:0.88rem; line-height: 1.5;">
           <div style="display:flex; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:10px;">
             <div>
-              <strong>NOVA MART DAR ES SALAAM</strong><br>
+              <strong>ACHETE.ME DAR ES SALAAM</strong><br>
               <span style="color:#64748b;">Mikocheni Store &bull; Dar es Salaam</span>
             </div>
             <div style="text-align:right;">

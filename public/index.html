@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NOVA MART — Online Store</title>
-  <meta name="description" content="Shop quality products with fast delivery in Dar es Salaam.">
+  <title>ACHETE.ME — Online Store</title>
+  <meta name="description" content="Shop quality products with fast delivery in Dar es Salaam on achete.me.">
   <link rel="icon" type="image/png" href="/assets/products/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -111,7 +111,7 @@
           </svg>
         </div>
         <div class="brand-info">
-          <h1 class="brand-name">NOVA MART</h1>
+          <h1 class="brand-name">achete.me</h1>
           <div class="brand-location">
             <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -354,7 +354,7 @@
       <div class="modal-header">
         <div class="modal-title-group">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <h3>NOVA MART</h3>
+          <h3>achete.me</h3>
         </div>
         <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
       </div>
@@ -886,7 +886,7 @@
 
           // Smooth transition to confirmation receipt
           const slug = NOVA.getStoreSlug();
-          const targetUrl = (slug && slug !== 'novamart' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
+          const targetUrl = (slug && slug !== 'achete' && slug !== 'novamart' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
           window.location.href = `${targetUrl}?orderId=${encodeURIComponent(confirmedOrder.orderId)}`;
         });
       }

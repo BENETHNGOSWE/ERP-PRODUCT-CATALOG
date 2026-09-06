@@ -8,7 +8,7 @@ This guide explains how to **load stock specifically for that store** so that **
 
 ## 🎯 Overview: The 3 Ways to Load Stock into Your Store
 
-In the Admin Dashboard (**`https://catalog.kodatechnologies.co.tz/dashboard`**), click the blue **`📦 Load Stock`** button next to your store in the **Registered Stores** table.
+In the Admin Dashboard (**`https://achete.me/dashboard`**), click the blue **`📦 Load Stock`** button next to your store in the **Registered Stores** table.
 
 A dedicated modal will open with 3 options:
 
@@ -37,7 +37,7 @@ A dedicated modal will open with 3 options:
 
 ### 🔹 Method 1: Quick-Add a New Product Specifically for Your Store (Most Common)
 
-1. Open the Admin Dashboard: **`https://catalog.kodatechnologies.co.tz/dashboard`**.
+1. Open the Admin Dashboard: **`https://achete.me/dashboard`**.
 2. Scroll to the **Registered Stores & Catalogues** table.
 3. Next to your store (e.g. **Ben Store**), click **`📦 Load Stock`**.
 4. In the modal, click the **`➕ Quick Add Product`** tab.
@@ -53,8 +53,8 @@ A dedicated modal will open with 3 options:
 **Result:**
 - The item is saved into Odoo ERP with 50 units in stock.
 - The item is **strictly assigned to Ben Store**.
-- Opening `https://catalog.kodatechnologies.co.tz/benstore` immediately shows the product with `50 in stock`.
-- Client B (e.g., NOVA MART or ABC Store) will **never** see Ben Store's items.
+- Opening `https://achete.me/benstore` immediately shows the product with `50 in stock`.
+- Client B (e.g., ACHETE or ABC Store) will **never** see Ben Store's items.
 
 ---
 
@@ -90,7 +90,7 @@ If you have a list of products to load all at once:
 
 ## 🔄 How Stock Deduction Works When Orders Are Placed
 
-1. **Customer shops on your store:** Customer adds items to cart on `https://catalog.kodatechnologies.co.tz/benstore` and checks out.
+1. **Customer shops on your store:** Customer adds items to cart on `https://achete.me/benstore` and checks out.
 2. **Instant Stock Deduction:** 
    - If 3 units are ordered, the on-hand stock drops from `50` &rarr; `47` units in real time.
    - All subsequent visitors see `47 in stock`.

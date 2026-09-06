@@ -17,16 +17,16 @@ const NOVA = (function () {
       return first;
     }
     const params = new URLSearchParams(window.location.search);
-    return params.get('store') || 'novamart';
+    return params.get('store') || 'achete';
   }
 
   const currentSlug = getActiveStoreSlug();
 
   let activeStore = {
-    name: 'NOVA MART',
-    slug: currentSlug,
+    name: 'ACHETE.ME',
+    slug: currentSlug || 'achete',
     logo: 'assets/products/logo.png',
-    tagline: 'Quality Products with Fast Delivery in Dar es Salaam',
+    tagline: 'Digital Storefront Platform | Fast Delivery in Dar es Salaam',
     address: 'Dar es Salaam',
     whatsapp: '+255712345678'
   };
@@ -38,7 +38,7 @@ const NOVA = (function () {
   const DEFAULT_CART = {};
 
   const DEFAULT_ORDER = {
-    orderId: 'NM-1048',
+    orderId: 'ACH-1048',
     totalPaid: 0,
     subtotal: 0,
     discount: 0,
@@ -143,7 +143,7 @@ const NOVA = (function () {
 
   // Rewrite all internal links to preserve store context
   function rewriteStoreLinks() {
-    const isCustomSlug = currentSlug && currentSlug !== 'novamart';
+    const isCustomSlug = currentSlug && currentSlug !== 'achete' && currentSlug !== 'novamart' && currentSlug !== 'shop';
     const storePrefix = isCustomSlug ? `/${currentSlug}` : '';
     const queryParam = isCustomSlug ? `?store=${currentSlug}` : '';
 

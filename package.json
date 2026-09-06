@@ -1,7 +1,7 @@
 {
-  "name": "nova-mart",
+  "name": "achete-me",
   "version": "1.0.0",
-  "description": "NOVA MART - Ultra Fast Single Page Web App (Web & Mobile)",
+  "description": "ACHETE.ME — Multi-Client Digital Storefront & WhatsApp Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

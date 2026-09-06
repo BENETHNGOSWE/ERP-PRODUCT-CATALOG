@@ -40,9 +40,9 @@ const DEFAULT_STORES = [
   },
   {
     id: 2,
-    name: 'NOVA MART',
-    slug: 'novamart',
-    tagline: 'Industrial Safety Gear, PPE & Heavy Duty Workwear',
+    name: 'ACHETE',
+    slug: 'achete',
+    tagline: 'Digital Storefront Platform | Fast Delivery in Dar es Salaam',
     logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%23081735"/><polygon points="40 16 18 52 38 52 36 68 62 32 42 32 40 16" fill="%2322c55e"/></svg>',
     whatsapp: '+255784112233',
     status: 'active',
@@ -131,7 +131,17 @@ class StoreManager {
   getStoreBySlug(slug) {
     if (!slug) return null;
     const clean = slug.trim().toLowerCase();
-    return this.stores.find(s => s.slug.toLowerCase() === clean) || null;
+    const direct = this.stores.find(s => s.slug.toLowerCase() === clean);
+    if (direct) return direct;
+    
+    // Alias support for legacy 'novamart' or 'achete'
+    if (clean === 'novamart') {
+      return this.stores.find(s => s.slug.toLowerCase() === 'achete') || this.stores[0];
+    }
+    if (clean === 'achete') {
+      return this.stores.find(s => s.slug.toLowerCase() === 'novamart') || this.stores[0];
+    }
+    return null;
   }
 
   getStoreById(id) {
@@ -285,7 +295,7 @@ class StoreManager {
   filterProductsForStore(allProducts = [], store) {
     if (!store) return allProducts;
 
-    const isMasterStore = store.slug === 'novamart' || !store.id;
+    const isMasterStore = store.slug === 'achete' || store.slug === 'novamart' || !store.id;
     let matched = [];
 
     // 1. Catalog Isolation

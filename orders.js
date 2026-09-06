@@ -75,7 +75,7 @@ class OrderManager {
       odooOrderName: orderData.odooOrderName || orderData.receiptNumber || null,
       receiptNumber: orderData.receiptNumber || `Order WEB-${Date.now()}`,
       storeId: orderData.storeId || 1,
-      storeSlug: (orderData.storeSlug || 'novamart').toLowerCase(),
+      storeSlug: (orderData.storeSlug || 'achete').toLowerCase(),
       storeName: orderData.storeName || 'Store',
       storeWhatsapp: orderData.storeWhatsapp || '+255712345678',
       posConfigId: orderData.posConfigId || 26,
