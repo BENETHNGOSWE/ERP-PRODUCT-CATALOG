@@ -307,7 +307,6 @@
       
       <div class="prod-detail-hero">
         <img id="detailModalImg" src="" alt="Product Image" class="prod-detail-hero-img">
-        <span id="detailModalCategory" class="prod-detail-category-badge">Category</span>
       </div>
 
       <div class="prod-detail-body">
@@ -338,7 +337,7 @@
           </div>
           <button type="button" class="prod-detail-btn-cart" id="detailModalAddToCartBtn" onclick="submitDetailModalCart()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span id="detailModalBtnText">Add to Cart • TZS 0</span>
+            <span id="detailModalBtnText">Add to Cart</span>
           </button>
         </div>
         <a id="detailModalWaLink" href="#" target="_blank" class="prod-detail-btn-wa">
@@ -618,9 +617,6 @@
           imgEl.alt = p.name;
         }
 
-        const catEl = document.getElementById('detailModalCategory');
-        if (catEl) catEl.textContent = p.category || 'General';
-
         const titleEl = document.getElementById('detailModalTitle');
         if (titleEl) titleEl.textContent = p.name;
 
@@ -688,18 +684,14 @@
         if (qtyValEl) qtyValEl.textContent = detailModalQty;
 
         const btnTextEl = document.getElementById('detailModalBtnText');
-        const total = (Number(currentDetailProduct.price) || 0) * detailModalQty;
-        if (btnTextEl) {
-          btnTextEl.textContent = `Add to Cart • ${NOVA.formatTZS(total)}`;
-        }
-
         const addBtn = document.getElementById('detailModalAddToCartBtn');
         const stock = typeof currentDetailProduct.qty_available === 'number' ? currentDetailProduct.qty_available : 50;
+        
         if (addBtn) {
           addBtn.disabled = stock <= 0;
-          if (stock <= 0 && btnTextEl) {
-            btnTextEl.textContent = 'Out of Stock';
-          }
+        }
+        if (btnTextEl) {
+          btnTextEl.textContent = stock <= 0 ? 'Out of Stock' : 'Add to Cart';
         }
       }
 
