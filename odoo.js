@@ -893,6 +893,10 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
         type: 'consu'
       };
 
+      if (productData.description && typeof productData.description === 'string') {
+        createPayload.description_sale = productData.description.trim();
+      }
+
       if (posCategId) {
         createPayload.pos_categ_ids = [[6, 0, [posCategId]]];
       }

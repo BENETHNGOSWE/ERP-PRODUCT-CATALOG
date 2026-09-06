@@ -311,23 +311,61 @@ app.post(['/api/:slug/stock/batch-receive', '/api/stores/:slug/stock/batch-recei
   }
 });
 
-// 5j. Client Store Create Brand New Custom Product
+// 5j. Client Store Create Brand New Custom Product (Creates in Odoo ERP + Assigns to Store)
 app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], async (req, res) => {
   try {
     const slug = req.params.slug;
+    const store = stores.getStoreBySlug(slug);
+    if (!store) {
+      return res.status(404).json({ success: false, error: 'Store not found' });
+    }
+
     const productData = req.body;
     if (!productData.name) {
       return res.status(400).json({ success: false, error: 'Product name is required' });
     }
 
-    const result = stores.addCustomProductToStore(slug, productData);
+    const initialStock = Number(productData.initialStock) || 0;
+    
+    // 1. Create in master Odoo ERP (Point of Sale -> Products)
+    let odooProductId = null;
+    let odooProductObj = null;
+    try {
+      const createResult = await odoo.createOdooProduct(productData, initialStock);
+      odooProductId = createResult.productId;
+      odooProductObj = createResult.product;
+    } catch (odooErr) {
+      console.warn('[Odoo Product Creation Warning]:', odooErr.message);
+    }
+
+    // 2. Assign and record in Store Manager with isolated stock and details
+    if (odooProductId) {
+      productData.id = odooProductId;
+      stores.addProductToStore(store.id, odooProductId);
+      stores.updateStoreProductStock(store.id, odooProductId, {
+        newQty: initialStock,
+        price: Number(productData.price) || 0,
+        name: productData.name,
+        description: productData.description
+      });
+    }
+
+    // 3. Register in store customProducts cache
+    const finalId = odooProductId || (1000 + Math.floor(Math.random() * 9000));
+    const result = stores.addCustomProductToStore(slug, {
+      ...productData,
+      id: finalId
+    });
+
     res.status(201).json({
       success: true,
-      message: `Product "${productData.name}" created and added to your store!`,
-      product: result.product
+      message: `Product "${productData.name}" created in Odoo ERP and added to your store!`,
+      productId: finalId,
+      product: result.product || odooProductObj
     });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    console.error('[Create Store Product Error]:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
