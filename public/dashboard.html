@@ -803,12 +803,16 @@
     .restock-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(15, 23, 42, 0.55);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 3000;
+      padding: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
     }
 
     .restock-modal {
@@ -821,6 +825,11 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+      margin: auto;
     }
 
     .modal-title {
@@ -1047,11 +1056,21 @@
         gap: 14px !important;
       }
 
+      .restock-modal-overlay {
+        padding: 12px 10px !important;
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
       .restock-modal {
-        width: 94% !important;
-        max-width: 94% !important;
-        padding: 16px !important;
-        max-height: 90vh !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 18px 14px 24px !important;
+        max-height: none !important;
+        margin: 12px 0 30px !important;
+        border-radius: 16px !important;
+        box-sizing: border-box !important;
       }
 
       .restock-modal [style*="grid-template-columns: 1fr 1fr"],
@@ -1074,6 +1093,23 @@
       .btn-create-store-action {
         width: 100% !important;
         text-align: center !important;
+      }
+
+      .modal-actions {
+        display: flex !important;
+        flex-direction: column-reverse !important;
+        gap: 8px !important;
+        margin-top: 16px !important;
+        width: 100% !important;
+      }
+
+      .btn-modal-cancel,
+      .btn-modal-confirm {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 0.92rem !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
       }
     }
 
@@ -2661,7 +2697,11 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
     // Add Product Modal Handlers
     function openClientAddProductModal() {
-      document.getElementById('clientAddProductModal').style.display = 'flex';
+      const modal = document.getElementById('clientAddProductModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.scrollTop = 0;
+      }
     }
 
     function closeClientAddProductModal() {
