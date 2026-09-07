@@ -265,37 +265,77 @@
     "status": "active",
     "themeColor": "#0047bb",
     "currency": "TZS",
-    "address": "Mikocheni B, Dar es Salaam, Tanzania",
+    "address": "Masaki, Dar es Salaam, Tanzania",
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
       "All",
+      "General",
       "Smartphones",
-      "Smartwatches",
       "Electronics"
     ],
     "productKeywords": [],
-    "productIds": [141, 140, 139, 142],
+    "productIds": [1001, 1002, 1003, 1004],
     "createdDate": "2026-09-07",
     "pin": "1234",
-    "inventoryOverrides": {
-      "141": {
-        "qty_available": 25,
-        "price": 1850000
-      },
-      "140": {
+    "inventoryOverrides": {},
+    "customProducts": [
+      {
+        "id": 1001,
+        "name": "Samsung S26",
+        "category": "General",
+        "price": 1350000,
+        "description": "Latest Samsung Galaxy S26 flagship smartphone with advanced camera system and high performance.",
         "qty_available": 20,
-        "price": 2450000
+        "inStock": true,
+        "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%230284c7\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">S</text></svg>",
+        "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%230284c7\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">S</text></svg>",
+        "default_code": "SKU-350406",
+        "sku": "SKU-350406",
+        "type": "consu"
       },
-      "139": {
-        "qty_available": 30,
-        "price": 1500000
+      {
+        "id": 1002,
+        "name": "BENSTORE IPHONE 18",
+        "category": "General",
+        "price": 5000000,
+        "description": "Premium Flagship iPhone 18 Pro Max edition with titanium finish and maximum storage.",
+        "qty_available": 12,
+        "inStock": true,
+        "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">IP</text></svg>",
+        "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">IP</text></svg>",
+        "default_code": "SKU-1001",
+        "sku": "SKU-1001",
+        "type": "consu"
       },
-      "142": {
-        "qty_available": 15,
-        "price": 1800000
+      {
+        "id": 1003,
+        "name": "Samsung S26",
+        "category": "General",
+        "price": 1350000,
+        "description": "Samsung Galaxy S26 256GB storage edition with dynamic AMOLED display.",
+        "qty_available": 20,
+        "inStock": true,
+        "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%230047bb\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">S</text></svg>",
+        "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%230047bb\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">S</text></svg>",
+        "default_code": "SKU-1002",
+        "sku": "SKU-1002",
+        "type": "consu"
+      },
+      {
+        "id": 1004,
+        "name": "test",
+        "category": "General",
+        "price": 2300000,
+        "description": "Store verified product available for instant checkout.",
+        "qty_available": 20,
+        "inStock": true,
+        "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23d97706\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">T</text></svg>",
+        "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23d97706\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">T</text></svg>",
+        "default_code": "SKU-7167",
+        "sku": "SKU-7167",
+        "type": "consu"
       }
-    },
-    "customProducts": []
+    ]
   }
 ]
