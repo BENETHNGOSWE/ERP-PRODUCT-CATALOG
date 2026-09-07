@@ -318,6 +318,10 @@ const NOVA = (function () {
   async function submitOrderToOdoo(orderPayload) {
     try {
       orderPayload.storeSlug = currentSlug;
+      if (activeStore) {
+        if (activeStore.whatsapp) orderPayload.storeWhatsapp = activeStore.whatsapp;
+        if (activeStore.name) orderPayload.storeName = activeStore.name;
+      }
       const res = await fetch('/api/odoo/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -89,6 +89,23 @@ const DEFAULT_STORES = [
     categories: ['Food', 'Drinks', 'BULLY Menu', 'GGM Menu', 'Northmara Menu'],
     productKeywords: ['chicken', 'chips', 'mayai', 'juice', 'water', 'coca', 'food'],
     createdDate: '2026-08-25'
+  },
+  {
+    id: 9,
+    name: 'Koda Store',
+    slug: 'kodastore',
+    tagline: 'Official Koda Store | Premium Tech & Essentials',
+    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%23081735"/><text x="50%" y="54%" fill="white" font-size="24" font-weight="bold" text-anchor="middle" dominant-baseline="middle">KODA</text></svg>',
+    whatsapp: '+255710459064',
+    status: 'active',
+    themeColor: '#0047bb',
+    currency: 'TZS',
+    address: 'Dar es Salaam, Tanzania',
+    posConfigId: 1,
+    posConfigName: 'Website Orders',
+    categories: ['General', 'Electronics', 'Accessories'],
+    productKeywords: ['charger', 'samsung', 'mouse'],
+    createdDate: '2026-09-07'
   }
 ];
 

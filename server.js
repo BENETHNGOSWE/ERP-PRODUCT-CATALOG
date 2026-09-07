@@ -419,26 +419,40 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     }
 
     const slug = req.params.slug || orderData.storeSlug || 'achete';
-    const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
+    let store = stores.getStoreBySlug(slug);
+    if (!store) {
+      store = stores.getAllStores().find(s => s.slug.toLowerCase() === slug.toLowerCase() || s.name.toLowerCase() === slug.toLowerCase()) || stores.getAllStores()[0];
+    }
+
+    const storeWhatsapp = orderData.storeWhatsapp || (store && store.whatsapp) || '+255710459064';
+    const storeName = orderData.storeName || (store && store.name) || 'Store';
+
+    const storeContext = {
+      ...(store || {}),
+      id: (store && store.id) || 9,
+      name: storeName,
+      slug: (store && store.slug) || slug,
+      whatsapp: storeWhatsapp
+    };
 
     const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || 'Store Customer';
-    const customerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || store.whatsapp;
-    const deliveryAddress = (orderData.customer && (orderData.customer.address || orderData.customer.deliveryAddress)) || orderData.deliveryAddress || store.address || 'Dar es Salaam';
+    const customerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || storeWhatsapp;
+    const deliveryAddress = (orderData.customer && (orderData.customer.address || orderData.customer.deliveryAddress)) || orderData.deliveryAddress || (store && store.address) || 'Dar es Salaam';
 
     const calculatedTotal = (orderData.items || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0);
     const finalTotal = Number(orderData.totalAmount || orderData.total || calculatedTotal);
 
-    orderData.storeId = store.id;
-    orderData.storeSlug = store.slug;
-    orderData.storeName = store.name;
-    orderData.storeWhatsapp = store.whatsapp;
-    orderData.posConfigId = store.posConfigId;
+    orderData.storeId = storeContext.id;
+    orderData.storeSlug = storeContext.slug;
+    orderData.storeName = storeContext.name;
+    orderData.storeWhatsapp = storeContext.whatsapp;
+    orderData.posConfigId = storeContext.posConfigId || 1;
     orderData.customerName = customerName;
     orderData.customerPhone = customerPhone;
     orderData.deliveryAddress = deliveryAddress;
     orderData.totalAmount = finalTotal;
 
-    console.log(`[Order Processing] Store "${store.name}" (${store.slug}) — Total: TZS ${finalTotal}`);
+    console.log(`[Order Processing] Store "${storeContext.name}" (${storeContext.slug}) -> WhatsApp: ${storeContext.whatsapp} — Total: TZS ${finalTotal}`);
 
     // 1. Create POS Order in Odoo ERP & Deduct Stock
     let odooOrderResult = { odooOrderId: null, receiptNumber: `Order WEB-${Date.now()}` };
@@ -452,7 +466,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
 
     // Deduct stock isolated strictly for this store's inventory
     try {
-      stores.deductStoreStock(store.id, orderData.items);
+      stores.deductStoreStock(storeContext.id, orderData.items);
     } catch (deductErr) {
       console.warn('[Store Stock Deduct Warning]:', deductErr.message);
     }
@@ -463,7 +477,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     // 2. Automatically Send WhatsApp Order Alert Directly via OpenWA in the Background
     let waResult = null;
     try {
-      waResult = await whatsapp.sendOrderNotification(store, {
+      waResult = await whatsapp.sendOrderNotification(storeContext, {
         orderNumber: finalOrderId,
         receiptNumber: finalReceipt,
         customer: {
@@ -474,7 +488,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
         items: orderData.items,
         totalAmount: finalTotal
       });
-      console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${store.whatsapp}!`);
+      console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${storeContext.whatsapp}!`);
     } catch (waErr) {
       console.warn('[WhatsApp Gateway Warning]:', waErr.message);
       waResult = { success: false, error: waErr.message };

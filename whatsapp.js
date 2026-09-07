@@ -431,12 +431,23 @@ Action Required: Please process and confirm this order.`
 
   // --- Provider 5: OpenWA HTTP REST API ---
   async getActiveOpenwaSessionId(openwaUrl, apiKey, requestedSession) {
+    if (this.config.openwaSessionId) {
+      return this.config.openwaSessionId;
+    }
+
     // If requestedSession already looks like a UUID, use it directly
     if (requestedSession && requestedSession.length > 30 && requestedSession.includes('-')) {
       return requestedSession;
     }
 
+    if (this.cachedOpenwaSessionId) {
+      return this.cachedOpenwaSessionId;
+    }
+
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       const endpoint = `${openwaUrl}/api/sessions`;
       const res = await fetch(endpoint, {
         method: 'GET',
@@ -444,8 +455,9 @@ Action Required: Please process and confirm this order.`
           'X-API-Key': apiKey,
           'Authorization': `Bearer ${apiKey}`
         },
-        signal: AbortSignal.timeout(8000)
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const sessions = await res.json();
 
       if (Array.isArray(sessions) && sessions.length > 0) {
@@ -454,19 +466,28 @@ Action Required: Please process and confirm this order.`
           (s.name && s.name.toLowerCase() === (requestedSession || '').toLowerCase()) ||
           s.id === requestedSession
         );
-        if (matched && matched.id) return matched.id;
+        if (matched && matched.id) {
+          this.cachedOpenwaSessionId = matched.id;
+          return matched.id;
+        }
 
         // 2. Fallback to first 'ready' or first available session
         const readySession = sessions.find(s => s.status === 'ready');
-        if (readySession && readySession.id) return readySession.id;
+        if (readySession && readySession.id) {
+          this.cachedOpenwaSessionId = readySession.id;
+          return readySession.id;
+        }
 
-        if (sessions[0] && sessions[0].id) return sessions[0].id;
+        if (sessions[0] && sessions[0].id) {
+          this.cachedOpenwaSessionId = sessions[0].id;
+          return sessions[0].id;
+        }
       }
     } catch (err) {
       console.warn('[OpenWA] Session resolution fallback:', err.message);
     }
 
-    return requestedSession || 'main';
+    return requestedSession || '815b1f8a-b0e5-4778-9b97-fc9adb727b6a';
   }
 
   async sendOpenWA(phone, message, sessionName = 'main') {
@@ -482,6 +503,9 @@ Action Required: Please process and confirm this order.`
     // OpenWA REST endpoint: /api/sessions/:sessionId/messages/send-text
     const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(actualSessionId)}/messages/send-text`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -493,8 +517,9 @@ Action Required: Please process and confirm this order.`
         chatId: `${phone}@c.us`,
         text: message
       }),
-      signal: AbortSignal.timeout(20000)
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
