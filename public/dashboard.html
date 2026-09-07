@@ -2077,16 +2077,28 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       <div>
         <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">WhatsApp Provider / Engine</label>
         <select id="waProviderSelect" class="modal-input" style="background:#ffffff;" onchange="updateWaProviderFields()">
+          <option value="openwa" selected>OpenWA Gateway (Self-Hosted: whatsapp.kodatechnologies.co.tz)</option>
           <option value="ultramsg">UltraMsg API (Fastest &amp; Easiest Cloud Gateway)</option>
           <option value="meta">Meta WhatsApp Cloud API (Official Business API)</option>
           <option value="evolution">Evolution API (Self-Hosted)</option>
           <option value="webhook">Custom HTTP Webhook / Wasender Gateway</option>
-          <option value="openwa">OpenWA Server</option>
         </select>
       </div>
 
+      <!-- OpenWA Fields -->
+      <div id="waFieldsOpenwa" style="margin-top:12px;">
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">OpenWA Server URL</label>
+        <input type="text" id="waOpenwaUrl" class="modal-input" placeholder="https://whatsapp.kodatechnologies.co.tz">
+        
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">OpenWA API Key (from API Keys page)</label>
+        <input type="password" id="waOpenwaApiKey" class="modal-input" placeholder="Enter OpenWA API Key (owa_k1_...)">
+
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin:8px 0 4px;">Active Session Name</label>
+        <input type="text" id="waOpenwaSession" class="modal-input" placeholder="e.g. main" value="main">
+      </div>
+
       <!-- UltraMsg Fields -->
-      <div id="waFieldsUltraMsg" style="margin-top:12px;">
+      <div id="waFieldsUltraMsg" style="margin-top:12px; display:none;">
         <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">UltraMsg Instance ID</label>
         <input type="text" id="waUltraInstance" class="modal-input" placeholder="e.g. instance12345">
         
@@ -3812,7 +3824,12 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (data.success && data.config) {
           const cfg = data.config;
-          document.getElementById('waProviderSelect').value = cfg.provider || 'ultramsg';
+          document.getElementById('waProviderSelect').value = cfg.provider || 'openwa';
+          document.getElementById('waOpenwaUrl').value = cfg.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz';
+          document.getElementById('waOpenwaSession').value = cfg.openwaSession || 'main';
+          if (cfg.hasOpenwaApiKey) {
+            document.getElementById('waOpenwaApiKey').placeholder = '•••••••••••••••• (Key Active)';
+          }
           document.getElementById('waUltraInstance').value = cfg.ultramsgInstanceId || '';
           document.getElementById('waMetaPhoneId').value = cfg.metaPhoneNumberId || '';
           document.getElementById('waEvoUrl').value = cfg.evolutionUrl || '';
@@ -3832,6 +3849,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
     function updateWaProviderFields() {
       const provider = document.getElementById('waProviderSelect').value;
+      document.getElementById('waFieldsOpenwa').style.display = (provider === 'openwa' ? 'block' : 'none');
       document.getElementById('waFieldsUltraMsg').style.display = (provider === 'ultramsg' ? 'block' : 'none');
       document.getElementById('waFieldsMeta').style.display = (provider === 'meta' ? 'block' : 'none');
       document.getElementById('waFieldsEvolution').style.display = (provider === 'evolution' ? 'block' : 'none');
@@ -3842,12 +3860,17 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const provider = document.getElementById('waProviderSelect').value;
       const payload = {
         provider: provider,
+        openwaUrl: document.getElementById('waOpenwaUrl').value.trim(),
+        openwaSession: document.getElementById('waOpenwaSession').value.trim() || 'main',
         ultramsgInstanceId: document.getElementById('waUltraInstance').value.trim(),
         metaPhoneNumberId: document.getElementById('waMetaPhoneId').value.trim(),
         evolutionUrl: document.getElementById('waEvoUrl').value.trim(),
         evolutionInstance: document.getElementById('waEvoInstance').value.trim(),
         gatewayUrl: document.getElementById('waCustomUrl').value.trim()
       };
+
+      const openwaKey = document.getElementById('waOpenwaApiKey').value.trim();
+      if (openwaKey) payload.openwaApiKey = openwaKey;
 
       const ultraToken = document.getElementById('waUltraToken').value.trim();
       if (ultraToken) payload.ultramsgToken = ultraToken;

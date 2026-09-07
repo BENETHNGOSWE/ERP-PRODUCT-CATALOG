@@ -73,7 +73,9 @@ class WhatsAppService {
       evolutionUrl: this.config.evolutionUrl,
       evolutionInstance: this.config.evolutionInstance,
       hasEvolutionApiKey: Boolean(this.config.evolutionApiKey),
-      openwaUrl: this.config.openwaUrl,
+      openwaUrl: this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz',
+      openwaSession: this.config.openwaSession || 'main',
+      hasOpenwaApiKey: Boolean(this.config.openwaApiKey),
       gatewayUrl: this.config.gatewayUrl,
       defaultSender: this.config.defaultSender
     };
@@ -427,43 +429,53 @@ Action Required: Please process and confirm this order.`
     });
   }
 
-  // --- Provider 5: OpenWA HTTP API ---
-  sendOpenWA(phone, message, session = 'default') {
+  // --- Provider 5: OpenWA HTTP REST API ---
+  sendOpenWA(phone, message, sessionName = 'main') {
     return new Promise((resolve, reject) => {
-      const openwaUrl = this.config.openwaUrl;
-      const apiKey = this.config.openwaApiKey;
+      const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');
+      const apiKey = this.config.openwaApiKey || '';
+      const session = this.config.openwaSession || sessionName || 'main';
+
       if (!openwaUrl) return reject(new Error('OpenWA API URL required.'));
 
-      const url = new URL('/sendText', openwaUrl);
+      // OpenWA REST endpoint: /api/sessions/:sessionId/messages/send-text
+      const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(session)}/messages/send-text`;
+      const url = new URL(endpoint);
       const isHttps = url.protocol === 'https:';
       const client = isHttps ? https : http;
 
       const postData = JSON.stringify({
         chatId: `${phone}@c.us`,
-        text: message,
-        session: session
+        text: message
       });
 
       const headers = {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData)
       };
-      if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+      if (apiKey) {
+        headers['X-API-Key'] = apiKey;
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
 
       const req = client.request(url, {
         method: 'POST',
         headers: headers,
-        timeout: 4000
+        timeout: 8000
       }, (res) => {
         let body = '';
         res.on('data', c => body += c);
         res.on('end', () => {
           try {
             const parsed = JSON.parse(body || '{}');
-            if (res.statusCode >= 200 && res.statusCode < 300) resolve(parsed);
-            else reject(new Error(`OpenWA HTTP ${res.statusCode}: ${body}`));
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              resolve(parsed);
+            } else {
+              reject(new Error(parsed.message || parsed.error || `OpenWA HTTP ${res.statusCode}: ${body}`));
+            }
           } catch (e) {
-            reject(new Error(`OpenWA response error: ${body}`));
+            if (res.statusCode >= 200 && res.statusCode < 300) resolve({ raw: body });
+            else reject(new Error(`OpenWA error (HTTP ${res.statusCode}): ${body}`));
           }
         });
       });
