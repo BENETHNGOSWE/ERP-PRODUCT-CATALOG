@@ -436,58 +436,6 @@
         document.getElementById(id).classList.remove('active');
       };
     })();
-
-                <table class="receipt-table">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th style="text-align:right;">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${itemsHtml}
-                  </tbody>
-                </table>
-
-                <div class="receipt-totals">
-                  <div style="display:flex; justify-content:space-between;">
-                    <span style="color:#64748b;">Subtotal:</span>
-                    <strong>${NOVA.formatTZS(order.subtotal || 15500)}</strong>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; color:#16a34a;">
-                    <span>Discount:</span>
-                    <strong>- ${NOVA.formatTZS(order.discount || 1500)}</strong>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid #cbd5e1; padding-top:6px; margin-top:4px;">
-                    <span>Total Paid:</span>
-                    <strong style="color:#0047bb;">${NOVA.formatTZS(order.totalPaid || 14000)}</strong>
-                  </div>
-                </div>
-
-                <div style="margin-top:14px; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:0.82rem; color:#334155;">
-                  📞 <strong>Contact Number:</strong> ${order.phone || '+255 7XX XXX XXX'}<br>
-                  📦 <strong>Status:</strong> Order Placed &amp; In Processing
-                </div>
-
-                <div class="receipt-barcode">
-                  ||| | |||| || | ||||| |||| | |||
-                </div>
-              </div>
-            `;
-          }
-
-          if (modal) modal.classList.add('active');
-        });
-      }
-
-      // Modal helpers
-      window.openShopModal = function() {
-        document.getElementById('shopModal').classList.add('active');
-      };
-      window.closeModal = function(id) {
-        document.getElementById(id).classList.remove('active');
-      };
-    })();
   </script>
 </body>
 </html>

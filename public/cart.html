@@ -391,7 +391,6 @@
           NOVA.savePhone(phoneVal);
 
           const cart = NOVA.getCart();
-          const products = NOVA.getProducts();
           let products = NOVA.getProducts();
           if (!products || products.length === 0) {
             await NOVA.loadOdooProducts();
