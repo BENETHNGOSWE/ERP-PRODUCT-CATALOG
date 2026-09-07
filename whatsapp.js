@@ -436,38 +436,19 @@ Action Required: Please process and confirm this order.`
       return requestedSession;
     }
 
-    // Otherwise, fetch available sessions from OpenWA API to resolve the exact UUID
     try {
-      const sessionsUrl = new URL(`${openwaUrl}/api/sessions`);
-      const isHttps = sessionsUrl.protocol === 'https:';
-      const client = isHttps ? https : http;
-
-      const sessions = await new Promise((resolve, reject) => {
-        const req = client.request(sessionsUrl, {
-          method: 'GET',
-          headers: {
-            'X-API-Key': apiKey,
-            'Authorization': `Bearer ${apiKey}`
-          },
-          timeout: 6000
-        }, (res) => {
-          let data = '';
-          res.on('data', chunk => data += chunk);
-          res.on('end', () => {
-            try {
-              const list = JSON.parse(data || '[]');
-              resolve(Array.isArray(list) ? list : []);
-            } catch (e) {
-              resolve([]);
-            }
-          });
-        });
-        req.on('error', () => resolve([]));
-        req.on('timeout', () => { req.destroy(); resolve([]); });
-        req.end();
+      const endpoint = `${openwaUrl}/api/sessions`;
+      const res = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': apiKey,
+          'Authorization': `Bearer ${apiKey}`
+        },
+        signal: AbortSignal.timeout(8000)
       });
+      const sessions = await res.json();
 
-      if (sessions.length > 0) {
+      if (Array.isArray(sessions) && sessions.length > 0) {
         // 1. Match by name or ID
         const matched = sessions.find(s => 
           (s.name && s.name.toLowerCase() === (requestedSession || '').toLowerCase()) ||
@@ -498,54 +479,29 @@ Action Required: Please process and confirm this order.`
     // Auto-resolve session name to actual OpenWA UUID
     const actualSessionId = await this.getActiveOpenwaSessionId(openwaUrl, apiKey, configSession);
 
-    return new Promise((resolve, reject) => {
-      // OpenWA REST endpoint: /api/sessions/:sessionId/messages/send-text
-      const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(actualSessionId)}/messages/send-text`;
-      const url = new URL(endpoint);
-      const isHttps = url.protocol === 'https:';
-      const client = isHttps ? https : http;
+    // OpenWA REST endpoint: /api/sessions/:sessionId/messages/send-text
+    const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(actualSessionId)}/messages/send-text`;
 
-      const postData = JSON.stringify({
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
         chatId: `${phone}@c.us`,
         text: message
-      });
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      };
-      if (apiKey) {
-        headers['X-API-Key'] = apiKey;
-        headers['Authorization'] = `Bearer ${apiKey}`;
-      }
-
-      const req = client.request(url, {
-        method: 'POST',
-        headers: headers,
-        timeout: 25000
-      }, (res) => {
-        let body = '';
-        res.on('data', c => body += c);
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(body || '{}');
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve(parsed);
-            } else {
-              reject(new Error(parsed.message || parsed.error || `OpenWA HTTP ${res.statusCode}: ${body}`));
-            }
-          } catch (e) {
-            if (res.statusCode >= 200 && res.statusCode < 300) resolve({ raw: body });
-            else reject(new Error(`OpenWA error (HTTP ${res.statusCode}): ${body}`));
-          }
-        });
-      });
-
-      req.on('error', reject);
-      req.on('timeout', () => { req.destroy(); reject(new Error('OpenWA connection timeout')); });
-      req.write(postData);
-      req.end();
+      }),
+      signal: AbortSignal.timeout(20000)
     });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || data.error || `OpenWA HTTP ${res.status}`);
+    }
+
+    return data;
   }
 
   /**
