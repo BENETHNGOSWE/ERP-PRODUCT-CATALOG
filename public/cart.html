@@ -392,18 +392,33 @@
 
           const cart = NOVA.getCart();
           const products = NOVA.getProducts();
-          const orderItems = [];
+          let products = NOVA.getProducts();
+          if (!products || products.length === 0) {
+            await NOVA.loadOdooProducts();
+            products = NOVA.getProducts();
+          }
 
+          const orderItems = [];
           for (const [id, qty] of Object.entries(cart)) {
             if (qty > 0) {
-              const p = products.find(item => String(item.id) === String(id));
+              const p = (products || []).find(item => String(item.id) === String(id));
               if (p) {
                 orderItems.push({
                   id: p.id,
                   name: p.name,
-                  price: p.price,
+                  price: Number(p.price) || 0,
                   qty: qty,
-                  subtotal: p.price * qty
+                  quantity: qty,
+                  subtotal: (Number(p.price) || 0) * qty
+                });
+              } else {
+                orderItems.push({
+                  id: id,
+                  name: `Product #${id}`,
+                  price: 0,
+                  qty: qty,
+                  quantity: qty,
+                  subtotal: 0
                 });
               }
             }

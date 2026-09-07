@@ -316,18 +316,12 @@ class StoreManager {
     const isMasterStore = store.slug === 'achete' || store.slug === 'novamart' || !store.id;
     let matched = [];
 
-    // 1. Catalog Isolation
-    if (isMasterStore) {
-      // Master platform store shows all live products available in Odoo POS
+    // 1. Catalog Isolation: If store has assigned productIds, show only those; otherwise show all available products
+    if (isMasterStore || !Array.isArray(store.productIds) || store.productIds.length === 0) {
       matched = (allProducts || []).map(p => ({ ...p }));
     } else {
-      // Client store: Strictly show ONLY products explicitly assigned to this store
-      if (Array.isArray(store.productIds) && store.productIds.length > 0) {
-        const idSet = new Set(store.productIds.map(Number));
-        matched = (allProducts || []).filter(p => idSet.has(Number(p.id))).map(p => ({ ...p }));
-      } else {
-        matched = [];
-      }
+      const idSet = new Set(store.productIds.map(Number));
+      matched = (allProducts || []).filter(p => idSet.has(Number(p.id))).map(p => ({ ...p }));
     }
 
     // 2. Merge store's custom created products
@@ -345,44 +339,25 @@ class StoreManager {
       const pId = String(prod.id);
       const ovr = overrides[pId];
 
-      if (isMasterStore) {
-        // Master store: uses live Odoo stock unless overridden
-        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : Number(prod.qty_available || 0);
-        const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
-        return {
-          ...prod,
-          name: ovr?.name || prod.name,
-          price: storePrice,
-          description: ovr?.description || prod.description || '',
-          image: ovr?.image || prod.image,
-          thumb: ovr?.image || prod.thumb || prod.image,
-          qty_available: storeStock,
-          inStock: storeStock > 0,
-          storeStock: storeStock,
-          storePrice: storePrice
-        };
-      } else {
-        // Client store: If it's a custom product created for this store with initial stock, use it.
-        // For master ERP assigned products, stock starts at 0 UNTIL loaded/restocked by the store owner!
-        const isCustomStoreProd = Array.isArray(store.customProducts) && store.customProducts.some(cp => Number(cp.id) === Number(prod.id));
-        const defaultClientStock = isCustomStoreProd ? Number(prod.qty_available || 0) : 0;
+      const isCustomStoreProd = Array.isArray(store.customProducts) && store.customProducts.some(cp => Number(cp.id) === Number(prod.id));
+      const baseStock = Number(prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 50));
 
-        const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : defaultClientStock;
-        const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
-        return {
-          ...prod,
-          name: ovr?.name || prod.name,
-          price: storePrice,
-          description: ovr?.description || prod.description || '',
-          image: ovr?.image || prod.image,
-          thumb: ovr?.image || prod.thumb || prod.image,
-          qty_available: storeStock,
-          inStock: storeStock > 0,
-          isStoreCustomized: Boolean(ovr) || isCustomStoreProd,
-          storeStock: storeStock,
-          storePrice: storePrice
-        };
-      }
+      const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : baseStock;
+      const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
+
+      return {
+        ...prod,
+        name: ovr?.name || prod.name,
+        price: storePrice,
+        description: ovr?.description || prod.description || '',
+        image: ovr?.image || prod.image,
+        thumb: ovr?.image || prod.thumb || prod.image,
+        qty_available: storeStock,
+        inStock: storeStock > 0,
+        isStoreCustomized: Boolean(ovr) || isCustomStoreProd,
+        storeStock: storeStock,
+        storePrice: storePrice
+      };
     });
   }
 
