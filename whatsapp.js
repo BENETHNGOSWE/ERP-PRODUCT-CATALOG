@@ -430,16 +430,77 @@ Action Required: Please process and confirm this order.`
   }
 
   // --- Provider 5: OpenWA HTTP REST API ---
-  sendOpenWA(phone, message, sessionName = 'main') {
+  async getActiveOpenwaSessionId(openwaUrl, apiKey, requestedSession) {
+    // If requestedSession already looks like a UUID, use it directly
+    if (requestedSession && requestedSession.length > 30 && requestedSession.includes('-')) {
+      return requestedSession;
+    }
+
+    // Otherwise, fetch available sessions from OpenWA API to resolve the exact UUID
+    try {
+      const sessionsUrl = new URL(`${openwaUrl}/api/sessions`);
+      const isHttps = sessionsUrl.protocol === 'https:';
+      const client = isHttps ? https : http;
+
+      const sessions = await new Promise((resolve, reject) => {
+        const req = client.request(sessionsUrl, {
+          method: 'GET',
+          headers: {
+            'X-API-Key': apiKey,
+            'Authorization': `Bearer ${apiKey}`
+          },
+          timeout: 6000
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try {
+              const list = JSON.parse(data || '[]');
+              resolve(Array.isArray(list) ? list : []);
+            } catch (e) {
+              resolve([]);
+            }
+          });
+        });
+        req.on('error', () => resolve([]));
+        req.on('timeout', () => { req.destroy(); resolve([]); });
+        req.end();
+      });
+
+      if (sessions.length > 0) {
+        // 1. Match by name or ID
+        const matched = sessions.find(s => 
+          (s.name && s.name.toLowerCase() === (requestedSession || '').toLowerCase()) ||
+          s.id === requestedSession
+        );
+        if (matched && matched.id) return matched.id;
+
+        // 2. Fallback to first 'ready' or first available session
+        const readySession = sessions.find(s => s.status === 'ready');
+        if (readySession && readySession.id) return readySession.id;
+
+        if (sessions[0] && sessions[0].id) return sessions[0].id;
+      }
+    } catch (err) {
+      console.warn('[OpenWA] Session resolution fallback:', err.message);
+    }
+
+    return requestedSession || 'main';
+  }
+
+  async sendOpenWA(phone, message, sessionName = 'main') {
+    const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');
+    const apiKey = this.config.openwaApiKey || '';
+    const configSession = this.config.openwaSession || sessionName || 'main';
+
+    if (!openwaUrl) throw new Error('OpenWA API URL required.');
+
+    // Auto-resolve session name to actual OpenWA UUID
+    const actualSessionId = await this.getActiveOpenwaSessionId(openwaUrl, apiKey, configSession);
+
     return new Promise((resolve, reject) => {
-      const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');
-      const apiKey = this.config.openwaApiKey || '';
-      const session = this.config.openwaSession || sessionName || 'main';
-
-      if (!openwaUrl) return reject(new Error('OpenWA API URL required.'));
-
       // OpenWA REST endpoint: /api/sessions/:sessionId/messages/send-text
-      const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(session)}/messages/send-text`;
+      const endpoint = `${openwaUrl}/api/sessions/${encodeURIComponent(actualSessionId)}/messages/send-text`;
       const url = new URL(endpoint);
       const isHttps = url.protocol === 'https:';
       const client = isHttps ? https : http;
@@ -461,7 +522,7 @@ Action Required: Please process and confirm this order.`
       const req = client.request(url, {
         method: 'POST',
         headers: headers,
-        timeout: 8000
+        timeout: 25000
       }, (res) => {
         let body = '';
         res.on('data', c => body += c);
