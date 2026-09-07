@@ -403,6 +403,11 @@
           .replace(/'/g, '&#039;');
       }
 
+      function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/"/g, '&quot;');
+      }
+
       const listContainer = document.getElementById('productsListContainer');
       const summaryList = document.getElementById('summaryItemsList');
       const subtotalEl = document.getElementById('summarySubtotal');
@@ -560,7 +565,7 @@
             <article class="product-item-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
               <div class="product-item-left" onclick="openProductDetailModal('${p.id}')">
                 <div class="product-item-thumb-wrap" title="Click to view details">
-                  <img src="${p.thumb || p.image}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
+                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
                 </div>
                 <div class="product-item-meta">
                   <h3 class="product-item-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>

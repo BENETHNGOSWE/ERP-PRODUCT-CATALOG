@@ -109,6 +109,17 @@ const DEFAULT_STORES = [
   }
 ];
 
+function sanitizeImageUrl(name, img) {
+  if (img && typeof img === 'string' && img.length > 5 && !img.includes('"') && !img.includes('\n') && (img.startsWith('data:image/') || img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/'))) {
+    return img;
+  }
+  const initial = (name || 'P').trim().charAt(0).toUpperCase();
+  const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+  const colorIndex = (name || 'P').charCodeAt(0) % bgColors.length;
+  const bgColor = bgColors[colorIndex];
+  return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+}
+
 class StoreManager {
   constructor() {
     this.stores = [];
@@ -454,6 +465,7 @@ class StoreManager {
     ) + 1;
 
     const initialStock = Number(data.initialStock || data.qty_available || data.stock || 0);
+    const prodImg = sanitizeImageUrl(data.name, data.image || data.thumb);
     const newProd = {
       id: nextId,
       name: (data.name || 'New Store Product').trim(),
@@ -462,8 +474,8 @@ class StoreManager {
       description: (data.description || '').trim(),
       qty_available: initialStock,
       inStock: initialStock > 0,
-      image: data.image || '/assets/products/samsung_charger.png',
-      thumb: data.thumb || data.image || '/assets/products/samsung_charger.png',
+      image: prodImg,
+      thumb: prodImg,
       default_code: (data.sku || data.default_code || `SKU-${nextId}`).trim(),
       barcode: data.barcode || '',
       type: 'consu',
