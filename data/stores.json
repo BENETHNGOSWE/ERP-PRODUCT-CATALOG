@@ -265,19 +265,37 @@
     "status": "active",
     "themeColor": "#0047bb",
     "currency": "TZS",
-    "address": "Dar es Salaam, Tanzania",
+    "address": "Mikocheni B, Dar es Salaam, Tanzania",
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
-      "General",
-      "Electronics",
-      "Accessories"
+      "All",
+      "Smartphones",
+      "Smartwatches",
+      "Electronics"
     ],
     "productKeywords": [],
-    "productIds": [],
+    "productIds": [141, 140, 139, 142],
     "createdDate": "2026-09-07",
     "pin": "1234",
-    "inventoryOverrides": {},
+    "inventoryOverrides": {
+      "141": {
+        "qty_available": 25,
+        "price": 1850000
+      },
+      "140": {
+        "qty_available": 20,
+        "price": 2450000
+      },
+      "139": {
+        "qty_available": 30,
+        "price": 1500000
+      },
+      "142": {
+        "qty_available": 15,
+        "price": 1800000
+      }
+    },
     "customProducts": []
   }
 ]
