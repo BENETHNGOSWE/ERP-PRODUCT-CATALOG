@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": 1,
+    "orderId": "ORD-5450",
+    "odooOrderId": 9,
+    "odooOrderName": "Order WEB-1788806162744",
+    "receiptNumber": "Order WEB-1788806162744",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Customer (+255745788788)",
+      "phone": "+255745788788",
+      "deliveryAddress": "Mikocheni, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 1002,
+        "name": "BENSTORE IPHONE 18",
+        "price": 5000000,
+        "qty": 1,
+        "subtotal": 5000000
+      }
+    ],
+    "itemCount": 1,
+    "subtotal": 4998500,
+    "discount": 0,
+    "totalAmount": 4998500,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": null,
+    "createdAt": "2026-09-07T18:36:12.187Z",
+    "dateFormatted": "7 Sept 2026, 18:36"
+  }
+]
