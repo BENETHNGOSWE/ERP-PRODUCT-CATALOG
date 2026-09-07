@@ -12,23 +12,44 @@ const NOVA = (function () {
     const parts = path.split('/');
     const first = parts[0];
     
-    // Check if path is a known static page or store slug
+    // 1. Check if path is a known static page or store slug
     if (first && first !== 'index.html' && first !== 'cart' && first !== 'cart.html' && first !== 'confirmation' && first !== 'confirmation.html' && first !== 'dashboard' && first !== 'dashboard.html' && first !== 'odoo_preview.html' && first !== 'admin') {
+      try {
+        localStorage.setItem('achete_active_store_slug', first);
+      } catch (e) {}
       return first;
     }
+
+    // 2. Query param ?store=kodastore
     const params = new URLSearchParams(window.location.search);
-    return params.get('store') || 'achete';
+    const qStore = params.get('store');
+    if (qStore) {
+      try {
+        localStorage.setItem('achete_active_store_slug', qStore);
+      } catch (e) {}
+      return qStore;
+    }
+
+    // 3. Saved store slug from previous navigation
+    try {
+      const saved = localStorage.getItem('achete_active_store_slug');
+      if (saved && saved !== 'undefined' && saved !== 'null' && saved !== 'achete' && saved !== 'novamart') {
+        return saved;
+      }
+    } catch (e) {}
+
+    return 'kodastore';
   }
 
   const currentSlug = getActiveStoreSlug();
 
   let activeStore = {
-    name: 'ACHETE.ME',
-    slug: currentSlug || 'achete',
+    name: 'KODA STORE',
+    slug: currentSlug || 'kodastore',
     logo: 'assets/products/logo.png',
-    tagline: 'Digital Storefront Platform | Fast Delivery in Dar es Salaam',
-    address: 'Dar es Salaam',
-    whatsapp: '+255712345678'
+    tagline: 'Official Store | Fast Delivery in Dar es Salaam',
+    address: 'Masaki, Dar es Salaam',
+    whatsapp: '+255710459064'
   };
 
   let liveProducts = [];
@@ -317,10 +338,16 @@ const NOVA = (function () {
   // Submit Order directly to Server -> Odoo POS + Direct WhatsApp Dispatch
   async function submitOrderToOdoo(orderPayload) {
     try {
-      orderPayload.storeSlug = currentSlug;
-      if (activeStore) {
-        if (activeStore.whatsapp) orderPayload.storeWhatsapp = activeStore.whatsapp;
-        if (activeStore.name) orderPayload.storeName = activeStore.name;
+      orderPayload.storeSlug = currentSlug || 'kodastore';
+      if (activeStore && activeStore.whatsapp) {
+        orderPayload.storeWhatsapp = activeStore.whatsapp;
+      } else {
+        orderPayload.storeWhatsapp = '+255710459064';
+      }
+      if (activeStore && activeStore.name) {
+        orderPayload.storeName = activeStore.name;
+      } else {
+        orderPayload.storeName = 'Koda Store';
       }
       const res = await fetch('/api/odoo/order', {
         method: 'POST',
