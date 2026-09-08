@@ -61,10 +61,16 @@ app.get('/api/stores/:identifier', (req, res) => {
   }
 });
 
-// 3. Create New Client Store
-app.post('/api/stores', (req, res) => {
+// 3. Create New Client Store & Sync Store Tag to Odoo ERP
+app.post('/api/stores', async (req, res) => {
   try {
     const newStore = stores.createStore(req.body);
+    
+    // Auto-create Store Tag in Odoo ERP so products can be tagged during bulk import
+    odoo.ensureStoreTagInOdoo(newStore).catch(e => {
+      console.warn('[Odoo Store Tag Auto-Sync Note]:', e.message);
+    });
+
     res.status(201).json({
       success: true,
       message: `Store "${newStore.name}" created successfully at /${newStore.slug}!`,
@@ -366,6 +372,46 @@ app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], as
   } catch (err) {
     console.error('[Create Store Product Error]:', err);
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5h. Sync All Stores to Odoo ERP as Product Tags (Enables Bulk Import Filtering in Odoo)
+app.post('/api/odoo/sync-stores', async (req, res) => {
+  try {
+    const allStoresList = stores.getAllStores();
+    const syncResults = await odoo.syncAllStoresToOdoo(allStoresList);
+    res.json({
+      success: true,
+      message: `Synchronized ${allStoresList.length} stores to Odoo ERP as Product Tags!`,
+      server: odoo.ODOO_CONFIG.host,
+      db: odoo.ODOO_CONFIG.db,
+      results: syncResults
+    });
+  } catch (err) {
+    console.error('[Odoo Store Sync Error]:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5i. Download Bulk Product Import CSV Template for Odoo ERP
+app.get('/api/odoo/template.csv', (req, res) => {
+  try {
+    const allStoresList = stores.getAllStores();
+    const sampleStoreSlugs = allStoresList.map(s => s.slug).slice(0, 3).join(', ');
+    
+    const csvContent = [
+      'Name,Sales Price,Product Category,Point of Sale Category,Available in POS,Product Tags,Internal Reference',
+      'Samsung Galaxy S24,1850000,Smartphones,Smartphones,TRUE,kodastore,SKU-SAM-S24',
+      'Apple MacBook Pro 16,5500000,Electronics,Electronics,TRUE,kodastore,SKU-MAC-16',
+      'Safety Hard Hat ArcGuard,45000,Safety Gear,Head Protection,TRUE,achete,SKU-HELM-01',
+      'Industrial TitanStep Boots,145000,Safety Gear,Foot Protection,TRUE,achete,SKU-BOOT-01'
+    ].join('\r\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="odoo_bulk_product_import_template.csv"');
+    res.send(csvContent);
+  } catch (err) {
+    res.status(500).send('Error generating template');
   }
 });
 

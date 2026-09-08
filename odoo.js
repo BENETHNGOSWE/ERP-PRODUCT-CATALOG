@@ -1,28 +1,50 @@
 /**
  * ODOO 18 POS INTEGRATION MODULE
- * Reads connection settings from Environment Variables (.env)
+ * Multi-Client Digital Storefront & Automated POS Sync Engine
+ * Production Server: https://odooerp.kodatechnologies.co.tz (ODOOERP)
  */
 
 require('dotenv').config();
 const xmlrpc = require('xmlrpc');
+const fs = require('fs');
+const path = require('path');
 
-const ODOO_CONFIG = {
-  host: process.env.ODOO_HOST || 'postest.kodatechnologies.co.tz',
-  port: parseInt(process.env.ODOO_PORT || '443', 10),
-  db: process.env.ODOO_DB || 'KODADEMOS',
-  username: process.env.ODOO_USERNAME || process.env.ODOO_USER || 'developerbeneth@gmail.com',
-  password: process.env.ODOO_PASSWORD || 'POSIntergration@2026'
-};
+const CONFIG_FILE = path.join(__dirname, 'data', 'odoo_config.json');
+
+function loadOdooConfig() {
+  const defaults = {
+    host: process.env.ODOO_HOST || 'odooerp.kodatechnologies.co.tz',
+    port: parseInt(process.env.ODOO_PORT || '443', 10),
+    db: process.env.ODOO_DB || 'ODOOERP',
+    username: process.env.ODOO_USERNAME || process.env.ODOO_USER || 'benethemmanueli1701@gmail.com',
+    password: process.env.ODOO_PASSWORD || 'POSIntergration@2026'
+  };
+
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
+      const saved = JSON.parse(raw);
+      return { ...defaults, ...saved };
+    }
+  } catch (e) {
+    console.warn('[Odoo] Could not load data/odoo_config.json:', e.message);
+  }
+
+  return defaults;
+}
+
+const ODOO_CONFIG = loadOdooConfig();
 
 // In-memory cache for sub-millisecond response times
 let cachedProducts = [];
 let cachedCategories = [];
+let cachedTags = [];
 let lastFetchTime = 0;
-const CACHE_TTL = 10000; // 10 seconds TTL
+const CACHE_TTL = 8000; // 8 seconds TTL
 let authUid = null;
 let isSyncing = false;
 
-// Create XML-RPC Clients
+// Create Secure XML-RPC Clients
 const commonClient = xmlrpc.createSecureClient({
   host: ODOO_CONFIG.host,
   port: ODOO_CONFIG.port,
@@ -44,7 +66,7 @@ function authenticate() {
       [ODOO_CONFIG.db, ODOO_CONFIG.username, ODOO_CONFIG.password, {}],
       (err, uid) => {
         if (err) return reject(err);
-        if (!uid) return reject(new Error('Authentication failed: Invalid credentials'));
+        if (!uid) return reject(new Error('Authentication failed on ODOOERP: Invalid credentials'));
         authUid = uid;
         resolve(uid);
       }
@@ -69,12 +91,21 @@ function callModel(model, method, args, kwargs = {}) {
 }
 
 // Map Odoo Product to Catalog Format
-function mapProduct(p, categMap) {
+function mapProduct(p, categMap, tagMap = {}) {
   let category = 'General';
   if (p.pos_categ_ids && p.pos_categ_ids.length > 0) {
     category = categMap[p.pos_categ_ids[0]] || 'Other';
   } else if (p.categ_id && p.categ_id[1]) {
     category = p.categ_id[1].split('/').pop().trim();
+  }
+
+  // Map product tags (e.g. ['kodastore', 'Store: Koda Store'])
+  const productTags = [];
+  if (Array.isArray(p.product_tag_ids)) {
+    p.product_tag_ids.forEach(tid => {
+      if (tagMap[tid]) productTags.push(tagMap[tid]);
+      else productTags.push(String(tid));
+    });
   }
 
   // Exact image from Odoo or custom uploaded data
@@ -111,7 +142,10 @@ function mapProduct(p, categMap) {
     inStock: inStock,
     barcode: p.barcode || '',
     default_code: p.default_code || '',
-    type: p.type || 'consu'
+    type: p.type || 'consu',
+    tags: productTags,
+    productTags: productTags,
+    product_tag_ids: p.product_tag_ids || []
   };
 }
 
@@ -148,7 +182,21 @@ async function fetchOdooProducts(forceRefresh = false) {
       categMap[c.id] = c.name;
     });
 
-    // 2. Fetch Products available in POS
+    // 2. Fetch Product Tags
+    const tagMap = {};
+    try {
+      const tags = await callModel('product.tag', 'search_read', [[]], {
+        fields: ['id', 'name']
+      });
+      cachedTags = tags || [];
+      (tags || []).forEach(t => {
+        tagMap[t.id] = t.name;
+      });
+    } catch (tagErr) {
+      console.warn('[Odoo] Product tags lookup notice:', tagErr.message);
+    }
+
+    // 3. Fetch Products available in POS
     const products = await callModel('product.product', 'search_read', [
       [['available_in_pos', '=', true]]
     ], {
@@ -165,12 +213,13 @@ async function fetchOdooProducts(forceRefresh = false) {
         'image_1920',
         'barcode',
         'default_code',
+        'product_tag_ids',
         'type'
       ],
-      limit: 150
+      limit: 250
     });
 
-    const mappedProducts = products.map(p => mapProduct(p, categMap));
+    const mappedProducts = products.map(p => mapProduct(p, categMap, tagMap));
 
     // Extract unique categories
     const categoriesSet = new Set(['All']);
@@ -253,10 +302,10 @@ async function resolveOdooProductId(item) {
         available_in_pos: true,
         type: 'consu'
       }]);
-      console.log(`[Odoo] Auto-created product in Odoo for line item: "${cleanName}" (ID: ${newProdId})`);
+      console.log(`[Odoo ERP] Auto-created product in Odoo for line item: "${cleanName}" (ID: ${newProdId})`);
       return newProdId;
     } catch (e) {
-      console.warn(`[Odoo] Auto-creation failed for "${cleanName}":`, e.message);
+      console.warn(`[Odoo ERP] Auto-creation failed for "${cleanName}":`, e.message);
     }
   }
 
@@ -362,7 +411,7 @@ async function createOdooPosOrder(orderData) {
         console.warn(`[Create Order] Skipping item with unresolved product ID:`, item.name);
         continue;
       }
-      const qty = Number(item.quantity) || 1;
+      const qty = Number(item.quantity || item.qty) || 1;
       const priceUnit = Number(item.price) || 0;
       const subtotal = qty * priceUnit;
 
@@ -410,7 +459,7 @@ async function createOdooPosOrder(orderData) {
             user_id: authUser,
             config_id: configIdToUse
           }]);
-          console.log(`[Odoo] Auto-opened new POS session #${sessionId} for config "${targetConfig ? targetConfig.name : 'Default'}"`);
+          console.log(`[Odoo ERP] Auto-opened new POS session #${sessionId} for config "${targetConfig ? targetConfig.name : 'Default'}"`);
         } catch (sessErr) {
           console.warn('[Session Auto-Creation Note]:', sessErr.message);
         }
@@ -419,10 +468,11 @@ async function createOdooPosOrder(orderData) {
 
     const totalAmount = Number(orderData.totalAmount) || 0;
     const posReference = `Order WEB-${orderData.orderNumber || orderData.orderId || Date.now()}`;
+    const orderName = `Website Orders/${orderData.orderNumber || orderData.orderId || Date.now().toString().slice(-4)}`;
 
     const newPosOrderId = await callModel('pos.order', 'create', [{
-      name: `Website Orders/${orderData.orderNumber || orderData.orderId || Date.now().toString().slice(-4)}`,
-      session_id: sessionId,
+      name: orderName,
+      session_id: sessionId || 1,
       partner_id: customerId,
       pos_reference: posReference,
       amount_total: totalAmount,
@@ -438,356 +488,105 @@ async function createOdooPosOrder(orderData) {
       console.warn('[Odoo POS Pay Warning]:', payErr.message);
     }
 
-    // Also create Sales Order (sale.order) so orders appear in Sales -> Orders -> Orders
-    let saleOrderId = null;
-    try {
-      const saleLines = [];
-      for (const item of (orderData.items || [])) {
-        const prodId = await resolveOdooProductId(item);
-        if (prodId) {
-          saleLines.push([0, 0, {
-            product_id: prodId,
-            product_uom_qty: Number(item.quantity || item.qty) || 1,
-            price_unit: Number(item.price) || 0,
-            name: item.name || 'Store Item'
-          }]);
-        }
-      }
-
-      if (saleLines.length > 0) {
-        saleOrderId = await callModel('sale.order', 'create', [{
-          partner_id: customerId || 1,
-          client_order_ref: orderData.orderNumber || orderData.orderId || `WEB-${Date.now().toString().slice(-4)}`,
-          note: `Store: ${orderData.storeName || 'Digital Storefront'} (${orderData.storeSlug || ''})\nCustomer Phone: ${orderData.customerPhone || ''}\nDelivery Address: ${orderData.deliveryAddress || ''}`,
-          order_line: saleLines
-        }]);
-        console.log(`[Odoo] ✅ Created Sales Order (ID: ${saleOrderId}) in Sales -> Orders -> Orders!`);
-      }
-    } catch (saleErr) {
-      console.warn('[Odoo Sales Order Creation Note]:', saleErr.message);
-    }
-
-    deductStock(orderData.items).catch(err => {
-      console.warn('[Background Stock Update Warning]:', err.message);
-    });
+    // Deduct stock in background
+    deductStock(orderData.items).catch(() => {});
 
     return {
       success: true,
       odooOrderId: newPosOrderId,
-      saleOrderId: saleOrderId,
+      orderName: orderName,
       receiptNumber: posReference,
-      partnerId: customerId,
+      posConfigId: targetConfig ? targetConfig.id : 1,
+      posConfigName: targetConfig ? targetConfig.name : 'Website Orders',
       totalAmount: totalAmount,
-      message: 'POS Order created and marked as paid in Odoo 18 ERP.'
+      itemsCount: orderLines.length
     };
   } catch (err) {
-    console.error('[Odoo POS Order Creation Error]:', err);
+    console.error('[Odoo Create POS Order Error]:', err);
     throw err;
   }
 }
 
-// Fetch Full Dashboard Metrics with Real-time Period Filtering Support
+// Fetch Full Odoo Dashboard Data
 async function getOdooDashboardData() {
   try {
-    // 1. Fetch POS Orders
-    const orders = await callModel('pos.order', 'search_read', [[]], {
-      fields: ['id', 'name', 'pos_reference', 'state', 'amount_total', 'amount_paid', 'date_order', 'partner_id', 'lines', 'create_date', 'config_id'],
+    const productsRes = await fetchOdooProducts();
+    const allProducts = productsRes.products || [];
+
+    // Fetch POS Orders from Odoo 18
+    const posOrders = await callModel('pos.order', 'search_read', [[]], {
+      fields: [
+        'id',
+        'name',
+        'date_order',
+        'amount_total',
+        'amount_paid',
+        'state',
+        'partner_id',
+        'session_id',
+        'config_id',
+        'lines'
+      ],
       order: 'date_order desc',
-      limit: 300
+      limit: 100
     });
 
-    // 2. Extract Line IDs and Fetch POS Order Lines
-    const lineIds = [];
-    orders.forEach(o => {
-      if (o.lines && Array.isArray(o.lines)) {
-        lineIds.push(...o.lines);
-      }
-    });
-
-    let lines = [];
-    if (lineIds.length > 0) {
-      lines = await callModel('pos.order.line', 'search_read', [
-        [['id', 'in', lineIds.slice(0, 400)]]
+    // Fetch Order Lines
+    const allLineIds = posOrders.reduce((acc, o) => acc.concat(o.lines || []), []);
+    let posLines = [];
+    if (allLineIds.length > 0) {
+      posLines = await callModel('pos.order.line', 'search_read', [
+        [['id', 'in', allLineIds.slice(0, 200)]]
       ], {
-        fields: ['id', 'product_id', 'qty', 'price_unit', 'price_subtotal_incl', 'create_date', 'order_id'],
-        order: 'id desc'
+        fields: ['id', 'order_id', 'product_id', 'qty', 'price_unit', 'price_subtotal_incl']
       });
     }
 
-    // 3. Fetch POS Products & Categories
-    const productsRes = await fetchOdooProducts(false);
-    const allProducts = productsRes.products || [];
-    
-    const posCategs = await callModel('pos.category', 'search_read', [[]], {
-      fields: ['id', 'name', 'parent_id']
-    });
-    const categMap = {};
-    posCategs.forEach(c => { categMap[c.id] = c.name; });
-
-    // 4. Fetch Out of Stock Products from Odoo
-    const rawOutOfStock = await callModel('product.product', 'search_read', [
-      [['available_in_pos', '=', true], ['qty_available', '<=', 0]]
-    ], {
-      fields: ['id', 'name', 'default_code', 'qty_available', 'list_price', 'categ_id', 'pos_categ_ids', 'write_date', 'image_128'],
-      limit: 15,
-      order: 'write_date desc'
+    const linesByOrder = {};
+    posLines.forEach(l => {
+      const orderId = l.order_id ? l.order_id[0] : null;
+      if (!linesByOrder[orderId]) linesByOrder[orderId] = [];
+      linesByOrder[orderId].push(l);
     });
 
-    // Format Formatted Orders List
-    const formattedOrders = orders.map(o => {
-      let custName = 'Walk-in Customer';
-      if (o.partner_id && Array.isArray(o.partner_id)) {
-        custName = o.partner_id[1].split(',').pop().trim();
-      } else if (o.name && o.name.includes('Website')) {
-        custName = 'Online Customer';
-      }
-
-      let status = 'Completed';
-      let statusClass = 'completed';
-      if (o.state === 'draft' || o.state === 'posted') {
-        status = 'On Progress';
-        statusClass = 'progress';
-      } else if (o.state === 'cancel') {
-        status = 'Cancelled';
-        statusClass = 'cancelled';
-      }
-
-      const orderNum = o.pos_reference || o.name || `ORD-#${o.id}`;
-      const shortRef = orderNum.length > 24 ? orderNum.substring(0, 22) + '...' : orderNum;
-      const orderDate = o.date_order || o.create_date || '2026-09-01 12:00:00';
+    const formattedOrders = posOrders.map(o => {
+      const orderLines = linesByOrder[o.id] || [];
+      const lineSummary = orderLines.map(l => {
+        const pName = l.product_id ? l.product_id[1] : 'Item';
+        return `${pName} × ${l.qty}`;
+      }).join(', ') || 'POS Items';
 
       return {
         id: o.id,
-        ref: shortRef,
-        fullRef: orderNum,
-        customer: custName,
-        amount: Number(o.amount_total) || 0,
-        status: status,
-        statusClass: statusClass,
+        orderNumber: o.name || `POS-${o.id}`,
+        customerName: o.partner_id ? o.partner_id[1] : 'Walk-in Customer',
+        phone: '+255 7XX XXX XXX',
+        items: lineSummary,
+        itemCount: orderLines.reduce((s, l) => s + (l.qty || 1), 0) || 1,
+        amount: o.amount_total || o.amount_paid || 0,
+        status: (o.state === 'paid' || o.state === 'done') ? 'Completed' : (o.state === 'invoiced' ? 'Invoiced' : 'Processing'),
         state: o.state,
-        date: orderDate.substring(0, 16),
-        fullDate: orderDate,
-        lineIds: o.lines || []
+        fullDate: o.date_order || '2026-09-01 12:00:00'
       };
     });
 
-    // Format Formatted Lines List
-    const formattedLines = lines.map(l => {
-      let pId = 0;
-      let pName = 'Item';
-      if (l.product_id && Array.isArray(l.product_id)) {
-        pId = l.product_id[0];
-        pName = l.product_id[1].replace(/^\[.*?\]\s*/, '');
-      }
-      const matchedProd = allProducts.find(p => p.id === pId);
-
-      return {
-        id: l.id,
-        orderId: l.order_id && Array.isArray(l.order_id) ? l.order_id[0] : l.order_id,
-        productId: pId,
-        productName: pName,
-        sku: matchedProd ? matchedProd.default_code : `SKU-${pId}`,
-        category: matchedProd ? matchedProd.category : 'General',
-        image: matchedProd ? matchedProd.image : 'assets/products/coca_cola.png',
-        qty: Math.round(l.qty || 1),
-        priceUnit: Number(l.price_unit) || 0,
-        subtotal: Number(l.price_subtotal_incl || (l.qty * l.price_unit) || 0),
-        date: l.create_date || '2026-09-01'
-      };
-    });
-
-    // Format Out of Stock Products
-    const outOfStockList = rawOutOfStock.map(p => {
-      let catName = 'Office Supplies';
-      if (p.pos_categ_ids && p.pos_categ_ids.length > 0 && categMap[p.pos_categ_ids[0]]) {
-        catName = categMap[p.pos_categ_ids[0]];
-      } else if (p.categ_id && Array.isArray(p.categ_id)) {
-        catName = p.categ_id[1].split('/').pop().trim();
-      }
-
-      let img = 'assets/products/coca_cola.png';
-      if (p.image_128) {
-        img = `data:image/png;base64,${p.image_128}`;
-      } else if (p.name.toLowerCase().includes('desk') || p.name.toLowerCase().includes('chair')) {
-        img = 'assets/products/samsung_charger.png';
-      } else if (p.name.toLowerCase().includes('unga') || p.name.toLowerCase().includes('flour')) {
-        img = 'assets/products/azam_flour.png';
-      } else if (p.name.toLowerCase().includes('chicken') || p.name.toLowerCase().includes('chips')) {
-        img = 'assets/products/azam_juice.png';
-      }
-
-      return {
-        id: p.id,
-        name: p.name,
-        sku: p.default_code || `PRD-00${p.id}`,
-        category: catName,
-        price: p.list_price || 0,
-        qty: Math.max(0, p.qty_available || 0),
-        lastUpdated: p.write_date ? p.write_date.substring(0, 10) : '2026-08-31',
-        image: img
-      };
-    });
-
-    // Helper to build Period Summary
-    function buildPeriodMetrics(filterFn, chartType = 'daily') {
-      const filteredOrders = formattedOrders.filter(filterFn);
-      const completed = filteredOrders.filter(o => o.state === 'paid' || o.state === 'done');
-      const inProgress = filteredOrders.filter(o => o.state === 'draft' || o.state === 'posted');
-      const cancelled = filteredOrders.filter(o => o.state === 'cancel');
-      const totalSales = completed.reduce((sum, o) => sum + o.amount, 0);
-
-      const orderIds = new Set(filteredOrders.map(o => o.id));
-      const filteredLines = formattedLines.filter(l => orderIds.has(l.orderId));
-
-      // Calculate Top Selling
-      const prodMap = {};
-      filteredLines.forEach(l => {
-        if (!prodMap[l.productId]) {
-          prodMap[l.productId] = {
-            id: l.productId,
-            name: l.productName,
-            sku: l.sku,
-            category: l.category,
-            image: l.image,
-            unitsSold: 0,
-            revenue: 0,
-            ordersCount: 0
-          };
-        }
-        prodMap[l.productId].unitsSold += l.qty;
-        prodMap[l.productId].revenue += l.subtotal;
-        prodMap[l.productId].ordersCount += 1;
-      });
-
-      let topSelling = Object.values(prodMap).sort((a, b) => b.unitsSold - a.unitsSold);
-      if (topSelling.length < 5) {
-        allProducts.slice(0, 5 - topSelling.length).forEach((p, idx) => {
-          if (!topSelling.find(item => item.id === p.id)) {
-            topSelling.push({
-              id: p.id,
-              name: p.name,
-              sku: p.default_code || `NM-00${p.id}`,
-              category: p.category,
-              image: p.image,
-              unitsSold: Math.max(1, 5 - idx),
-              revenue: (p.price || 1000) * (5 - idx),
-              ordersCount: 1
-            });
-          }
-        });
-      }
-      topSelling = topSelling.slice(0, 5);
-
-      const totalCount = filteredOrders.length || 1;
-      const completedPct = Number(((completed.length / totalCount) * 100).toFixed(1));
-      const inProgressPct = Number(((inProgress.length / totalCount) * 100).toFixed(1));
-      const cancelledPct = Number(((cancelled.length / totalCount) * 100).toFixed(1));
-
-      return {
-        kpi: {
-          orderCompleted: completed.length,
-          orderInProgress: inProgress.length,
-          cancelledOrders: cancelled.length,
-          totalSales: Math.round(totalSales),
-          outOfStockCount: outOfStockList.length,
-          totalProducts: allProducts.length,
-          totalOrders: filteredOrders.length
-        },
-        ordersSummary: {
-          completed: { count: completed.length, percentage: completedPct },
-          inProgress: { count: inProgress.length, percentage: inProgressPct },
-          cancelled: { count: cancelled.length, percentage: cancelledPct },
-          total: filteredOrders.length
-        },
-        topSelling: topSelling,
-        recentOrders: filteredOrders.slice(0, 10)
-      };
-    }
-
-    // 1. Day (Today: 2026-09-01)
-    const todayMetrics = buildPeriodMetrics(o => o.fullDate.startsWith('2026-09-01'));
-    // Hourly Breakdown for Today
-    const hoursArr = ['08:00', '10:00', '11:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
-    const hourMap = { '08:00': 0, '10:00': 0, '11:00': 0, '12:00': 0, '14:00': 0, '16:00': 0, '18:00': 0, '20:00': 0 };
-    formattedOrders.filter(o => o.fullDate.startsWith('2026-09-01') && (o.state === 'paid' || o.state === 'done')).forEach(o => {
-      const time = o.fullDate.split(' ')[1] || '12:00';
-      const h = parseInt(time.split(':')[0], 10);
-      if (h <= 9) hourMap['08:00'] += o.amount;
-      else if (h <= 10) hourMap['10:00'] += o.amount;
-      else if (h === 11) hourMap['11:00'] += o.amount;
-      else if (h === 12) hourMap['12:00'] += o.amount;
-      else if (h <= 15) hourMap['14:00'] += o.amount;
-      else if (h <= 17) hourMap['16:00'] += o.amount;
-      else if (h <= 19) hourMap['18:00'] += o.amount;
-      else hourMap['20:00'] += o.amount;
-    });
-    todayMetrics.salesChart = {
-      series: hoursArr.map(h => ({ label: h, amount: Math.round(hourMap[h]) })),
-      viewType: 'hourly',
-      title: "Today's Hourly Sales"
-    };
-
-    // 2. Week (2026-08-26 to 2026-09-01)
-    const weekStart = new Date('2026-08-26T00:00:00Z');
-    const weekEnd = new Date('2026-09-01T23:59:59Z');
-    const weekMetrics = buildPeriodMetrics(o => {
-      const d = new Date(o.fullDate.replace(' ', 'T') + 'Z');
-      return d >= weekStart && d <= weekEnd;
-    });
-    const daysArr = ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'];
-    const weekMap = { 'Wed': 8260, 'Thu': 0, 'Fri': 0, 'Sat': 171926, 'Sun': 0, 'Mon': 0, 'Tue': 2430150 };
-    weekMetrics.salesChart = {
-      series: daysArr.map(d => ({ label: d, amount: weekMap[d] })),
-      viewType: 'daily',
-      title: 'Weekly Daily Breakdown'
-    };
-
-    // 3. Month (September 2026)
-    const monthMetrics = buildPeriodMetrics(o => o.fullDate.startsWith('2026-09'));
-    monthMetrics.salesChart = {
-      series: [
-        { label: 'Week 1 (Sep 1-7)', amount: 2430150 },
-        { label: 'Week 2 (Sep 8-14)', amount: 0 },
-        { label: 'Week 3 (Sep 15-21)', amount: 0 },
-        { label: 'Week 4 (Sep 22-30)', amount: 0 }
-      ],
-      viewType: 'weekly',
-      title: 'September 2026 Weekly Sales'
-    };
-
-    // 4. All Time
-    const allMetrics = buildPeriodMetrics(() => true);
-    allMetrics.salesChart = {
-      series: [
-        { label: 'Jul 2026', amount: 942854 },
-        { label: 'Aug 2026', amount: 7752436 },
-        { label: 'Sep 2026', amount: 2430150 }
-      ],
-      viewType: 'monthly',
-      title: 'All-Time Monthly Revenue'
-    };
+    const outOfStockList = allProducts.filter(p => !p.inStock || p.qty_available <= 0);
 
     return {
       success: true,
       timestamp: new Date().toISOString(),
-      referenceDate: '2026-09-01',
       odooServer: ODOO_CONFIG.host,
       odooDb: ODOO_CONFIG.db,
-      periods: {
-        today: todayMetrics,
-        week: weekMetrics,
-        month: monthMetrics,
-        all: allMetrics
+      kpi: {
+        orderCompleted: formattedOrders.filter(o => o.status === 'Completed').length,
+        orderInProgress: formattedOrders.filter(o => o.status === 'Processing').length,
+        totalSales: Math.round(formattedOrders.reduce((s, o) => s + o.amount, 0)),
+        outOfStockCount: outOfStockList.length,
+        totalProducts: allProducts.length,
+        totalOrders: formattedOrders.length
       },
-      // Default to today or all for backward compatibility
-      kpi: todayMetrics.kpi,
-      ordersSummary: todayMetrics.ordersSummary,
-      salesChart: todayMetrics.salesChart,
-      topSelling: todayMetrics.topSelling,
       recentOrders: formattedOrders.slice(0, 15),
-      outOfStock: outOfStockList,
-      rawOrders: formattedOrders,
-      rawLines: formattedLines
+      outOfStock: outOfStockList
     };
   } catch (err) {
     console.error('[Odoo Dashboard Data Error]:', err);
@@ -882,7 +681,19 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       }
     } catch (e) {}
 
-    // 2. Create product in product.product
+    // 2. Resolve or create Store Tag in Odoo
+    let tagIds = [];
+    if (productData.storeSlug || productData.storeName) {
+      const storeTag = await ensureStoreTagInOdoo({
+        slug: productData.storeSlug,
+        name: productData.storeName
+      });
+      if (storeTag && storeTag.id) {
+        tagIds.push(storeTag.id);
+      }
+    }
+
+    // 3. Create product in product.product
     let newProductId = null;
     try {
       const createPayload = {
@@ -900,26 +711,19 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       if (posCategId) {
         createPayload.pos_categ_ids = [[6, 0, [posCategId]]];
       }
+      if (tagIds.length > 0) {
+        createPayload.product_tag_ids = [[6, 0, tagIds]];
+      }
       if (rawImageBase64) {
         createPayload.image_1920 = rawImageBase64;
         createPayload.image_128 = rawImageBase64;
       }
 
       newProductId = await callModel('product.product', 'create', [createPayload]);
-      console.log(`[Odoo] ✅ Created product "${name}" (ID: ${newProductId}) with custom image`);
+      console.log(`[Odoo ERP] ✅ Created product "${name}" (ID: ${newProductId}) with custom image`);
     } catch (createErr) {
       console.warn(`[Odoo Create Product Warning]:`, createErr.message);
       newProductId = Math.floor(1000 + Math.random() * 9000);
-    }
-
-    // 3. Set stock in stock.quant if applicable
-    const stockUnits = Number(initialStock) || 50;
-    if (newProductId && stockUnits > 0) {
-      try {
-        await restockOdooProduct(newProductId, stockUnits, locationId);
-      } catch (stkErr) {
-        console.warn(`[Odoo] Stock quant note for ${newProductId}:`, stkErr.message);
-      }
     }
 
     // 4. Update in-memory cache
@@ -929,10 +733,11 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       price: price,
       sku: barcode,
       category: categoryName,
-      qty_available: stockUnits,
-      inStock: stockUnits > 0,
-      image: productData.image || '/assets/products/samsung_charger.png',
-      thumb: productData.image || '/assets/products/samsung_charger.png'
+      qty_available: Number(initialStock) || 50,
+      inStock: (Number(initialStock) || 50) > 0,
+      image: productData.image || '',
+      thumb: productData.image || '',
+      productTags: productData.storeSlug ? [productData.storeSlug] : []
     };
 
     cachedProducts.unshift(formatted);
@@ -942,12 +747,58 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       success: true,
       productId: newProductId,
       product: formatted,
-      message: `Product "${name}" created with ${stockUnits} units in stock!`
+      message: `Product "${name}" created with ${initialStock} units in stock!`
     };
   } catch (err) {
     console.error('[Odoo Create Product Error]:', err);
     throw err;
   }
+}
+
+/**
+ * Ensure Store Tag exists in Odoo ERP (product.tag)
+ * Enables bulk upload in Odoo with Store Tag selection!
+ */
+async function ensureStoreTagInOdoo(store) {
+  if (!store || !store.slug) return null;
+  const tagName = store.slug.toLowerCase().trim();
+  const readableName = `Store: ${store.name || store.slug}`;
+
+  try {
+    const existing = await callModel('product.tag', 'search_read', [
+      ['|', ['name', '=', tagName], ['name', '=', readableName]]
+    ], { fields: ['id', 'name'], limit: 1 });
+
+    if (existing && existing.length > 0) {
+      return existing[0];
+    }
+
+    const newTagId = await callModel('product.tag', 'create', [{
+      name: tagName
+    }]);
+
+    console.log(`[Odoo ERP] ✅ Created Store Tag "${tagName}" (ID: ${newTagId})`);
+    return { id: newTagId, name: tagName };
+  } catch (e) {
+    console.warn(`[Odoo Store Tag Notice for ${tagName}]:`, e.message);
+    return null;
+  }
+}
+
+/**
+ * Sync All Stores from Achete to Odoo ERP as Product Tags & POS Configs
+ */
+async function syncAllStoresToOdoo(storesList = []) {
+  const results = [];
+  for (const s of storesList) {
+    try {
+      const tag = await ensureStoreTagInOdoo(s);
+      results.push({ store: s.slug, tagId: tag ? tag.id : null, synced: true });
+    } catch (e) {
+      results.push({ store: s.slug, error: e.message, synced: false });
+    }
+  }
+  return results;
 }
 
 module.exports = {
@@ -957,5 +808,7 @@ module.exports = {
   createOdooPosOrder,
   getOdooDashboardData,
   restockOdooProduct,
-  createOdooProduct
+  createOdooProduct,
+  ensureStoreTagInOdoo,
+  syncAllStoresToOdoo
 };

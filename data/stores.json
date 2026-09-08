@@ -283,7 +283,12 @@
     ],
     "createdDate": "2026-09-07",
     "pin": "1234",
-    "inventoryOverrides": {},
+    "inventoryOverrides": {
+      "143": {
+        "qty_available": 0,
+        "updatedAt": "2026-09-08T08:58:37.396Z"
+      }
+    },
     "customProducts": [
       {
         "id": 1001,

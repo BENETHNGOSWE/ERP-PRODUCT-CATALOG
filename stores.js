@@ -325,17 +325,37 @@ class StoreManager {
     if (!store) return allProducts;
 
     const isMasterStore = store.slug === 'achete' || store.slug === 'novamart' || !store.id;
+    const storeSlug = (store.slug || '').toLowerCase();
+    const storeName = (store.name || '').toLowerCase();
     let matched = [];
 
-    // 1. Catalog Isolation: If store has assigned productIds, show only those; otherwise show all available products
-    if (isMasterStore || !Array.isArray(store.productIds) || store.productIds.length === 0) {
-      matched = (allProducts || []).map(p => ({ ...p }));
-    } else {
-      const idSet = new Set(store.productIds.map(Number));
-      matched = (allProducts || []).filter(p => idSet.has(Number(p.id))).map(p => ({ ...p }));
+    // 1. Tag-Based Matching (Odoo Product Tags from bulk import / Odoo product form)
+    const taggedProducts = (allProducts || []).filter(p => {
+      const tags = (p.productTags || p.tags || []).map(t => String(t).toLowerCase());
+      return tags.some(t => t === storeSlug || t === `store: ${storeName}` || t === `store: ${storeSlug}` || t.includes(storeSlug));
+    });
+
+    if (taggedProducts.length > 0) {
+      matched = taggedProducts.map(p => ({ ...p }));
     }
 
-    // 2. Merge store's custom created products
+    // 2. Explicit ID Assignment (store.productIds)
+    if (Array.isArray(store.productIds) && store.productIds.length > 0) {
+      const idSet = new Set(store.productIds.map(Number));
+      const byId = (allProducts || []).filter(p => idSet.has(Number(p.id)));
+      byId.forEach(p => {
+        if (!matched.some(m => Number(m.id) === Number(p.id))) {
+          matched.push({ ...p });
+        }
+      });
+    }
+
+    // 3. Fallback: If no tags or explicit IDs matched, show all products for master or new store
+    if (matched.length === 0) {
+      matched = (allProducts || []).map(p => ({ ...p }));
+    }
+
+    // 4. Merge store's custom created products
     if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
       store.customProducts.forEach(cp => {
         if (!matched.some(p => Number(p.id) === Number(cp.id))) {
@@ -344,7 +364,7 @@ class StoreManager {
       });
     }
 
-    // 3. Apply Store-Specific Isolated Stock & Pricing Overrides
+    // 5. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
     return matched.map(prod => {
       const pId = String(prod.id);
