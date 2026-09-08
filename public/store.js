@@ -174,8 +174,8 @@ const NOVA = (function () {
     });
 
     // Home / Shop links
-    document.querySelectorAll('a[href="index.html"], a[href="/"], a.brand-block, a.nav-link[href="index.html"]').forEach(el => {
-      el.href = isCustomSlug ? `/${currentSlug}` : 'index.html';
+    document.querySelectorAll('a[href="index.html"], a[href="/"], a.brand-block, a.nav-link[href="index.html"], a.cart-heading-link, .btn-outline-continue, #btnContinueShopping').forEach(el => {
+      el.href = isCustomSlug ? `/${currentSlug}` : '/shop';
     });
   }
 

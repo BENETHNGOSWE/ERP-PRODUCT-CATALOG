@@ -1003,26 +1003,26 @@ app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
 });
 
-// Platform Homepage (Snippe-inspired modern high-converting platform website)
+// Platform Homepage (Official Snippe-inspired Achete Website)
 app.get(['/', '/home', '/home.html'], (req, res) => {
   if (req.query.store) {
-    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
-  res.sendFile(path.join(__dirname, 'public', 'home.html'));
-});
-
-// Main Catalog / Storefront Route (Supports /shop, /catalog, /:slug)
-app.get(['/shop', '/catalog', '/store', '/index.html', '/:slug'], (req, res, next) => {
-  const slug = req.params.slug;
-  if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json'))) {
-    return next();
+    return res.sendFile(path.join(__dirname, 'public', 'shop.html'));
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Main Store Catalog Route (Supports /shop, /catalog, /store, /:slug)
+app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
+  const slug = req.params.slug;
+  if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json') || slug.endsWith('.html'))) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'public', 'shop.html'));
+});
+
 // Fallback Route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'home.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start Express Server

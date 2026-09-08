@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ACHETE.ME — Online Store</title>
+  <meta name="description" content="Shop quality products with fast delivery in Dar es Salaam on achete.me.">
+  <link rel="icon" type="image/png" href="/assets/products/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Compact item summary rows inside sticky checkout */
+    .summary-item-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #f1f5f9;
+      font-size: 0.85rem;
+    }
+    .summary-item-entry:last-child {
+      border-bottom: none;
+    }
+    .summary-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+    .summary-item-mini-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+    .summary-item-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .summary-item-name {
+      font-weight: 600;
+      color: var(--navy-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.82rem;
+    }
+    .summary-item-unit {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .summary-item-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .summary-item-price {
+      font-weight: 700;
+      color: var(--navy-dark);
+      font-size: 0.84rem;
+    }
+    .summary-item-del {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s ease;
+    }
+    .summary-item-del:hover {
+      color: #ef4444;
+    }
+    .empty-summary-box {
+      text-align: center;
+      padding: 20px 10px;
+      color: #94a3b8;
+    }
+    .empty-summary-box svg {
+      margin-bottom: 8px;
+    }
+    .empty-summary-box p {
+      font-size: 0.82rem;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Store Header -->
+  <header class="main-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo & Location -->
+      <a href="index.html" class="brand-block" title="Store Home">
+        <div class="brand-logo-circle">
+          <svg class="cart-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-name">achete.me</h1>
+          <div class="brand-location">
+            <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Dar es Salaam</span>
+            <span class="status-dot"></span>
+            <span class="status-text">Open</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link active">Shop</a>
+        <a href="#about" class="nav-link" onclick="event.preventDefault(); openShopModal();">About Us</a>
+        <a href="#contact" class="nav-link" onclick="event.preventDefault(); openShopModal();">Contact</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <!-- Sync Stock Button -->
+        <button class="btn-sync-odoo" id="btnSyncOdoo" title="Refresh Stock">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span class="sync-text">Sync Stock</span>
+        </button>
+
+        <!-- Notification Button -->
+        <button class="btn-icon-header" onclick="NOVA.showToast('🔔 Store is open and accepting orders!')" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+
+        <!-- Cart Button -->
+        <a href="cart.html" class="btn-cart-header" id="btnHeaderCart" aria-label="View Cart">
+          <div class="cart-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+          </div>
+          <span class="cart-btn-text">Cart</span>
+          <span class="cart-badge-count" id="headerCartBadge">0</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Page Content: Unified 1-Page Layout -->
+  <main class="shop-main">
+    <div class="shop-container">
+
+      <!-- Search Section -->
+      <div class="search-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search products..." autocomplete="off">
+          <button class="search-clear-btn" id="searchClearBtn" style="display:none;" title="Clear search">&times;</button>
+          <button class="search-filter-icon-btn" title="Filter &amp; Sort" onclick="document.getElementById('sortSelect').focus();">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls: Category Pills & Sort -->
+      <div class="controls-section">
+        <div class="category-pills" id="categoryPills" role="tablist">
+          <button class="pill-btn active" data-category="All" role="tab">All</button>
+          <button class="pill-btn" data-category="Drinks" role="tab">Drinks</button>
+          <button class="pill-btn" data-category="Food" role="tab">Food</button>
+          <button class="pill-btn" data-category="Cosmetics" role="tab">Cosmetics</button>
+          <button class="pill-btn" data-category="Electronics" role="tab">Electronics</button>
+          <button class="pill-btn" data-category="Household" role="tab">Household</button>
+          <button class="pill-btn" data-category="Safety Gear" role="tab">Safety Gear</button>
+        </div>
+
+        <div class="sort-wrapper">
+          <label for="sortSelect" class="sort-label">Sort by:</label>
+          <div class="custom-select">
+            <select id="sortSelect" aria-label="Sort products">
+              <option value="popular">Popular</option>
+              <option value="stock-desc">Highest Stock</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name-asc">Name: A to Z</option>
+            </select>
+            <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unified Single-Page 2-Column Section (Catalog + Sticky Order Summary) -->
+      <section class="shop-unified-layout" aria-label="Catalog & Order Summary">
+        
+        <!-- Left Side: Product List with Horizontal Item Cards (Image 1 Style) -->
+        <div class="product-list-column" id="productsListContainer">
+          <!-- Dynamically Populated Cards -->
+        </div>
+
+        <!-- Right Side: Sticky Order Summary & Quick Checkout Panel (Image 2 Style) -->
+        <aside class="order-summary-panel" id="orderSummaryCard">
+          <h2 class="summary-heading" style="margin-bottom: 14px;">Order Summary</h2>
+
+          <!-- Selected Items Scrollable List -->
+          <div class="summary-items-list" id="summaryItemsList">
+            <!-- Dynamically Populated Items -->
+          </div>
+
+          <!-- Dynamic Subtotal, Discount, and Total -->
+          <div class="summary-rows" style="margin-bottom: 18px;">
+            <div class="summary-row">
+              <span class="summary-label">Subtotal</span>
+              <span class="summary-val" id="summarySubtotal">TZS 0</span>
+            </div>
+            <div class="summary-row discount-row">
+              <span class="summary-label">Discount</span>
+              <span class="summary-val discount-val" id="summaryDiscount">TZS 0</span>
+            </div>
+            <div class="summary-row total-row">
+              <span class="summary-label">Total</span>
+              <span class="summary-val total-val" id="summaryTotal">TZS 0</span>
+            </div>
+          </div>
+
+          <!-- Mobile Number Input Box -->
+          <div class="mobile-number-box" style="margin-bottom: 16px;">
+            <label for="customerPhone" class="input-label">Mobile Number</label>
+            <div class="phone-input-wrapper">
+              <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+              <input type="tel" id="customerPhone" class="phone-input" placeholder="+255 7XX XXX XXX" value="+255 712 345 678" autocomplete="tel">
+            </div>
+            <p class="phone-hint">Enter your phone number to receive order updates via SMS/WhatsApp.</p>
+          </div>
+
+          <!-- Place Order Button -->
+          <button class="btn-place-order" id="btnPlaceOrder">
+            PLACE ORDER
+          </button>
+        </aside>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mobile Floating Cart Bar (Navigates directly to dedicated Cart page) -->
+  <a href="cart.html" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
+    <div class="float-cart-info">
+      <div class="float-cart-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="float-badge" id="mobileFloatBadge">0</span>
+      </div>
+      <span class="float-cart-text">Cart</span>
+    </div>
+    <div class="float-view-cart-btn">
+      <span>View Cart &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Product Details & Quick View Popup Modal -->
+  <div class="prod-detail-overlay" id="productDetailModal" onclick="if(event.target === this) closeProductDetailModal()">
+    <div class="prod-detail-card" onclick="event.stopPropagation()">
+      <button type="button" class="prod-detail-close" onclick="closeProductDetailModal()">&times;</button>
+      
+      <div class="prod-detail-hero">
+        <img id="detailModalImg" src="" alt="Product Image" class="prod-detail-hero-img">
+      </div>
+
+      <div class="prod-detail-body">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+          <h2 id="detailModalTitle" class="prod-detail-title">Product Title</h2>
+          <span id="detailModalStockTag" class="product-item-stock-tag in-stock" style="margin-top:4px;">In Stock</span>
+        </div>
+
+        <div class="prod-detail-price-row">
+          <div id="detailModalPrice" class="prod-detail-price">TZS 0</div>
+          <span id="detailModalSku" style="font-size:0.75rem; color:#64748b; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-weight:600;">SKU: ---</span>
+        </div>
+
+        <div class="prod-detail-desc-box">
+          <div class="prod-detail-desc-heading">Description &amp; Details</div>
+          <p id="detailModalDesc" class="prod-detail-desc-text">
+            High quality product with official warranty and fast delivery across Dar es Salaam.
+          </p>
+        </div>
+      </div>
+
+      <div class="prod-detail-footer">
+        <div class="prod-detail-action-row">
+          <div class="stepper-horizontal" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:4px 8px;">
+            <button class="stepper-btn-h" id="detailModalMinusBtn" onclick="updateDetailModalQty(-1)">&minus;</button>
+            <span class="stepper-val-h" id="detailModalQtyVal" style="min-width:24px; font-size:1.1rem;">1</span>
+            <button class="stepper-btn-h" id="detailModalPlusBtn" onclick="updateDetailModalQty(1)">&#43;</button>
+          </div>
+          <button type="button" class="prod-detail-btn-cart" id="detailModalAddToCartBtn" onclick="submitDetailModalCart()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span id="detailModalBtnText">Add to Cart</span>
+          </button>
+        </div>
+        <a id="detailModalWaLink" href="#" target="_blank" class="prod-detail-btn-wa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.177.182-.076.355.101.173.448.74 1.025 1.254.746.665 1.374.871 1.569.968.195.097.311.082.427-.051.116-.133.491-.571.621-.767.13-.196.26-.163.433-.099.173.064 1.097.517 1.285.611.188.094.314.14.36.218.046.078.046.452-.098.857z"/></svg>
+          <span>Ask Store on WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store Info Modal -->
+  <div class="modal-overlay" id="shopModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <h3>achete.me</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="store-info-box">
+          <div class="store-badge-open">
+            <span class="status-dot"></span> Store Open &bull; Mikocheni, Dar es Salaam
+          </div>
+          <p class="store-address"><strong>📍 Location:</strong> Mikocheni B, Dar es Salaam, Tanzania</p>
+          <p class="store-address"><strong>📞 Contact:</strong> +255 712 345 678 / +255 784 123 456</p>
+          <p class="store-service"><strong>🕒 Opening Hours:</strong> Monday – Sunday: 8:00 AM – 10:00 PM</p>
+          <p class="store-service"><strong>🚚 Delivery:</strong> Fast direct delivery across Dar es Salaam region.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary-modal" onclick="closeModal('shopModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 <strong>achete.</strong> all right reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/store.js"></script>
+  <script>
+    (function() {
+      let currentCategory = 'All';
+      let currentSearch = '';
+      let currentSort = 'popular';
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/"/g, '&quot;');
+      }
+
+      const listContainer = document.getElementById('productsListContainer');
+      const summaryList = document.getElementById('summaryItemsList');
+      const subtotalEl = document.getElementById('summarySubtotal');
+      const discountEl = document.getElementById('summaryDiscount');
+      const totalEl = document.getElementById('summaryTotal');
+      const mobileTotalEl = document.getElementById('mobileFloatTotal');
+      const phoneInput = document.getElementById('customerPhone');
+      const btnPlaceOrder = document.getElementById('btnPlaceOrder');
+
+      // Load saved customer phone if available
+      const savedPhone = NOVA.getPhone();
+      if (savedPhone && phoneInput) phoneInput.value = savedPhone;
+
+      // Render Category Pills dynamically from available products
+      function renderCategoryPills(products) {
+        const catBox = document.getElementById('categoryPills');
+        if (!catBox) return;
+        const categories = ['All'];
+        (products || []).forEach(p => {
+          if (p.category && !categories.includes(p.category)) {
+            categories.push(p.category);
+          }
+        });
+        
+        if (!categories.includes(currentCategory)) {
+          currentCategory = 'All';
+        }
+
+        catBox.innerHTML = categories.map(cat => `
+          <button class="pill-btn ${cat === currentCategory ? 'active' : ''}" data-category="${escapeHtml(cat)}" role="tab">${escapeHtml(cat)}</button>
+        `).join('');
+      }
+
+      // Render both Catalog & Sticky Order Summary simultaneously
+      function renderStoreView() {
+        const cart = NOVA.getCart();
+        const products = NOVA.getProducts();
+        const totals = NOVA.calculateTotals(cart);
+
+        renderCategoryPills(products);
+
+        // 1. Update Order Summary Calculations
+        if (subtotalEl) subtotalEl.textContent = NOVA.formatTZS(totals.subtotal);
+        if (discountEl) discountEl.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
+        if (totalEl) totalEl.textContent = NOVA.formatTZS(totals.total);
+        if (mobileTotalEl) mobileTotalEl.textContent = totals.total > 0 ? `${NOVA.formatTZS(totals.total)} \u2192` : 'Review \u2192';
+
+        if (btnPlaceOrder) {
+          btnPlaceOrder.disabled = totals.itemCount === 0;
+        }
+
+        // 2. Render Order Summary Items List
+        const cartEntries = Object.entries(cart).filter(([_, qty]) => qty > 0);
+        if (cartEntries.length === 0) {
+          summaryList.innerHTML = `
+            <div class="empty-summary-box">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.8">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              <p>No products selected yet.<br>Click <strong>+</strong> to add items.</p>
+            </div>
+          `;
+        } else {
+          let summaryHtml = '';
+          cartEntries.forEach(([id, qty]) => {
+            const p = products.find(prod => String(prod.id) === String(id));
+            if (!p) return;
+            const itemSubtotal = p.price * qty;
+            summaryHtml += `
+              <div class="summary-item-entry" data-id="${p.id}">
+                <div class="summary-item-left">
+                  <img src="${p.thumb || p.image}" alt="${p.name}" class="summary-item-mini-thumb">
+                  <div class="summary-item-text">
+                    <span class="summary-item-name" title="${p.name}">${p.name}</span>
+                    <span class="summary-item-unit">${qty} &times; ${NOVA.formatTZS(p.price)}</span>
+                  </div>
+                </div>
+                <div class="summary-item-right">
+                  <span class="summary-item-price">${NOVA.formatTZS(itemSubtotal)}</span>
+                  <button class="summary-item-del" data-id="${p.id}" title="Remove item">&times;</button>
+                </div>
+              </div>
+            `;
+          });
+          summaryList.innerHTML = summaryHtml;
+        }
+
+        // 3. Filter & Sort Products for Product List
+        const filtered = products.filter(p => {
+          const catMatch = currentCategory === 'All' || p.category === currentCategory || 
+                           (currentCategory === 'Safety Gear' && (p.category.includes('Protection') || p.category.includes('Safety')));
+          const searchMatch = !currentSearch || p.name.toLowerCase().includes(currentSearch.toLowerCase());
+          return catMatch && searchMatch;
+        }).sort((a, b) => {
+          if (currentSort === 'price-asc') return a.price - b.price;
+          if (currentSort === 'price-desc') return b.price - a.price;
+          if (currentSort === 'name-asc') return a.name.localeCompare(b.name);
+          if (currentSort === 'stock-desc') return (b.qty_available || 0) - (a.qty_available || 0);
+          return 0;
+        });
+
+        // 4. Handle Empty Store Inventory State
+        if (filtered.length === 0) {
+          if (products.length === 0) {
+            const store = NOVA.getStore() || { name: 'Store', whatsapp: '+255712345678' };
+            let cleanWa = String(store.whatsapp || '').replace(/[^0-9]/g, '');
+            if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
+            else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
+
+            listContainer.innerHTML = `
+              <div style="text-align: center; padding: 50px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 10px 0;">
+                <div style="font-size: 2.8rem; margin-bottom: 12px;">📦</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #081735; margin-bottom: 8px;">Stock Not Loaded Yet</h3>
+                <p style="font-size: 0.92rem; color: #64748b; max-width: 440px; margin: 0 auto 18px; line-height: 1.5;">
+                  <strong>${store.name}</strong> has not loaded its inventory to the system yet. Please check back soon or contact the shop directly on WhatsApp.
+                </p>
+                <a href="https://wa.me/${cleanWa}?text=${encodeURIComponent(`Hello ${store.name}, I am visiting your store catalog and would like to ask about available products and stock!`)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-weight: 700; font-size: 0.88rem; padding: 10px 20px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(37,211,102,0.25);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.177.182-.076.355.101.173.448.74 1.025 1.254.746.665 1.374.871 1.569.968.195.097.311.082.427-.051.116-.133.491-.571.621-.767.13-.196.26-.163.433-.099.173.064 1.097.517 1.285.611.188.094.314.14.36.218.046.078.046.452-.098.857z"/></svg>
+                  <span>Inquire via WhatsApp</span>
+                </a>
+              </div>
+            `;
+            return;
+          }
+
+          listContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #64748b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <p style="font-size: 1.1rem; font-weight: 600; color: #1e293b;">No products found</p>
+              <p style="font-size: 0.9rem; margin-top: 4px;">Try searching for another keyword or select a different category.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // 5. Render Horizontal Product Item Cards (Exact Match to User Reference)
+        let html = '';
+        filtered.forEach(p => {
+          const strId = String(p.id);
+          const qty = cart[strId] || 0;
+          const stock = typeof p.qty_available === 'number' ? p.qty_available : 0;
+          
+          let stockClass = 'in-stock';
+          let stockText = `${stock} in stock`;
+          if (stock <= 0) {
+            stockClass = 'out-stock';
+            stockText = 'Out of stock';
+          } else if (stock <= 5) {
+            stockClass = 'low-stock';
+            stockText = `Only ${stock} left`;
+          }
+
+          html += `
+            <article class="product-item-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
+              <div class="product-item-left" onclick="openProductDetailModal('${p.id}')">
+                <div class="product-item-thumb-wrap" title="Click to view details">
+                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
+                </div>
+                <div class="product-item-meta">
+                  <h3 class="product-item-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
+                  <div class="product-item-price">${NOVA.formatTZS(p.price)}</div>
+                  <button type="button" class="btn-open-product" onclick="event.stopPropagation(); openProductDetailModal('${p.id}')">
+                    View Details &rarr;
+                  </button>
+                </div>
+              </div>
+              <div class="product-item-right-wrap">
+                <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
+                <div class="stepper-horizontal">
+                  <button class="stepper-btn-h btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
+                  <span class="stepper-val-h" id="qty-${p.id}">${qty}</span>
+                  <button class="stepper-btn-h btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} title="Increase quantity">&#43;</button>
+                </div>
+              </div>
+            </article>
+          `;
+        });
+
+        listContainer.innerHTML = html;
+        NOVA.updateHeaderCartBadge();
+      }
+
+      // Product Detail Modal State & Handlers
+      let currentDetailProduct = null;
+      let detailModalQty = 1;
+
+      window.openProductDetailModal = function(id) {
+        const products = NOVA.getProducts();
+        const p = products.find(x => String(x.id) === String(id));
+        if (!p) return;
+
+        currentDetailProduct = p;
+        const cart = NOVA.getCart();
+        const currentInCart = cart[String(p.id)] || 0;
+        detailModalQty = currentInCart > 0 ? currentInCart : 1;
+
+        const stock = typeof p.qty_available === 'number' ? p.qty_available : 0;
+        let stockClass = 'in-stock';
+        let stockText = `${stock} in stock`;
+        if (stock <= 0) {
+          stockClass = 'out-stock';
+          stockText = 'Out of stock';
+        } else if (stock <= 5) {
+          stockClass = 'low-stock';
+          stockText = `Only ${stock} left`;
+        }
+
+        const imgEl = document.getElementById('detailModalImg');
+        if (imgEl) {
+          imgEl.src = p.thumb || p.image;
+          imgEl.alt = p.name;
+        }
+
+        const titleEl = document.getElementById('detailModalTitle');
+        if (titleEl) titleEl.textContent = p.name;
+
+        const stockTagEl = document.getElementById('detailModalStockTag');
+        if (stockTagEl) {
+          stockTagEl.className = `product-item-stock-tag ${stockClass}`;
+          stockTagEl.textContent = stockText;
+        }
+
+        const priceEl = document.getElementById('detailModalPrice');
+        if (priceEl) priceEl.textContent = NOVA.formatTZS(p.price);
+
+        const skuEl = document.getElementById('detailModalSku');
+        if (skuEl) skuEl.textContent = p.sku || p.default_code ? `SKU: ${p.sku || p.default_code}` : 'Verified Product';
+
+        const descEl = document.getElementById('detailModalDesc');
+        if (descEl) {
+          if (p.description && p.description.trim()) {
+            descEl.textContent = p.description.trim();
+          } else {
+            descEl.textContent = `Authentic ${p.name}. In stock and available for fast pickup or delivery in Dar es Salaam.`;
+          }
+        }
+
+        updateDetailModalUI();
+
+        // WhatsApp direct inquiry link
+        const waLinkEl = document.getElementById('detailModalWaLink');
+        if (waLinkEl) {
+          const store = NOVA.getStore() || { whatsapp: '+255712345678', name: 'Store' };
+          let cleanWa = String(store.whatsapp || '').replace(/[^0-9]/g, '');
+          if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
+          else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
+          const msg = `Hello ${store.name}, I am interested in *${p.name}* (Price: ${NOVA.formatTZS(p.price)}). Is it currently available for delivery?`;
+          waLinkEl.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
+        }
+
+        document.getElementById('productDetailModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      };
+
+      window.closeProductDetailModal = function() {
+        const modal = document.getElementById('productDetailModal');
+        if (modal) modal.classList.remove('active');
+        currentDetailProduct = null;
+        document.body.style.overflow = '';
+      };
+
+      window.updateDetailModalQty = function(delta) {
+        if (!currentDetailProduct) return;
+        const stock = typeof currentDetailProduct.qty_available === 'number' ? currentDetailProduct.qty_available : 50;
+        const newQty = detailModalQty + delta;
+        if (newQty < 1) return;
+        if (stock > 0 && newQty > stock) {
+          NOVA.showToast(`⚠️ Only ${stock} units available in stock!`, 'danger');
+          return;
+        }
+        detailModalQty = newQty;
+        updateDetailModalUI();
+      };
+
+      function updateDetailModalUI() {
+        if (!currentDetailProduct) return;
+        const qtyValEl = document.getElementById('detailModalQtyVal');
+        if (qtyValEl) qtyValEl.textContent = detailModalQty;
+
+        const btnTextEl = document.getElementById('detailModalBtnText');
+        const addBtn = document.getElementById('detailModalAddToCartBtn');
+        const stock = typeof currentDetailProduct.qty_available === 'number' ? currentDetailProduct.qty_available : 50;
+        
+        if (addBtn) {
+          addBtn.disabled = stock <= 0;
+        }
+        if (btnTextEl) {
+          btnTextEl.textContent = stock <= 0 ? 'Out of Stock' : 'Add to Cart';
+        }
+      }
+
+      window.submitDetailModalCart = function() {
+        if (!currentDetailProduct) return;
+        NOVA.setItemQty(currentDetailProduct.id, detailModalQty);
+        NOVA.showToast(`Added ${detailModalQty} × ${currentDetailProduct.name} to cart!`);
+        renderStoreView();
+        closeProductDetailModal();
+      };
+
+      // Keyboard support
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeProductDetailModal();
+        }
+      });
+
+      // Event Delegation: Steppers, Card Clicks, and Quick Deletes
+      document.addEventListener('click', (e) => {
+        // 1. Plus Button (Explicit stepper +)
+        const plus = e.target.closest('.btn-plus');
+        if (plus) {
+          const id = plus.getAttribute('data-id');
+          NOVA.updateItemQty(id, 1);
+          const products = NOVA.getProducts();
+          const p = products.find(x => String(x.id) === String(id));
+          if (p) NOVA.showToast(`Added ${p.name} to cart`);
+          renderStoreView();
+          return;
+        }
+
+        // 2. Minus Button (Explicit stepper -)
+        const minus = e.target.closest('.btn-minus');
+        if (minus) {
+          const id = minus.getAttribute('data-id');
+          NOVA.updateItemQty(id, -1);
+          renderStoreView();
+          return;
+        }
+
+        // 3. Quick Delete from Summary List
+        const delBtn = e.target.closest('.summary-item-del');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-id');
+          const products = NOVA.getProducts();
+          const p = products.find(x => String(x.id) === String(id));
+          NOVA.removeItem(id);
+          if (p) NOVA.showToast(`Removed ${p.name}`, 'danger');
+          renderStoreView();
+          return;
+        }
+      });
+
+      // Category filter pills
+      const catBox = document.getElementById('categoryPills');
+      if (catBox) {
+        catBox.addEventListener('click', (e) => {
+          const pill = e.target.closest('.pill-btn');
+          if (!pill) return;
+          catBox.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+          pill.classList.add('active');
+          currentCategory = pill.getAttribute('data-category') || 'All';
+          renderStoreView();
+        });
+      }
+
+      // Search bar
+      const searchInput = document.getElementById('searchInput');
+      const searchClear = document.getElementById('searchClearBtn');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentSearch = e.target.value.trim();
+          if (searchClear) searchClear.style.display = currentSearch ? 'block' : 'none';
+          renderStoreView();
+        });
+      }
+      if (searchClear) {
+        searchClear.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
+          currentSearch = '';
+          searchClear.style.display = 'none';
+          renderStoreView();
+        });
+      }
+
+      // Sort Select
+      const sortSelect = document.getElementById('sortSelect');
+      if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+          currentSort = e.target.value;
+          renderStoreView();
+        });
+      }
+
+      // Sync Stock Button
+      const syncBtn = document.getElementById('btnSyncOdoo');
+      if (syncBtn) {
+        syncBtn.addEventListener('click', async () => {
+          syncBtn.disabled = true;
+          syncBtn.querySelector('.sync-text').textContent = 'Syncing...';
+          NOVA.showToast('🔄 Updating stock with Odoo ERP...');
+          await NOVA.loadOdooProducts(true);
+          renderStoreView();
+          syncBtn.disabled = false;
+          syncBtn.querySelector('.sync-text').textContent = 'Sync Stock';
+          NOVA.showToast('✅ Stock updated successfully!');
+        });
+      }
+
+      // Direct Single-Page Order Checkout Execution
+      if (btnPlaceOrder) {
+        btnPlaceOrder.addEventListener('click', async () => {
+          const totals = NOVA.calculateTotals();
+          if (totals.itemCount === 0) {
+            NOVA.showToast('⚠️ Your order summary is empty. Add products first!', 'danger');
+            return;
+          }
+
+          btnPlaceOrder.disabled = true;
+          btnPlaceOrder.innerHTML = `
+            <span class="loading-spinner"></span>
+            <span>Processing Order...</span>
+          `;
+
+          const phoneVal = phoneInput?.value.trim() || '+255 712 345 678';
+          NOVA.savePhone(phoneVal);
+
+          const cart = NOVA.getCart();
+          let products = NOVA.getProducts();
+          if (!products || products.length === 0) {
+            await NOVA.loadOdooProducts();
+            products = NOVA.getProducts();
+          }
+
+          const orderItems = [];
+          for (const [id, qty] of Object.entries(cart)) {
+            if (qty > 0) {
+              const p = (products || []).find(item => String(item.id) === String(id));
+              if (p) {
+                orderItems.push({
+                  id: p.id,
+                  name: p.name,
+                  price: Number(p.price) || 0,
+                  qty: qty,
+                  quantity: qty,
+                  subtotal: (Number(p.price) || 0) * qty
+                });
+              } else {
+                orderItems.push({
+                  id: id,
+                  name: `Product #${id}`,
+                  price: 0,
+                  qty: qty,
+                  quantity: qty,
+                  subtotal: 0
+                });
+              }
+            }
+          }
+
+          const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
+          NOVA.showToast('Submitting order to Odoo ERP...');
+          
+          let odooResult = null;
+          try {
+            odooResult = await NOVA.submitOrderToOdoo({
+              orderId: orderId,
+              customerPhone: phoneVal,
+              customerName: `Customer (${phoneVal})`,
+              items: orderItems,
+              totalAmount: totals.total
+            });
+          } catch (netErr) {
+            console.error('Order submission error:', netErr);
+          }
+
+          if (!odooResult || !odooResult.success) {
+            NOVA.showToast('⚠️ Failed to place order in Odoo POS: ' + (odooResult && odooResult.error ? odooResult.error : 'Connection error. Please try again.'), 'danger');
+            btnPlaceOrder.disabled = false;
+            btnPlaceOrder.innerHTML = 'PLACE ORDER';
+            return;
+          }
+
+          const confirmedOrder = {
+            orderId: orderId,
+            odooOrderId: odooResult && odooResult.order ? odooResult.order.odooOrderId : null,
+            odooOrderName: odooResult && odooResult.order ? odooResult.order.odooOrderName : null,
+            receiptNumber: odooResult && odooResult.order ? odooResult.order.receiptNumber : null,
+            storeSlug: odooResult && odooResult.order ? odooResult.order.storeSlug : NOVA.getStoreSlug(),
+            storeName: odooResult && odooResult.order ? odooResult.order.storeName : ((NOVA.getStore() && NOVA.getStore().name) || 'Store'),
+            storeWhatsapp: odooResult && odooResult.order ? odooResult.order.storeWhatsapp : ((NOVA.getStore() && NOVA.getStore().whatsapp) || '+255712345678'),
+            waLink: odooResult && odooResult.order ? odooResult.order.waLink : null,
+            totalPaid: totals.total,
+            subtotal: totals.subtotal,
+            discount: totals.discount,
+            itemCount: totals.itemCount,
+            phone: phoneVal,
+            items: orderItems,
+            status: 'Order Placed & Confirmed in Odoo',
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          };
+
+          NOVA.saveLatestOrder(confirmedOrder);
+          NOVA.resetCart();
+
+          // Smooth transition to confirmation receipt
+          const slug = NOVA.getStoreSlug();
+          const targetUrl = (slug && slug !== 'achete' && slug !== 'novamart' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
+          window.location.href = `${targetUrl}?orderId=${encodeURIComponent(confirmedOrder.orderId)}`;
+        });
+      }
+
+      // Modal helpers
+      window.openShopModal = function() {
+        document.getElementById('shopModal').classList.add('active');
+      };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+      };
+
+      // Initial Render & Stock fetch
+      renderStoreView();
+      NOVA.loadOdooProducts().then(() => {
+        renderStoreView();
+      });
+    })();
+  </script>
+</body>
+</html>
