@@ -350,12 +350,36 @@ class StoreManager {
       });
     }
 
-    // 3. Fallback: If no tags or explicit IDs matched, show all products for master or new store
-    if (matched.length === 0) {
-      matched = (allProducts || []).map(p => ({ ...p }));
+    // 3. Keyword-Based Matching (store.productKeywords)
+    if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
+      const keywords = store.productKeywords.map(k => String(k).toLowerCase());
+      const byKeywords = (allProducts || []).filter(p => {
+        const pName = (p.name || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+        const pDesc = (p.description || '').toLowerCase();
+        return keywords.some(k => pName.includes(k) || pCat.includes(k) || pDesc.includes(k));
+      });
+      byKeywords.forEach(p => {
+        if (!matched.some(m => Number(m.id) === Number(p.id))) {
+          matched.push({ ...p });
+        }
+      });
     }
 
-    // 4. Merge store's custom created products
+    // 4. Fallback: If no tags, explicit IDs, or keywords matched, match by store categories or master list
+    if (matched.length === 0) {
+      if (store.categories && store.categories.length > 0 && !store.categories.includes('All')) {
+        const byCat = (allProducts || []).filter(p => store.categories.includes(p.category));
+        if (byCat.length > 0) {
+          matched = byCat.map(p => ({ ...p }));
+        }
+      }
+      if (matched.length === 0) {
+        matched = (allProducts || []).map(p => ({ ...p }));
+      }
+    }
+
+    // 5. Merge store's custom created products
     if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
       store.customProducts.forEach(cp => {
         if (!matched.some(p => Number(p.id) === Number(cp.id))) {
@@ -364,7 +388,7 @@ class StoreManager {
       });
     }
 
-    // 5. Apply Store-Specific Isolated Stock & Pricing Overrides
+    // 6. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
     return matched.map(prod => {
       const pId = String(prod.id);

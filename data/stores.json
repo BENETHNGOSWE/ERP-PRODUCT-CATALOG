@@ -246,10 +246,28 @@
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
-      "General"
+      "All",
+      "Smartphones",
+      "Electronics",
+      "Accessories",
+      "Audio"
     ],
-    "productKeywords": [],
-    "productIds": [],
+    "productKeywords": [
+      "samsung",
+      "iphone",
+      "charger",
+      "airpods",
+      "sony",
+      "anker"
+    ],
+    "productIds": [
+      141,
+      140,
+      145,
+      142,
+      143,
+      144
+    ],
     "createdDate": "2026-09-03",
     "pin": "1234",
     "inventoryOverrides": {},
@@ -270,13 +288,30 @@
     "posConfigName": "Website Orders",
     "categories": [
       "All",
-      "General",
       "Smartphones",
-      "Electronics",
-      "Accessories"
+      "Accessories",
+      "Audio",
+      "Electronics"
     ],
-    "productKeywords": [],
-    "productIds": [],
+    "productKeywords": [
+      "samsung",
+      "iphone",
+      "charger",
+      "airpods",
+      "sony",
+      "anker",
+      "phone",
+      "audio",
+      "fast charger"
+    ],
+    "productIds": [
+      141,
+      140,
+      145,
+      142,
+      143,
+      144
+    ],
     "createdDate": "2026-09-07",
     "pin": "1234",
     "inventoryOverrides": {},
