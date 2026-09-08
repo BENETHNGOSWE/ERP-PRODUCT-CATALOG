@@ -745,6 +745,9 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 8)
         console.warn(`[Odoo] Stock quant note for ${newProductId}:`, stkErr.message);
       }
     }
+
+    // 5. Update in-memory cache
+    const formatted = {
       id: newProductId,
       name: name,
       price: price,

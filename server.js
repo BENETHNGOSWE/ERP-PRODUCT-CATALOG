@@ -1003,14 +1003,26 @@ app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
 });
 
-// Main Catalog / Storefront Route (Supports /, /index.html, /:slug)
-app.get(['/', '/index.html', '/shop', '/:slug'], (req, res) => {
+// Platform Homepage (Snippe-inspired modern high-converting platform website)
+app.get(['/', '/home', '/home.html'], (req, res) => {
+  if (req.query.store) {
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
+});
+
+// Main Catalog / Storefront Route (Supports /shop, /catalog, /:slug)
+app.get(['/shop', '/catalog', '/store', '/index.html', '/:slug'], (req, res, next) => {
+  const slug = req.params.slug;
+  if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json'))) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Fallback to Catalog
+// Fallback Route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
 // Start Express Server
