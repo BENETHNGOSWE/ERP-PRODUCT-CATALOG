@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install dependencies first for fast layer caching
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Copy source files
 COPY . .
@@ -15,9 +15,8 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV DATA_DIR=/app/data
 
-# Declare persistent data storage volume
+# Declare persistent data storage directory
 RUN mkdir -p /app/data
-VOLUME ["/app/data"]
 
 # Expose container port
 EXPOSE 3000
