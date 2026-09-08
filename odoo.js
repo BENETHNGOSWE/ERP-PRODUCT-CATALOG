@@ -595,37 +595,46 @@ async function getOdooDashboardData() {
 }
 
 // Restock Product in Odoo
-async function restockOdooProduct(productId, quantityToAdd = 25, locationId = 28) {
+async function restockOdooProduct(productId, quantityToAdd = 25, locationId = 8) {
   try {
     const prodId = Number(productId);
     const qty = Number(quantityToAdd) || 25;
 
-    const prodInfo = await callModel('product.product', 'search_read', [
-      [['id', '=', prodId]]
-    ], { fields: ['id', 'name', 'type', 'is_storable'] });
+    // 1. Ensure product template/variant has is_storable=true
+    try {
+      await callModel('product.product', 'write', [
+        [prodId],
+        { is_storable: true }
+      ]);
+    } catch (e) {}
 
-    const isConsu = prodInfo && prodInfo.length > 0 && (prodInfo[0].type === 'consu' || prodInfo[0].type === 'service');
+    // 2. Resolve internal location
+    let targetLocId = locationId;
+    try {
+      const locs = await callModel('stock.location', 'search_read', [
+        [['usage', '=', 'internal']]
+      ], { fields: ['id'], limit: 1 });
+      if (locs && locs.length > 0) targetLocId = locs[0].id;
+    } catch (e) {}
+
+    const quants = await callModel('stock.quant', 'search_read', [
+      [['product_id', '=', prodId], ['location_id', '=', targetLocId]]
+    ], {
+      fields: ['id', 'quantity', 'location_id']
+    });
+
     let newTotal = qty;
-
-    if (!isConsu) {
-      const quants = await callModel('stock.quant', 'search_read', [
-        [['product_id', '=', prodId], ['location_id.usage', '=', 'internal']]
-      ], {
-        fields: ['id', 'quantity', 'location_id']
-      });
-
-      if (quants && quants.length > 0) {
-        const qid = quants[0].id;
-        const current = quants[0].quantity || 0;
-        newTotal = current + qty;
-        await callModel('stock.quant', 'write', [[qid], { quantity: newTotal }]);
-      } else {
-        await callModel('stock.quant', 'create', [{
-          product_id: prodId,
-          location_id: locationId,
-          quantity: qty
-        }]);
-      }
+    if (quants && quants.length > 0) {
+      const qid = quants[0].id;
+      const current = quants[0].quantity || 0;
+      newTotal = current + qty;
+      await callModel('stock.quant', 'write', [[qid], { quantity: newTotal }]);
+    } else {
+      await callModel('stock.quant', 'create', [{
+        product_id: prodId,
+        location_id: targetLocId,
+        quantity: qty
+      }]);
     }
 
     // Update in-memory product cache
@@ -653,7 +662,7 @@ async function restockOdooProduct(productId, quantityToAdd = 25, locationId = 28
 /**
  * Create New Product in Odoo 18 ERP & Set Initial Stock
  */
-async function createOdooProduct(productData, initialStock = 50, locationId = 28) {
+async function createOdooProduct(productData, initialStock = 50, locationId = 8) {
   try {
     const name = productData.name || 'New Store Product';
     const price = Number(productData.price) || 1000;
@@ -693,7 +702,7 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       }
     }
 
-    // 3. Create product in product.product
+    // 3. Create product in product.product with is_storable=true so it shows in Physical Inventory
     let newProductId = null;
     try {
       const createPayload = {
@@ -701,6 +710,7 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
         list_price: price,
         default_code: barcode,
         available_in_pos: true,
+        is_storable: true,
         type: 'consu'
       };
 
@@ -720,14 +730,21 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 28
       }
 
       newProductId = await callModel('product.product', 'create', [createPayload]);
-      console.log(`[Odoo ERP] ✅ Created product "${name}" (ID: ${newProductId}) with custom image`);
+      console.log(`[Odoo ERP] ✅ Created storable product "${name}" (ID: ${newProductId}) with custom image`);
     } catch (createErr) {
       console.warn(`[Odoo Create Product Warning]:`, createErr.message);
       newProductId = Math.floor(1000 + Math.random() * 9000);
     }
 
-    // 4. Update in-memory cache
-    const formatted = {
+    // 4. Set stock in stock.quant if applicable
+    const stockUnits = Number(initialStock) || 50;
+    if (newProductId && stockUnits > 0) {
+      try {
+        await restockOdooProduct(newProductId, stockUnits, locationId);
+      } catch (stkErr) {
+        console.warn(`[Odoo] Stock quant note for ${newProductId}:`, stkErr.message);
+      }
+    }
       id: newProductId,
       name: name,
       price: price,
