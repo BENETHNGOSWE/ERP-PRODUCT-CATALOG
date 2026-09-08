@@ -454,15 +454,42 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
 
     console.log(`[Order Processing] Store "${storeContext.name}" (${storeContext.slug}) -> WhatsApp: ${storeContext.whatsapp} — Total: TZS ${finalTotal}`);
 
-    // 1. Create POS Order in Odoo ERP & Deduct Stock
-    let odooOrderResult = { odooOrderId: null, receiptNumber: `Order WEB-${Date.now()}` };
-    try {
-      odooOrderResult = await odoo.createOdooPosOrder(orderData);
-    } catch (odooErr) {
-      console.warn('[Odoo POS Order Notice]:', odooErr.message);
-      // Fallback stock deduction in memory
-      odoo.deductStock(orderData.items).catch(() => {});
-    }
+    const finalOrderId = orderData.orderId || `ORD-${Date.now().toString().slice(-4)}`;
+    const finalReceipt = `Order WEB-${finalOrderId}`;
+
+    // 1. Immediately Dispatch WhatsApp Order Notification in parallel (non-blocking)
+    const waNotificationPromise = (async () => {
+      try {
+        const res = await whatsapp.sendOrderNotification(storeContext, {
+          orderNumber: finalOrderId,
+          receiptNumber: finalReceipt,
+          customer: {
+            name: customerName,
+            phone: customerPhone,
+            deliveryAddress: deliveryAddress
+          },
+          items: orderData.items,
+          totalAmount: finalTotal
+        });
+        console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${storeContext.whatsapp}!`);
+        return res;
+      } catch (waErr) {
+        console.warn('[WhatsApp Gateway Warning]:', waErr.message);
+        return { success: false, error: waErr.message };
+      }
+    })();
+
+    // 2. Create POS Order in Odoo ERP & Deduct Stock in parallel
+    const odooOrderPromise = (async () => {
+      let odooResult = { odooOrderId: null, receiptNumber: finalReceipt };
+      try {
+        odooResult = await odoo.createOdooPosOrder(orderData);
+      } catch (odooErr) {
+        console.warn('[Odoo POS Order Notice]:', odooErr.message);
+        odoo.deductStock(orderData.items).catch(() => {});
+      }
+      return odooResult;
+    })();
 
     // Deduct stock isolated strictly for this store's inventory
     try {
@@ -471,39 +498,25 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       console.warn('[Store Stock Deduct Warning]:', deductErr.message);
     }
 
-    const finalOrderId = orderData.orderId || `ORD-${Date.now().toString().slice(-4)}`;
-    const finalReceipt = odooOrderResult.receiptNumber || `Order WEB-${finalOrderId}`;
+    // Wait for both to complete or timeout safely
+    const [waResSettled, odooResSettled] = await Promise.allSettled([
+      waNotificationPromise,
+      odooOrderPromise
+    ]);
 
-    // 2. Automatically Send WhatsApp Order Alert Directly via OpenWA in the Background
-    let waResult = null;
-    try {
-      waResult = await whatsapp.sendOrderNotification(storeContext, {
-        orderNumber: finalOrderId,
-        receiptNumber: finalReceipt,
-        customer: {
-          name: customerName,
-          phone: customerPhone,
-          deliveryAddress: deliveryAddress
-        },
-        items: orderData.items,
-        totalAmount: finalTotal
-      });
-      console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${storeContext.whatsapp}!`);
-    } catch (waErr) {
-      console.warn('[WhatsApp Gateway Warning]:', waErr.message);
-      waResult = { success: false, error: waErr.message };
-    }
+    const waResult = waResSettled.status === 'fulfilled' ? waResSettled.value : { success: false };
+    const odooOrderResult = odooResSettled.status === 'fulfilled' ? odooResSettled.value : { odooOrderId: null, receiptNumber: finalReceipt };
 
     // 3. Persist Order in Local Database (data/orders.json)
     const recorded = orders.recordOrder({
       orderId: finalOrderId,
-      odooOrderId: odooOrderResult.odooOrderId,
-      receiptNumber: finalReceipt,
-      storeId: store.id,
-      storeSlug: store.slug,
-      storeName: store.name,
-      storeWhatsapp: store.whatsapp,
-      posConfigId: store.posConfigId,
+      odooOrderId: odooOrderResult ? odooOrderResult.odooOrderId : null,
+      receiptNumber: (odooOrderResult && odooOrderResult.receiptNumber) || finalReceipt,
+      storeId: storeContext.id,
+      storeSlug: storeContext.slug,
+      storeName: storeContext.name,
+      storeWhatsapp: storeContext.whatsapp,
+      posConfigId: storeContext.posConfigId,
       customerName: customerName,
       customerPhone: customerPhone,
       deliveryAddress: deliveryAddress,
@@ -519,15 +532,15 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       success: true,
       message: 'Order created in Odoo and recorded with direct WhatsApp notification!',
       order: {
-        id: recorded.id,
-        orderId: recorded.orderId,
-        odooOrderId: recorded.odooOrderId,
-        odooOrderName: recorded.receiptNumber,
-        receiptNumber: recorded.receiptNumber,
-        storeSlug: recorded.storeSlug,
-        storeName: recorded.storeName,
-        storeWhatsapp: recorded.storeWhatsapp,
-        totalAmount: recorded.totalAmount,
+        id: recorded ? recorded.id : 1,
+        orderId: finalOrderId,
+        odooOrderId: odooOrderResult ? odooOrderResult.odooOrderId : null,
+        odooOrderName: odooOrderResult ? (odooOrderResult.orderName || odooOrderResult.receiptNumber) : finalReceipt,
+        receiptNumber: (odooOrderResult && odooOrderResult.receiptNumber) || finalReceipt,
+        storeSlug: storeContext.slug,
+        storeName: storeContext.name,
+        storeWhatsapp: storeContext.whatsapp,
+        totalAmount: finalTotal,
         whatsapp: waResult,
         waLink: waResult ? waResult.waLink : null
       }

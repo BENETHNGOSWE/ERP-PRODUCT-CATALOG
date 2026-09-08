@@ -30,11 +30,13 @@ class WhatsAppService {
       evolutionUrl: process.env.EVOLUTION_API_URL || '',
       evolutionApiKey: process.env.EVOLUTION_API_KEY || '',
       evolutionInstance: process.env.EVOLUTION_INSTANCE || 'main',
-      openwaUrl: process.env.OPENWA_API_URL || 'http://localhost:8080',
-      openwaApiKey: process.env.OPENWA_API_KEY || '',
+      openwaUrl: process.env.OPENWA_API_URL || 'https://whatsapp.kodatechnologies.co.tz',
+      openwaApiKey: process.env.OPENWA_API_KEY || 'owa_k1_1264a938030cd6d59488aeeeb60f5f13e3876549595758e3dc0abfd4e3572845',
+      openwaSession: process.env.OPENWA_SESSION || 'achete-main',
+      openwaSessionId: process.env.OPENWA_SESSION_ID || '815b1f8a-b0e5-4778-9b97-fc9adb727b6a',
       gatewayUrl: process.env.WHATSAPP_GATEWAY_URL || process.env.WHATSAPP_WEBHOOK_URL || '',
       gatewayApiKey: process.env.WHATSAPP_API_KEY || '',
-      defaultSender: process.env.WHATSAPP_DEFAULT_NUMBER || '+255712345678'
+      defaultSender: process.env.WHATSAPP_DEFAULT_NUMBER || '+255757681480'
     };
 
     this.loadConfig();

@@ -305,7 +305,7 @@
         "category": "General",
         "price": 5000000,
         "description": "Premium Flagship iPhone 18 Pro Max edition with titanium finish and maximum storage.",
-        "qty_available": 11,
+        "qty_available": 10,
         "inStock": true,
         "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">IP</text></svg>",
         "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">IP</text></svg>",
