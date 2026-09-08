@@ -392,6 +392,7 @@
       let currentCategory = 'All';
       let currentSearch = '';
       let currentSort = 'popular';
+      let isLoadingCatalog = true;
 
       function escapeHtml(str) {
         if (!str) return '';
@@ -514,6 +515,16 @@
         // 4. Handle Empty Store Inventory State
         if (filtered.length === 0) {
           if (products.length === 0) {
+            if (isLoadingCatalog) {
+              listContainer.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #64748b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; margin: 10px 0;">
+                  <div style="display:inline-block; width:36px; height:36px; border:3px solid #e2e8f0; border-top-color:#7c3aed; border-radius:50%; animation: spin 0.8s linear infinite; margin-bottom:12px;"></div>
+                  <p style="font-size:0.95rem; font-weight:600; color:#1e293b;">Loading store products...</p>
+                </div>
+              `;
+              return;
+            }
+
             const store = NOVA.getStore() || { name: 'Store', whatsapp: '+255712345678' };
             let cleanWa = String(store.whatsapp || '').replace(/[^0-9]/g, '');
             if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
@@ -921,6 +932,10 @@
       // Initial Render & Stock fetch
       renderStoreView();
       NOVA.loadOdooProducts().then(() => {
+        isLoadingCatalog = false;
+        renderStoreView();
+      }).catch(() => {
+        isLoadingCatalog = false;
         renderStoreView();
       });
     })();

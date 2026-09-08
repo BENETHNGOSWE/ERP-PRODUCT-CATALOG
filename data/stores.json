@@ -13,29 +13,18 @@
     "posConfigId": 4,
     "posConfigName": "Mangi shop",
     "categories": [
+      "All",
       "Food",
-      "Drinks",
-      "Household",
-      "Cosmetics",
-      "Electronics"
+      "Drinks"
     ],
-    "productKeywords": [
-      "coca",
-      "azam",
-      "water",
-      "nivea",
-      "soap",
-      "dettol",
-      "rice",
-      "oil",
-      "charger",
-      "flour",
-      "bread",
-      "juice"
-    ],
+    "productKeywords": [],
     "createdDate": "2026-08-15",
     "pin": "1234",
-    "productIds": [],
+    "productIds": [
+      156,
+      157,
+      158
+    ],
     "inventoryOverrides": {},
     "customProducts": []
   },
@@ -53,33 +42,20 @@
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
-      "Safety Gear",
-      "Head Protection",
-      "Eye Protection",
-      "Foot Protection",
-      "Body Protection",
-      "Respiratory Protection",
-      "Hand Protection"
+      "All",
+      "Safety Gear"
     ],
-    "productKeywords": [
-      "boot",
-      "titanstep",
-      "helmet",
-      "arcguard",
-      "glasses",
-      "clearvision",
-      "respirator",
-      "forcefield",
-      "coverall",
-      "chembarrier",
-      "harness",
-      "glove"
-    ],
+    "productKeywords": [],
     "createdDate": "2026-08-01",
     "pin": "1234",
     "inventoryOverrides": {},
     "customProducts": [],
-    "productIds": []
+    "productIds": [
+      146,
+      147,
+      148,
+      149
+    ]
   },
   {
     "id": 3,
@@ -95,25 +71,17 @@
     "posConfigId": 5,
     "posConfigName": "Min Market",
     "categories": [
-      "Office Furniture",
-      "Kitchen materials",
-      "Equipments",
-      "Electronics"
+      "All",
+      "Office Furniture"
     ],
-    "productKeywords": [
-      "desk",
-      "chair",
-      "cabinet",
-      "storage",
-      "utensils",
-      "mouse",
-      "lamp",
-      "stand",
-      "organizer"
-    ],
+    "productKeywords": [],
     "createdDate": "2026-08-20",
     "pin": "1234",
-    "productIds": [],
+    "productIds": [
+      153,
+      154,
+      155
+    ],
     "inventoryOverrides": {},
     "customProducts": []
   },
@@ -131,24 +99,18 @@
     "posConfigId": 6,
     "posConfigName": "Restaurant",
     "categories": [
+      "All",
       "Food",
-      "Drinks",
-      "BULLY Menu",
-      "GGM Menu",
-      "Northmara Menu"
+      "Drinks"
     ],
-    "productKeywords": [
-      "chicken",
-      "chips",
-      "mayai",
-      "juice",
-      "water",
-      "coca",
-      "food"
-    ],
+    "productKeywords": [],
     "createdDate": "2026-08-25",
     "pin": "1234",
-    "productIds": [],
+    "productIds": [
+      150,
+      151,
+      152
+    ],
     "inventoryOverrides": {},
     "customProducts": []
   },
@@ -166,17 +128,14 @@
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
-      "Electronics",
-      "Accessories"
+      "All",
+      "Electronics"
     ],
-    "productKeywords": [
-      "samsung",
-      "mouse",
-      "charger",
-      "stand",
-      "electronics"
+    "productKeywords": [],
+    "productIds": [
+      159,
+      160
     ],
-    "productIds": [],
     "createdDate": "2026-09-03",
     "pin": "1234",
     "inventoryOverrides": {},
@@ -196,14 +155,14 @@
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
+      "All",
       "Food"
     ],
-    "productKeywords": [
-      "rice",
-      "oil",
-      "flour"
+    "productKeywords": [],
+    "productIds": [
+      161,
+      162
     ],
-    "productIds": [],
     "createdDate": "2026-09-03",
     "pin": "1234",
     "inventoryOverrides": {},
@@ -223,10 +182,14 @@
     "posConfigId": 1,
     "posConfigName": "Website Orders",
     "categories": [
+      "All",
       "General"
     ],
     "productKeywords": [],
-    "productIds": [],
+    "productIds": [
+      163,
+      164
+    ],
     "createdDate": "2026-09-03",
     "pin": "1234",
     "inventoryOverrides": {},
@@ -248,25 +211,15 @@
     "categories": [
       "All",
       "Smartphones",
-      "Electronics",
       "Accessories",
       "Audio"
     ],
-    "productKeywords": [
-      "samsung",
-      "iphone",
-      "charger",
-      "airpods",
-      "sony",
-      "anker"
-    ],
+    "productKeywords": [],
     "productIds": [
       141,
       140,
       145,
-      142,
-      143,
-      144
+      142
     ],
     "createdDate": "2026-09-03",
     "pin": "1234",
@@ -290,20 +243,9 @@
       "All",
       "Smartphones",
       "Accessories",
-      "Audio",
-      "Electronics"
+      "Audio"
     ],
-    "productKeywords": [
-      "samsung",
-      "iphone",
-      "charger",
-      "airpods",
-      "sony",
-      "anker",
-      "phone",
-      "audio",
-      "fast charger"
-    ],
+    "productKeywords": [],
     "productIds": [
       141,
       140,

@@ -36,6 +36,7 @@ function loadOdooConfig() {
 const ODOO_CONFIG = loadOdooConfig();
 
 const DEFAULT_SEED_PRODUCTS = [
+  // --- KODA STORE & BEN STORE (Tech & Gadgets) ---
   {
     id: 141,
     name: 'Samsung Galaxy S26 Ultra',
@@ -51,8 +52,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-S26U',
     default_code: 'SKU-S26U',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store']
+    tags: ['kodastore', 'benstore'],
+    productTags: ['kodastore', 'benstore']
   },
   {
     id: 140,
@@ -69,8 +70,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-IP18PM',
     default_code: 'SKU-IP18PM',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'achete', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'achete', 'store: koda store']
+    tags: ['kodastore', 'benstore'],
+    productTags: ['kodastore', 'benstore']
   },
   {
     id: 145,
@@ -87,8 +88,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-45W-CHG',
     default_code: 'SKU-45W-CHG',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'xyzstore', 'crownshop', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'xyzstore', 'crownshop', 'store: koda store']
+    tags: ['kodastore', 'benstore'],
+    productTags: ['kodastore', 'benstore']
   },
   {
     id: 142,
@@ -105,8 +106,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-APP2',
     default_code: 'SKU-APP2',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store']
+    tags: ['kodastore', 'benstore'],
+    productTags: ['kodastore', 'benstore']
   },
   {
     id: 143,
@@ -123,8 +124,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-WH1000XM5',
     default_code: 'SKU-WH1000XM5',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'crownshop', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'crownshop', 'store: koda store']
+    tags: ['kodastore'],
+    productTags: ['kodastore']
   },
   {
     id: 144,
@@ -141,9 +142,11 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-ANKER-65W',
     default_code: 'SKU-ANKER-65W',
     type: 'consu',
-    tags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store'],
-    productTags: ['kodastore', 'benstore', 'xyzstore', 'store: koda store']
+    tags: ['kodastore'],
+    productTags: ['kodastore']
   },
+
+  // --- ACHETE (Industrial Safety Gear & PPE) ---
   {
     id: 146,
     name: 'ArcGuard Pro Safety Helmet',
@@ -159,8 +162,8 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-ARCGUARD',
     default_code: 'SKU-ARCGUARD',
     type: 'consu',
-    tags: ['achete', 'store: achete'],
-    productTags: ['achete', 'store: achete']
+    tags: ['achete'],
+    productTags: ['achete']
   },
   {
     id: 147,
@@ -177,8 +180,326 @@ const DEFAULT_SEED_PRODUCTS = [
     barcode: 'SKU-TITANSTEP',
     default_code: 'SKU-TITANSTEP',
     type: 'consu',
-    tags: ['achete', 'store: achete'],
-    productTags: ['achete', 'store: achete']
+    tags: ['achete'],
+    productTags: ['achete']
+  },
+  {
+    id: 148,
+    name: 'ClearVision Anti-Fog Safety Glasses',
+    category: 'Safety Gear',
+    price: 18000,
+    description: 'Scratch-resistant wrap-around UV protective industrial safety goggles.',
+    rating: 4.8,
+    reviews: 26,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230284c7"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">CV</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230284c7"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">CV</text></svg>',
+    qty_available: 45,
+    inStock: true,
+    barcode: 'SKU-CLEARVISION',
+    default_code: 'SKU-CLEARVISION',
+    type: 'consu',
+    tags: ['achete'],
+    productTags: ['achete']
+  },
+  {
+    id: 149,
+    name: 'ForceField Chemical Coverall Heavy Duty',
+    category: 'Safety Gear',
+    price: 85000,
+    description: 'Liquid and particulate resistant hazardous environment protection overall suit.',
+    rating: 4.9,
+    reviews: 17,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%237c3aed"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">FF</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%237c3aed"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">FF</text></svg>',
+    qty_available: 28,
+    inStock: true,
+    barcode: 'SKU-FORCEFIELD',
+    default_code: 'SKU-FORCEFIELD',
+    type: 'consu',
+    tags: ['achete'],
+    productTags: ['achete']
+  },
+
+  // --- SAFARI DINER & CAFE (Food & Drinks) ---
+  {
+    id: 150,
+    name: 'Chef Grilled Half Chicken & Chips',
+    category: 'Food',
+    price: 18000,
+    description: 'Tender marinated flame-grilled half chicken served with crispy seasoned fries and salad.',
+    rating: 4.9,
+    reviews: 74,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23d97706"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🍗</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23d97706"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🍗</text></svg>',
+    qty_available: 30,
+    inStock: true,
+    barcode: 'SKU-CHICKEN-CHIPS',
+    default_code: 'SKU-CHICKEN-CHIPS',
+    type: 'consu',
+    tags: ['safaridiner'],
+    productTags: ['safaridiner']
+  },
+  {
+    id: 151,
+    name: 'Serengeti BBQ Beef Ribs Combo',
+    category: 'Food',
+    price: 24000,
+    description: 'Slow-smoked juicy beef ribs glazed in homemade Serengeti BBQ sauce with chips.',
+    rating: 5.0,
+    reviews: 58,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23dc2626"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥩</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23dc2626"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥩</text></svg>',
+    qty_available: 20,
+    inStock: true,
+    barcode: 'SKU-BBQ-RIBS',
+    default_code: 'SKU-BBQ-RIBS',
+    type: 'consu',
+    tags: ['safaridiner'],
+    productTags: ['safaridiner']
+  },
+  {
+    id: 152,
+    name: 'Fresh Passion & Pineapple Juice 500ml',
+    category: 'Drinks',
+    price: 5000,
+    description: '100% pure cold-pressed tropical fruit juice freshly prepared daily with no added sugar.',
+    rating: 4.8,
+    reviews: 63,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥤</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥤</text></svg>',
+    qty_available: 45,
+    inStock: true,
+    barcode: 'SKU-JUICE-PASSION',
+    default_code: 'SKU-JUICE-PASSION',
+    type: 'consu',
+    tags: ['safaridiner'],
+    productTags: ['safaridiner']
+  },
+
+  // --- CROWN SHOP (Office Furniture & Interior) ---
+  {
+    id: 153,
+    name: 'Executive Ergonomic Mesh Office Chair',
+    category: 'Office Furniture',
+    price: 380000,
+    description: 'Breathable lumbar-supported executive office desk chair with 3D adjustable armrests.',
+    rating: 4.9,
+    reviews: 33,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%237c3aed"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🪑</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%237c3aed"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🪑</text></svg>',
+    qty_available: 15,
+    inStock: true,
+    barcode: 'SKU-CHAIR-ERGO',
+    default_code: 'SKU-CHAIR-ERGO',
+    type: 'consu',
+    tags: ['crownshop'],
+    productTags: ['crownshop']
+  },
+  {
+    id: 154,
+    name: 'Height Adjustable Standing Desk 140cm',
+    category: 'Office Furniture',
+    price: 750000,
+    description: 'Dual-motor electric motorized sit-stand executive office desk with memory presets.',
+    rating: 5.0,
+    reviews: 21,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23081735"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🖥️</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23081735"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🖥️</text></svg>',
+    qty_available: 10,
+    inStock: true,
+    barcode: 'SKU-DESK-STAND',
+    default_code: 'SKU-DESK-STAND',
+    type: 'consu',
+    tags: ['crownshop'],
+    productTags: ['crownshop']
+  },
+  {
+    id: 155,
+    name: 'Steel 3-Drawer Locking File Cabinet',
+    category: 'Office Furniture',
+    price: 260000,
+    description: 'Heavy gauge powder-coated anti-tilt steel office storage cabinet with master key lock.',
+    rating: 4.8,
+    reviews: 19,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🗄️</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🗄️</text></svg>',
+    qty_available: 18,
+    inStock: true,
+    barcode: 'SKU-CABINET-3D',
+    default_code: 'SKU-CABINET-3D',
+    type: 'consu',
+    tags: ['crownshop'],
+    productTags: ['crownshop']
+  },
+
+  // --- ABC STORE (Groceries & Essentials) ---
+  {
+    id: 156,
+    name: 'Kilombero Super Aromatic Rice 5kg',
+    category: 'Food',
+    price: 17500,
+    description: 'Premium Grade-A polished aromatic Tanzanian long grain rice for everyday family cooking.',
+    rating: 4.9,
+    reviews: 80,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌾</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌾</text></svg>',
+    qty_available: 60,
+    inStock: true,
+    barcode: 'SKU-RICE-5KG',
+    default_code: 'SKU-RICE-5KG',
+    type: 'consu',
+    tags: ['abcstore'],
+    productTags: ['abcstore']
+  },
+  {
+    id: 157,
+    name: 'Sunflower Pure Cooking Oil 2L',
+    category: 'Food',
+    price: 13500,
+    description: 'Refined 100% natural pure sunflower cooking oil enriched with Vitamin A & D.',
+    rating: 4.8,
+    reviews: 65,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23d97706"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌻</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23d97706"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌻</text></svg>',
+    qty_available: 40,
+    inStock: true,
+    barcode: 'SKU-OIL-2L',
+    default_code: 'SKU-OIL-2L',
+    type: 'consu',
+    tags: ['abcstore'],
+    productTags: ['abcstore']
+  },
+  {
+    id: 158,
+    name: 'Coca-Cola Chilled Bottle 500ml',
+    category: 'Drinks',
+    price: 1500,
+    description: 'Original refreshing classic Coca-Cola served perfectly chilled.',
+    rating: 4.9,
+    reviews: 110,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23dc2626"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥤</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23dc2626"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🥤</text></svg>',
+    qty_available: 120,
+    inStock: true,
+    barcode: 'SKU-COCA-500ML',
+    default_code: 'SKU-COCA-500ML',
+    type: 'consu',
+    tags: ['abcstore'],
+    productTags: ['abcstore']
+  },
+
+  // --- XYZ ELECTRONICS ---
+  {
+    id: 159,
+    name: 'Logitech MX Master 3S Wireless Mouse',
+    category: 'Electronics',
+    price: 320000,
+    description: 'Quiet click performance ergonomic wireless mouse with 8K DPI sensor and MagSpeed wheel.',
+    rating: 5.0,
+    reviews: 28,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🖱️</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🖱️</text></svg>',
+    qty_available: 16,
+    inStock: true,
+    barcode: 'SKU-MX-MASTER-3S',
+    default_code: 'SKU-MX-MASTER-3S',
+    type: 'consu',
+    tags: ['xyzstore'],
+    productTags: ['xyzstore']
+  },
+  {
+    id: 160,
+    name: '100W GaN USB-C Multi-Port Fast Charger',
+    category: 'Electronics',
+    price: 110000,
+    description: 'Compact 4-port GaN high power desktop fast charger for MacBooks, iPads, and phones.',
+    rating: 4.8,
+    reviews: 35,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23081735"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">⚡</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23081735"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">⚡</text></svg>',
+    qty_available: 24,
+    inStock: true,
+    barcode: 'SKU-100W-GAN',
+    default_code: 'SKU-100W-GAN',
+    type: 'consu',
+    tags: ['xyzstore'],
+    productTags: ['xyzstore']
+  },
+
+  // --- KARIAKOO SPICES ---
+  {
+    id: 161,
+    name: 'Pure Zanzibar Organic Cloves 250g',
+    category: 'Food',
+    price: 12000,
+    description: 'Hand-picked dried aromatic organic whole cloves from the spice islands of Zanzibar.',
+    rating: 4.9,
+    reviews: 44,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌿</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌿</text></svg>',
+    qty_available: 50,
+    inStock: true,
+    barcode: 'SKU-CLOVES-250G',
+    default_code: 'SKU-CLOVES-250G',
+    type: 'consu',
+    tags: ['kariakoospices'],
+    productTags: ['kariakoospices']
+  },
+  {
+    id: 162,
+    name: 'Grade-A Whole Cardamom Pods 100g',
+    category: 'Food',
+    price: 15000,
+    description: 'Intense aromatic green whole cardamom pods for traditional chai and pilau seasoning.',
+    rating: 5.0,
+    reviews: 36,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌱</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23059669"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🌱</text></svg>',
+    qty_available: 35,
+    inStock: true,
+    barcode: 'SKU-CARDAMOM-100G',
+    default_code: 'SKU-CARDAMOM-100G',
+    type: 'consu',
+    tags: ['kariakoospices'],
+    productTags: ['kariakoospices']
+  },
+
+  // --- TANZANITE FASHION ---
+  {
+    id: 163,
+    name: 'Premium Tanzanite Silk Scarf',
+    category: 'General',
+    price: 45000,
+    description: 'Luxurious handmade pure silk printed scarf with vibrant Tanzanian gemstone motifs.',
+    rating: 4.9,
+    reviews: 22,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23ec4899"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🧣</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23ec4899"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">🧣</text></svg>',
+    qty_available: 20,
+    inStock: true,
+    barcode: 'SKU-SILK-SCARF',
+    default_code: 'SKU-SILK-SCARF',
+    type: 'consu',
+    tags: ['tanzanitefashion'],
+    productTags: ['tanzanitefashion']
+  },
+  {
+    id: 164,
+    name: 'African Print Kitenge Maxi Dress',
+    category: 'General',
+    price: 85000,
+    description: 'Custom tailored elegant 100% cotton wax print Kitenge maxi dress with matching belt.',
+    rating: 5.0,
+    reviews: 31,
+    image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23ec4899"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">👗</text></svg>',
+    thumb: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="%23ec4899"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">👗</text></svg>',
+    qty_available: 15,
+    inStock: true,
+    barcode: 'SKU-KITENGE-MAXI',
+    default_code: 'SKU-KITENGE-MAXI',
+    type: 'consu',
+    tags: ['tanzanitefashion'],
+    productTags: ['tanzanitefashion']
   }
 ];
 

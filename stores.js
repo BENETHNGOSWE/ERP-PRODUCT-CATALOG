@@ -319,10 +319,10 @@ class StoreManager {
 
   /**
    * Filter and resolve products strictly for this Client Store with isolated stock & pricing
-   * Enforces multi-client catalog separation, custom store stock, and store price overrides.
+   * Enforces strict multi-client catalog separation, custom store stock, and store price overrides.
    */
   filterProductsForStore(allProducts = [], store) {
-    if (!store) return allProducts;
+    if (!store) return [];
 
     const isMasterStore = store.slug === 'achete' || store.slug === 'novamart' || !store.id;
     const storeSlug = (store.slug || '').toLowerCase();
@@ -332,7 +332,7 @@ class StoreManager {
     // 1. Tag-Based Matching (Odoo Product Tags from bulk import / Odoo product form)
     const taggedProducts = (allProducts || []).filter(p => {
       const tags = (p.productTags || p.tags || []).map(t => String(t).toLowerCase());
-      return tags.some(t => t === storeSlug || t === `store: ${storeName}` || t === `store: ${storeSlug}` || t.includes(storeSlug));
+      return tags.some(t => t === storeSlug || t === `store: ${storeName}` || t === `store: ${storeSlug}`);
     });
 
     if (taggedProducts.length > 0) {
@@ -350,14 +350,13 @@ class StoreManager {
       });
     }
 
-    // 3. Keyword-Based Matching (store.productKeywords)
-    if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
+    // 3. Keyword-Based Matching (store.productKeywords) only if no explicit IDs or tags
+    if (matched.length === 0 && Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
       const keywords = store.productKeywords.map(k => String(k).toLowerCase());
       const byKeywords = (allProducts || []).filter(p => {
         const pName = (p.name || '').toLowerCase();
         const pCat = (p.category || '').toLowerCase();
-        const pDesc = (p.description || '').toLowerCase();
-        return keywords.some(k => pName.includes(k) || pCat.includes(k) || pDesc.includes(k));
+        return keywords.some(k => pName.includes(k) || pCat.includes(k));
       });
       byKeywords.forEach(p => {
         if (!matched.some(m => Number(m.id) === Number(p.id))) {
@@ -366,17 +365,9 @@ class StoreManager {
       });
     }
 
-    // 4. Fallback: If no tags, explicit IDs, or keywords matched, match by store categories or master list
-    if (matched.length === 0) {
-      if (store.categories && store.categories.length > 0 && !store.categories.includes('All')) {
-        const byCat = (allProducts || []).filter(p => store.categories.includes(p.category));
-        if (byCat.length > 0) {
-          matched = byCat.map(p => ({ ...p }));
-        }
-      }
-      if (matched.length === 0) {
-        matched = (allProducts || []).map(p => ({ ...p }));
-      }
+    // 4. Master store fallback ONLY (Achete platform)
+    if (matched.length === 0 && isMasterStore) {
+      matched = (allProducts || []).map(p => ({ ...p }));
     }
 
     // 5. Merge store's custom created products
