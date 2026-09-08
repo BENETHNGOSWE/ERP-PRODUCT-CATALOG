@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ACHETE.ME — Executive Admin Dashboard (Live Odoo 18 Sync)</title>
+  <title>Achete Dashboard — Store Management & Live Odoo ERP Sync</title>
   <link rel="icon" type="image/png" href="/assets/products/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,11 +19,15 @@
     }
 
     :root {
-      --primary: #0047bb;
-      --primary-hover: #00368f;
-      --primary-light: #eff6ff;
-      --navy-dark: #081735;
-      --text-main: #1e293b;
+      --primary: #7c3aed;
+      --primary-hover: #6d28d9;
+      --primary-light: #f5f3ff;
+      --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+      --primary-glow: rgba(124, 58, 237, 0.28);
+      --navy-dark: #0B152C;
+      --brand-navy: #0B152C;
+      --brand-navy-light: #162447;
+      --text-main: #0B152C;
       --text-muted: #64748b;
       --text-light: #94a3b8;
       --bg-page: #f8fafc;
@@ -168,8 +172,8 @@
     }
 
     .dash-nav-item.active {
-      background: #eff6ff;
-      color: #0047bb;
+      background: var(--primary-light);
+      color: var(--primary);
       font-weight: 700;
     }
 
