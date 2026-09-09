@@ -46,7 +46,7 @@ const NOVA = (function () {
   let activeStore = {
     name: 'KODA STORE',
     slug: currentSlug || 'kodastore',
-    logo: 'assets/products/logo.png',
+    logo: '/assets/products/logo.png',
     tagline: 'Official Store | Fast Delivery in Dar es Salaam',
     address: 'Masaki, Dar es Salaam',
     whatsapp: '+255710459064'

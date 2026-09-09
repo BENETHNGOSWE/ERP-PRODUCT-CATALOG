@@ -365,12 +365,7 @@ class StoreManager {
       });
     }
 
-    // 4. Master store fallback ONLY (Achete platform)
-    if (matched.length === 0 && isMasterStore) {
-      matched = (allProducts || []).map(p => ({ ...p }));
-    }
-
-    // 5. Merge store's custom created products
+    // 4. Merge store's custom created products
     if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
       store.customProducts.forEach(cp => {
         if (!matched.some(p => Number(p.id) === Number(cp.id))) {
@@ -552,11 +547,15 @@ class StoreManager {
       }
 
       // 2. Check or initialize inventoryOverrides
-      const existing = store.inventoryOverrides[pIdStr] || { qty_available: 0 };
-      const current = Number(existing.qty_available || 0);
+      const existing = store.inventoryOverrides[pIdStr];
+      const baseQty = existing && existing.qty_available !== undefined
+        ? Number(existing.qty_available)
+        : Number(item.qty_available !== undefined ? item.qty_available : (item.stock || 50));
+      const finalQty = Math.max(0, baseQty - qtyToDeduct);
+
       store.inventoryOverrides[pIdStr] = {
-        ...existing,
-        qty_available: Math.max(0, current - qtyToDeduct),
+        ...(existing || {}),
+        qty_available: finalQty,
         updatedAt: new Date().toISOString()
       };
     });

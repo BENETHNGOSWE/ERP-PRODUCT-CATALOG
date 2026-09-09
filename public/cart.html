@@ -270,7 +270,7 @@
           tableHtml += `
             <tr data-id="${p.id}">
               <td class="cart-product-cell">
-                <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb">
+                <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb" onerror="this.onerror=null; this.src='/assets/products/samsung_charger.png'">
                 <div class="cart-item-meta">
                   <span class="cart-item-name">${p.name}</span>
                   <span class="cart-item-unit-price">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a; font-weight:600;">${stock} in stock</span></span>
@@ -307,7 +307,7 @@
 
           mobileHtml += `
             <div class="m-cart-card" data-id="${p.id}">
-              <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb">
+              <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb" onerror="this.onerror=null; this.src='/assets/products/samsung_charger.png'">
               <div style="flex:1;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                   <div>

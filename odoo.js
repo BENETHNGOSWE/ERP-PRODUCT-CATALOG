@@ -525,8 +525,8 @@ const modelsClient = xmlrpc.createSecureClient({
   path: '/xmlrpc/2/object'
 });
 
-// Authenticate with Odoo with 4-second timeout
-function authenticate(timeoutMs = 4000) {
+// Authenticate with Odoo with 12-second timeout
+function authenticate(timeoutMs = 12000) {
   return new Promise((resolve, reject) => {
     if (authUid) return resolve(authUid);
     const timer = setTimeout(() => {
@@ -548,7 +548,7 @@ function authenticate(timeoutMs = 4000) {
 }
 
 // Call Odoo Model Method with timeout protection
-function callModel(model, method, args, kwargs = {}, timeoutMs = 4000) {
+function callModel(model, method, args, kwargs = {}, timeoutMs = 12000) {
   return authenticate(timeoutMs).then(uid => {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -815,33 +815,30 @@ async function deductStock(items, locationId = 28) {
         continue;
       }
 
-      const prodInfo = await callModel('product.product', 'search_read', [
-        [['id', '=', prodId]]
-      ], { fields: ['id', 'name', 'type', 'is_storable'] });
+      // Deduct warehouse stock quant if it exists in Odoo
+      try {
+        const quants = await callModel('stock.quant', 'search_read', [
+          [['product_id', '=', prodId], ['location_id.usage', '=', 'internal']]
+        ], {
+          fields: ['id', 'quantity', 'location_id'],
+          limit: 1
+        });
 
-      const isConsu = prodInfo && prodInfo.length > 0 && (prodInfo[0].type === 'consu' || prodInfo[0].type === 'service');
-      if (isConsu) {
-        console.log(`[Stock Deduct] Product ${prodId} (${item.name}) is type=${prodInfo[0].type}; quants not required.`);
-        results.push({ productId: prodId, newQuantity: 999, skipped: true });
-        continue;
-      }
-
-      const quants = await callModel('stock.quant', 'search_read', [
-        [['product_id', '=', prodId], ['location_id.usage', '=', 'internal']]
-      ], {
-        fields: ['id', 'quantity', 'location_id'],
-        limit: 1
-      });
-
-      if (quants && quants.length > 0) {
-        const quant = quants[0];
-        const currentQty = quant.quantity || 0;
-        const newQty = Math.max(0, currentQty - itemQty);
-        await callModel('stock.quant', 'write', [
-          [quant.id],
-          { quantity: newQty }
-        ]);
-        results.push({ productId: prodId, newQuantity: newQty });
+        if (quants && quants.length > 0) {
+          const quant = quants[0];
+          const currentQty = quant.quantity || 0;
+          const newQty = Math.max(0, currentQty - itemQty);
+          await callModel('stock.quant', 'write', [
+            [quant.id],
+            { quantity: newQty }
+          ]);
+          console.log(`[Stock Quant Deduct] ✅ Deducted ${itemQty} units of product ${prodId} (${item.name}) from ${currentQty} to ${newQty}`);
+          results.push({ productId: prodId, newQuantity: newQty });
+        } else {
+          results.push({ productId: prodId, newQuantity: cached ? cached.qty_available : 0 });
+        }
+      } catch (quantErr) {
+        console.warn(`[Stock Quant Deduct Notice for ${prodId}]:`, quantErr.message);
       }
     }
 

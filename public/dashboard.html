@@ -3053,7 +3053,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       container.innerHTML = topSelling.map(item => `
         <div class="top-product-item">
           <div class="top-product-left">
-            <img src="${item.image || 'assets/products/coca_cola.png'}" alt="${item.name}" class="top-product-img" onerror="this.src='assets/products/coca_cola.png'">
+            <img src="${item.image || '/assets/products/coca_cola.png'}" alt="${item.name}" class="top-product-img" onerror="this.src='/assets/products/coca_cola.png'">
             <div style="display:flex; flex-direction:column; min-width:0;">
               <span class="top-product-name" title="${item.name}">${item.name}</span>
               <span style="font-size:0.72rem; color:#64748b;">${formatTZS(item.revenue)}</span>
@@ -3122,7 +3122,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           <td>${idx + 1}</td>
           <td>
             <div class="table-prod-cell">
-              <img src="${prod.image || 'assets/products/samsung_charger.png'}" alt="" class="table-prod-img" onerror="this.src='assets/products/samsung_charger.png'">
+              <img src="${prod.image || '/assets/products/samsung_charger.png'}" alt="" class="table-prod-img" onerror="this.src='/assets/products/samsung_charger.png'">
               <div class="table-prod-info">
                 <span class="table-prod-name">${prod.name}</span>
                 <span class="table-prod-sku">SKU: ${prod.sku}</span>

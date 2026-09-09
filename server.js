@@ -503,6 +503,10 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     const finalOrderId = orderData.orderId || `ORD-${Date.now().toString().slice(-4)}`;
     const finalReceipt = `Order WEB-${finalOrderId}`;
 
+    orderData.orderId = finalOrderId;
+    orderData.orderNumber = finalOrderId;
+    orderData.receiptNumber = finalReceipt;
+
     // 1. Immediately Dispatch WhatsApp Order Notification in parallel (non-blocking)
     const waNotificationPromise = (async () => {
       try {

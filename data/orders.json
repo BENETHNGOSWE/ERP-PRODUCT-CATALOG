@@ -1,5 +1,77 @@
 [
   {
+    "id": 5,
+    "orderId": "ORD-5627",
+    "odooOrderId": 16,
+    "odooOrderName": "Order WEB-ORD-5627",
+    "receiptNumber": "Order WEB-ORD-5627",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Emmanuel Test Customer",
+      "phone": "+255710459064",
+      "deliveryAddress": "Masaki, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 146,
+        "name": "final product test",
+        "price": 34000,
+        "qty": 2,
+        "subtotal": 68000
+      }
+    ],
+    "itemCount": 2,
+    "subtotal": 68000,
+    "discount": 0,
+    "totalAmount": 68000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": null,
+    "createdAt": "2026-09-09T10:18:31.390Z",
+    "dateFormatted": "9 Sept 2026, 10:18"
+  },
+  {
+    "id": 4,
+    "orderId": "ORD-0072",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-ORD-0072",
+    "receiptNumber": "Order WEB-ORD-0072",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Emmanuel Test Customer",
+      "phone": "+255710459064",
+      "deliveryAddress": "Masaki, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 146,
+        "name": "final product test",
+        "price": 34000,
+        "qty": 2,
+        "subtotal": 68000
+      }
+    ],
+    "itemCount": 2,
+    "subtotal": 68000,
+    "discount": 0,
+    "totalAmount": 68000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Sent",
+    "waLink": null,
+    "createdAt": "2026-09-09T10:17:08.933Z",
+    "dateFormatted": "9 Sept 2026, 10:17"
+  },
+  {
     "id": 3,
     "orderId": "ORD-7305",
     "odooOrderId": 12,

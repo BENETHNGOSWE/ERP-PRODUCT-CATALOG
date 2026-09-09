@@ -13,8 +13,8 @@
       name: 'Coca-Cola 500ml',
       price: 1000,
       category: 'Drinks',
-      image: 'assets/products/coca_cola.png',
-      thumb: 'assets/products/coca_thumb.png',
+      image: '/assets/products/coca_cola.png',
+      thumb: '/assets/products/coca_thumb.png',
       popularity: 100
     },
     {
@@ -22,8 +22,8 @@
       name: 'Azam Juice 500ml',
       price: 1500,
       category: 'Drinks',
-      image: 'assets/products/azam_juice.png',
-      thumb: 'assets/products/azam_thumb.png',
+      image: '/assets/products/azam_juice.png',
+      thumb: '/assets/products/azam_thumb.png',
       popularity: 95
     },
     {
@@ -31,8 +31,8 @@
       name: 'Mineral Water 500ml',
       price: 700,
       category: 'Drinks',
-      image: 'assets/products/mineral_water.png',
-      thumb: 'assets/products/mineral_water.png',
+      image: '/assets/products/mineral_water.png',
+      thumb: '/assets/products/mineral_water.png',
       popularity: 90
     },
     {
@@ -40,8 +40,8 @@
       name: 'Nivea Body Lotion',
       price: 12000,
       category: 'Cosmetics',
-      image: 'assets/products/nivea_lotion.png',
-      thumb: 'assets/products/nivea_thumb.png',
+      image: '/assets/products/nivea_lotion.png',
+      thumb: '/assets/products/nivea_thumb.png',
       popularity: 88
     },
     {
@@ -49,8 +49,8 @@
       name: 'Samsung Charger',
       price: 25000,
       category: 'Electronics',
-      image: 'assets/products/samsung_charger.png',
-      thumb: 'assets/products/samsung_charger.png',
+      image: '/assets/products/samsung_charger.png',
+      thumb: '/assets/products/samsung_charger.png',
       popularity: 82
     },
     {
@@ -58,8 +58,8 @@
       name: 'MWANZA RICE 1kg',
       price: 3500,
       category: 'Food',
-      image: 'assets/products/mwanza_rice.png',
-      thumb: 'assets/products/mwanza_rice.png',
+      image: '/assets/products/mwanza_rice.png',
+      thumb: '/assets/products/mwanza_rice.png',
       popularity: 85
     },
     {
@@ -67,8 +67,8 @@
       name: 'Korie Cooking Oil 1L',
       price: 5500,
       category: 'Food',
-      image: 'assets/products/cooking_oil.png',
-      thumb: 'assets/products/cooking_oil.png',
+      image: '/assets/products/cooking_oil.png',
+      thumb: '/assets/products/cooking_oil.png',
       popularity: 80
     },
     {
@@ -76,8 +76,8 @@
       name: 'Azam Wheat Flour 2kg',
       price: 3200,
       category: 'Food',
-      image: 'assets/products/azam_flour.png',
-      thumb: 'assets/products/azam_flour.png',
+      image: '/assets/products/azam_flour.png',
+      thumb: '/assets/products/azam_flour.png',
       popularity: 78
     },
     {
@@ -85,8 +85,8 @@
       name: 'Dettol Original Soap',
       price: 2500,
       category: 'Cosmetics',
-      image: 'assets/products/dettol_soap.png',
-      thumb: 'assets/products/dettol_soap.png',
+      image: '/assets/products/dettol_soap.png',
+      thumb: '/assets/products/dettol_soap.png',
       popularity: 75
     },
     {
@@ -94,8 +94,8 @@
       name: 'Asas Fresh Milk 1L',
       price: 2800,
       category: 'Drinks',
-      image: 'assets/products/fresh_milk.png',
-      thumb: 'assets/products/fresh_milk.png',
+      image: '/assets/products/fresh_milk.png',
+      thumb: '/assets/products/fresh_milk.png',
       popularity: 86
     },
     {
@@ -103,8 +103,8 @@
       name: 'Oraimo FreePods 4',
       price: 45000,
       category: 'Electronics',
-      image: 'assets/products/oraimo_earbuds.png',
-      thumb: 'assets/products/oraimo_earbuds.png',
+      image: '/assets/products/oraimo_earbuds.png',
+      thumb: '/assets/products/oraimo_earbuds.png',
       popularity: 70
     },
     {
@@ -112,8 +112,8 @@
       name: 'Sunlight Washing Powder 1kg',
       price: 4500,
       category: 'Household',
-      image: 'assets/products/sunlight_detergent.png',
-      thumb: 'assets/products/sunlight_detergent.png',
+      image: '/assets/products/sunlight_detergent.png',
+      thumb: '/assets/products/sunlight_detergent.png',
       popularity: 74
     }
   ];
