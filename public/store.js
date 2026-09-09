@@ -33,7 +33,7 @@ const NOVA = (function () {
     // 3. Saved store slug from previous navigation
     try {
       const saved = localStorage.getItem('achete_active_store_slug');
-      if (saved && saved !== 'undefined' && saved !== 'null' && saved !== 'achete' && saved !== 'novamart') {
+      if (saved && saved !== 'undefined' && saved !== 'null' && saved !== 'achete') {
         return saved;
       }
     } catch (e) {}
@@ -46,7 +46,7 @@ const NOVA = (function () {
   let activeStore = {
     name: 'KODA STORE',
     slug: currentSlug || 'kodastore',
-    logo: '/assets/products/logo.png',
+    logo: '/assets/achete-icon.svg',
     tagline: 'Official Store | Fast Delivery in Dar es Salaam',
     address: 'Masaki, Dar es Salaam',
     whatsapp: '+255710459064'
@@ -164,7 +164,7 @@ const NOVA = (function () {
 
   // Rewrite all internal links to preserve store context
   function rewriteStoreLinks() {
-    const isCustomSlug = currentSlug && currentSlug !== 'achete' && currentSlug !== 'novamart' && currentSlug !== 'shop';
+    const isCustomSlug = currentSlug && currentSlug !== 'achete' && currentSlug !== 'shop';
     const storePrefix = isCustomSlug ? `/${currentSlug}` : '';
     const queryParam = isCustomSlug ? `?store=${currentSlug}` : '';
 
