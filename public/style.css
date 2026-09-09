@@ -387,39 +387,65 @@ img {
 }
 
 /* ==========================================================================
-   TOP STOREFRONT SIGNBOARD BANNER (Flush Full-Device Width)
+   TOP STOREFRONT SIGNBOARD BANNER (Responsive Mobile & Laptop Proportions)
+   Standard Universal Dimension: 1200 x 400 px (3:1 / 16:5 Ratio)
    ========================================================================== */
 .store-top-banner {
   width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  background: #0f172a;
   position: relative;
   overflow: hidden;
   line-height: 0;
+  box-sizing: border-box;
 }
 
 .store-banner-wrapper {
   width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
   position: relative;
+  overflow: hidden;
+  background: #0f172a;
 }
 
 .store-banner-img {
   width: 100%;
-  height: clamp(100px, 28vw, 190px);
+  height: auto;
+  aspect-ratio: 16 / 5.2;
+  max-height: 160px;
+  min-height: 90px;
   object-fit: cover;
   object-position: center;
   display: block;
   border: none;
 }
 
-@media (min-width: 1024px) {
+/* Laptop & Desktop High-Resolution Screen Layout */
+@media (min-width: 769px) {
+  .store-top-banner {
+    max-width: 1440px;
+    margin: 14px auto 0;
+    padding: 0 20px;
+  }
+  .store-banner-wrapper {
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(116, 51, 223, 0.08);
+    border: 1px solid rgba(237, 233, 254, 0.8);
+  }
   .store-banner-img {
-    height: 220px;
+    aspect-ratio: 16 / 4.4;
+    max-height: 270px;
+    min-height: 180px;
+  }
+}
+
+/* Mobile Screen Layout (Full Edge-to-Edge Bleed) */
+@media (max-width: 768px) {
+  .store-top-banner {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    border-radius: 0;
+  }
+  .store-banner-wrapper {
+    border-radius: 0;
   }
 }
 
