@@ -255,15 +255,31 @@ app.post(['/api/:slug/stock/receive', '/api/stores/:slug/stock/receive'], async 
     const { productId, addQty, price, name } = req.body;
     if (!productId) return res.status(400).json({ success: false, error: 'Product ID is required' });
 
+    const qtyToAdd = Number(addQty) || 0;
+    let odooUpdated = null;
+
+    // 1. If it is an Odoo product, increment physical stock in Odoo ERP WH/Stock directly
+    try {
+      if (qtyToAdd > 0) {
+        odooUpdated = await odoo.restockOdooProduct(productId, qtyToAdd);
+      }
+    } catch (odooErr) {
+      console.warn(`[Odoo Restock Warning for ${productId}]:`, odooErr.message);
+    }
+
+    // 2. Update store manager record
     const result = stores.updateStoreProductStock(slug, productId, {
-      addQty: Number(addQty) || 0,
+      addQty: qtyToAdd,
+      newQty: odooUpdated ? odooUpdated.newStock : undefined,
       price: price !== undefined ? Number(price) : undefined,
       name
     });
 
     res.json({
       success: true,
-      message: `Successfully received +${addQty} stock units for store!`,
+      message: `Successfully received +${qtyToAdd} stock units for store!`,
+      odooSync: Boolean(odooUpdated),
+      newStock: odooUpdated ? odooUpdated.newStock : undefined,
       ...result
     });
   } catch (err) {
@@ -278,6 +294,15 @@ app.post(['/api/:slug/stock/update', '/api/stores/:slug/stock/update'], async (r
     const { productId, newQty, price, name } = req.body;
     if (!productId) return res.status(400).json({ success: false, error: 'Product ID is required' });
 
+    let odooUpdated = null;
+    if (newQty !== undefined && newQty !== null && !isNaN(Number(newQty))) {
+      try {
+        odooUpdated = await odoo.setOdooProductStock(productId, Number(newQty));
+      } catch (odooErr) {
+        console.warn(`[Odoo Set Stock Warning for ${productId}]:`, odooErr.message);
+      }
+    }
+
     const result = stores.updateStoreProductStock(slug, productId, {
       newQty: newQty !== undefined ? Number(newQty) : undefined,
       price: price !== undefined ? Number(price) : undefined,
@@ -287,6 +312,8 @@ app.post(['/api/:slug/stock/update', '/api/stores/:slug/stock/update'], async (r
     res.json({
       success: true,
       message: 'Store stock & price updated successfully!',
+      odooSync: Boolean(odooUpdated),
+      newStock: odooUpdated ? odooUpdated.newStock : undefined,
       ...result
     });
   } catch (err) {
@@ -305,6 +332,16 @@ app.post(['/api/:slug/stock/batch-receive', '/api/stores/:slug/stock/batch-recei
 
     for (const item of items) {
       if (item.productId) {
+        if (item.addQty && Number(item.addQty) > 0) {
+          try {
+            await odoo.restockOdooProduct(item.productId, Number(item.addQty));
+          } catch (e) {}
+        } else if (item.newQty !== undefined && !isNaN(Number(item.newQty))) {
+          try {
+            await odoo.setOdooProductStock(item.productId, Number(item.newQty));
+          } catch (e) {}
+        }
+
         stores.updateStoreProductStock(slug, item.productId, {
           addQty: item.addQty !== undefined ? Number(item.addQty) : undefined,
           newQty: item.newQty !== undefined ? Number(item.newQty) : undefined,
@@ -315,7 +352,7 @@ app.post(['/api/:slug/stock/batch-receive', '/api/stores/:slug/stock/batch-recei
 
     res.json({
       success: true,
-      message: `Updated stock levels for ${items.length} items in store!`
+      message: `Updated stock levels for ${items.length} items in store and Odoo ERP!`
     });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -996,8 +1033,8 @@ app.get('/api/:slug/dashboard-data', async (req, res) => {
     const store = stores.getStoreBySlug(slug);
     if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
 
-    // 1. Get Store Products strictly isolated
-    const odooRes = await odoo.fetchOdooProducts();
+    // 1. Get Store Products strictly isolated with fresh live Odoo ERP data
+    const odooRes = await odoo.fetchOdooProducts(true);
     const allOdooProducts = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
     const storeProducts = stores.filterProductsForStore(allOdooProducts, store);
 

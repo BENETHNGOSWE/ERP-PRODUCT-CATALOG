@@ -333,10 +333,14 @@ class StoreManager {
       const ovr = overrides[pId];
 
       const isCustomStoreProd = Array.isArray(store.customProducts) && store.customProducts.some(cp => Number(cp.id) === Number(prod.id));
-      const baseStock = Number(prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 50));
+      const baseStock = Number(prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 0));
 
-      const storeStock = ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : baseStock;
-      const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || 0);
+      // Real-time stock parity: For Odoo products, live Odoo ERP qty_available is authoritative across all screens
+      const storeStock = (!isCustomStoreProd && prod.qty_available !== undefined)
+        ? Number(prod.qty_available)
+        : (ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : baseStock);
+
+      const storePrice = ovr && ovr.price !== undefined ? Number(ovr.price) : Number(prod.price || prod.list_price || 0);
 
       return {
         ...prod,

@@ -1131,6 +1131,67 @@ async function restockOdooProduct(productId, quantityToAdd = 25, locationId = 8)
   }
 }
 
+// Set Exact Product Stock in Odoo ERP (Updates physical stock.quant in WH/Stock)
+async function setOdooProductStock(productId, exactQty = 0, locationId = 8) {
+  try {
+    const prodId = Number(productId);
+    const qty = Math.max(0, Number(exactQty) || 0);
+
+    // 1. Ensure product template/variant has is_storable=true
+    try {
+      await callModel('product.product', 'write', [
+        [prodId],
+        { is_storable: true }
+      ]);
+    } catch (e) {}
+
+    // 2. Resolve internal location
+    let targetLocId = locationId;
+    try {
+      const locs = await callModel('stock.location', 'search_read', [
+        [['usage', '=', 'internal']]
+      ], { fields: ['id'], limit: 1 });
+      if (locs && locs.length > 0) targetLocId = locs[0].id;
+    } catch (e) {}
+
+    const quants = await callModel('stock.quant', 'search_read', [
+      [['product_id', '=', prodId], ['location_id', '=', targetLocId]]
+    ], {
+      fields: ['id', 'quantity', 'location_id']
+    });
+
+    if (quants && quants.length > 0) {
+      const qid = quants[0].id;
+      await callModel('stock.quant', 'write', [[qid], { quantity: qty }]);
+    } else {
+      await callModel('stock.quant', 'create', [{
+        product_id: prodId,
+        location_id: targetLocId,
+        quantity: qty
+      }]);
+    }
+
+    // Update in-memory product cache
+    const cached = cachedProducts.find(p => p.id === prodId);
+    if (cached) {
+      cached.qty_available = qty;
+      cached.inStock = qty > 0;
+    }
+
+    setTimeout(() => fetchOdooProducts(true).catch(() => {}), 100);
+
+    return {
+      success: true,
+      productId: prodId,
+      newStock: qty,
+      message: `Successfully updated stock to ${qty} units in Odoo ERP!`
+    };
+  } catch (err) {
+    console.error(`[Odoo Set Stock Error for product ${productId}]:`, err);
+    throw err;
+  }
+}
+
 /**
  * Create New Product in Odoo 18 ERP & Set Initial Stock
  */
@@ -1345,6 +1406,7 @@ module.exports = {
   createOdooPosOrder,
   getOdooDashboardData,
   restockOdooProduct,
+  setOdooProductStock,
   createOdooProduct,
   ensureStoreTagInOdoo,
   removeStoreTagFromOdoo,
