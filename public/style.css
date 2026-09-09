@@ -387,56 +387,217 @@ img {
 }
 
 /* ==========================================================================
-   STOREFRONT PHYSICAL SIGNBOARD & HERO BANNER (Image 1 Reference)
+   TOP STOREFRONT SIGNBOARD BANNER (Image 1 Reference — Flush Top Edge-to-Edge)
    ========================================================================== */
-.store-hero-banner-container {
+.store-top-banner {
   width: 100%;
+  background: #1e1b4b;
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.store-banner-wrapper {
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: 0 4px 18px rgba(116, 51, 223, 0.08);
-  border: 1px solid var(--border-color);
-  background: #0f172a;
 }
 
-.store-hero-banner-inner {
-  position: relative;
+.store-banner-img {
   width: 100%;
-  height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.store-hero-banner-img {
-  width: 100%;
-  height: 100%;
+  height: clamp(80px, 22vw, 150px);
   object-fit: cover;
   object-position: center;
   display: block;
-  transition: transform 0.4s ease;
 }
 
-.store-hero-banner-container:hover .store-hero-banner-img {
-  transform: scale(1.02);
+@media (min-width: 1024px) {
+  .store-banner-img {
+    height: 180px;
+  }
 }
 
-.store-hero-banner-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.28) 100%);
+/* ==========================================================================
+   STORE ACTION & SEARCH BAR (Image 1 Reference — Integrated Below Banner)
+   ========================================================================== */
+.store-action-bar-wrapper {
+  background: linear-gradient(180deg, #f5eefc 0%, #f9f5fd 100%);
+  border-bottom: 1px solid #ede4fc;
+  padding: 10px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  box-shadow: 0 2px 10px rgba(116, 51, 223, 0.04);
+}
+
+.store-action-bar {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-pill-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 9999px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid #ede4fc;
+  box-shadow: 0 2px 8px rgba(116, 51, 223, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-pill-container:focus-within {
+  border-color: #7433df;
+  box-shadow: 0 0 0 3px rgba(116, 51, 223, 0.15);
+}
+
+.search-pill-container .search-icon {
+  width: 18px;
+  height: 18px;
+  stroke: #7433df;
+  flex-shrink: 0;
   pointer-events: none;
 }
 
-@media (max-width: 768px) {
-  .store-hero-banner-container {
-    border-radius: 14px;
-    margin-bottom: 2px;
+.search-pill-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 8px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #1e1b4b;
+  font-family: inherit;
+}
+
+.search-pill-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.search-pill-container .search-filter-icon-btn {
+  background: none;
+  border: none;
+  color: #7433df;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.search-pill-container .search-filter-icon-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Store Action Buttons Right of Search */
+.store-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-action-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #ede4fc;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.btn-action-circle:hover {
+  background: #f3ebfc;
+  color: #7433df;
+  border-color: #c4b5fd;
+  transform: scale(1.05);
+}
+
+.btn-action-circle:active {
+  transform: scale(0.95);
+}
+
+/* Cart Pill Button */
+.btn-cart-pill {
+  background: #7433df;
+  color: #ffffff;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 14px rgba(116, 51, 223, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-cart-pill:hover {
+  background: #6226c2;
+  box-shadow: 0 6px 18px rgba(116, 51, 223, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-cart-pill:active {
+  transform: scale(0.96);
+}
+
+.cart-pill-badge {
+  background: #ffffff;
+  color: #7433df;
+  font-size: 0.76rem;
+  font-weight: 800;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .store-action-bar-wrapper {
+    padding: 8px 10px;
   }
-  .store-hero-banner-inner {
-    height: clamp(95px, 28vw, 135px);
+  .search-pill-container {
+    height: 40px;
+    padding: 0 10px;
+  }
+  .search-pill-input {
+    font-size: 0.84rem;
+  }
+  .btn-action-circle {
+    width: 34px;
+    height: 34px;
+  }
+  .btn-cart-pill {
+    height: 38px;
+    padding: 0 12px;
+    gap: 6px;
   }
 }
 

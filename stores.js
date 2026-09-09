@@ -20,6 +20,32 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+function saveBase64ToFile(base64Data, fileNamePrefix) {
+  if (!base64Data || typeof base64Data !== 'string' || !base64Data.startsWith('data:image/')) {
+    return base64Data;
+  }
+  // Keep raw SVG text data URIs as they are lightweight
+  if (base64Data.startsWith('data:image/svg+xml;utf8')) {
+    return base64Data;
+  }
+  try {
+    const parts = base64Data.split(';base64,');
+    if (parts.length === 2) {
+      const mime = parts[0].split(':')[1] || '';
+      const ext = mime.includes('png') ? 'png' : (mime.includes('svg') ? 'svg' : (mime.includes('webp') ? 'webp' : 'jpg'));
+      const filename = `${fileNamePrefix}.${ext}`;
+      const assetsDir = path.join(__dirname, 'public', 'assets', 'stores');
+      fs.mkdirSync(assetsDir, { recursive: true });
+      const filePath = path.join(assetsDir, filename);
+      fs.writeFileSync(filePath, Buffer.from(parts[1], 'base64'));
+      return `/assets/stores/${filename}?t=${Date.now()}`;
+    }
+  } catch (err) {
+    console.warn('[Asset Save Note]:', err.message);
+  }
+  return base64Data;
+}
+
 // Default Client Stores
 const DEFAULT_STORES = [
   {
@@ -144,7 +170,12 @@ class StoreManager {
       const initial = (data.name || 'S').charAt(0).toUpperCase();
       const color = data.themeColor || '#0047bb';
       logo = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="${encodeURIComponent(color)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="32" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+    } else {
+      logo = saveBase64ToFile(logo, `store-${nextId}-logo`);
     }
+
+    let banner = data.banner || '/assets/stores/simukitaa-banner.jpg';
+    banner = saveBase64ToFile(banner, `store-${nextId}-banner`);
 
     const newStore = {
       id: nextId,
@@ -153,7 +184,7 @@ class StoreManager {
       pin: data.pin || '1234',
       tagline: (data.tagline || 'Official Online Store').trim(),
       logo: logo,
-      banner: data.banner || '/assets/stores/koda-store-banner.jpg',
+      banner: banner,
       whatsapp: (data.whatsapp || '+255712345678').trim(),
       status: data.status === 'inactive' ? 'inactive' : 'active',
       themeColor: data.themeColor || '#0047bb',
@@ -195,8 +226,12 @@ class StoreManager {
     if (data.name) store.name = data.name.trim();
     if (data.pin) store.pin = String(data.pin).trim();
     if (data.tagline !== undefined) store.tagline = data.tagline.trim();
-    if (data.logo) store.logo = data.logo;
-    if (data.banner !== undefined) store.banner = data.banner;
+    if (data.logo) {
+      store.logo = saveBase64ToFile(data.logo, `store-${store.id}-logo`);
+    }
+    if (data.banner !== undefined) {
+      store.banner = saveBase64ToFile(data.banner, `store-${store.id}-banner`);
+    }
     if (data.whatsapp) store.whatsapp = data.whatsapp.trim();
     if (data.status) store.status = data.status;
     if (data.themeColor) store.themeColor = data.themeColor;

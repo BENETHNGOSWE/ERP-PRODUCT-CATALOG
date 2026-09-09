@@ -251,7 +251,7 @@ const NOVA = (function () {
     const bannerContainer = document.getElementById('storeHeroBannerContainer');
     const bannerImg = document.getElementById('storeHeroBannerImg');
     if (bannerContainer && bannerImg) {
-      const bannerSrc = store.banner || '/assets/stores/koda-store-banner.jpg';
+      const bannerSrc = store.banner || '/assets/stores/simukitaa-banner.jpg';
       bannerImg.src = bannerSrc;
       bannerContainer.style.display = 'block';
     }

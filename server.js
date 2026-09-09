@@ -17,8 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static Assets
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
@@ -83,12 +83,31 @@ app.post('/api/stores', async (req, res) => {
 });
 
 // 4. Update Client Store
-app.put('/api/stores/:id', (req, res) => {
+app.put(['/api/stores/:id', '/api/:id/settings'], (req, res) => {
   try {
     const updated = stores.updateStore(req.params.id, req.body);
     res.json({
       success: true,
       message: `Store "${updated.name}" updated successfully!`,
+      store: updated
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 4b. Dedicated Store Signboard Banner Upload & Update
+app.post(['/api/stores/:id/banner', '/api/:id/banner'], (req, res) => {
+  try {
+    const bannerData = req.body.banner || req.body.image;
+    if (!bannerData) {
+      return res.status(400).json({ success: false, error: 'No banner image data provided' });
+    }
+    const updated = stores.updateStore(req.params.id, { banner: bannerData });
+    res.json({
+      success: true,
+      message: `Store banner for "${updated.name}" updated successfully!`,
+      banner: updated.banner,
       store: updated
     });
   } catch (err) {
