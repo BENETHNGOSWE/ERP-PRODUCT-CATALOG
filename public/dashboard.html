@@ -1773,23 +1773,47 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
 
       <input type="hidden" id="storeModalId" value="">
 
-      <!-- Logo Attachment & Live Preview Section -->
-      <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px;">
-        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ffffff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
-          <img id="storeModalLogoPreview" src="/assets/products/logo.png" alt="Logo Preview" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
-        <div style="flex: 1;">
-          <label style="display:block; font-size:0.82rem; font-weight:700; color:#334155; margin-bottom:4px;">Store Logo (Attach Image or Paste URL)</label>
-          <div style="display:flex; gap: 8px; align-items:center;">
-            <input type="file" id="storeModalLogoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
-            <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-              📁 Attach Logo File
-            </button>
-            <button type="button" onclick="resetStoreLogo()" style="background:#f1f5f9; color:#475569; font-size:0.78rem; font-weight:600; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
-              Reset
-            </button>
+      <!-- Logo & Storefront Banner Cover Attachment Section -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <!-- Logo -->
+        <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">🏪 Store Logo</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: #ffffff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+              <img id="storeModalLogoPreview" src="/assets/achete-icon.svg" alt="Logo Preview" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
+              <input type="file" id="storeModalLogoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
+              <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
+                📁 Upload Logo
+              </button>
+              <input type="text" id="storeModalLogoUrl" class="modal-input" placeholder="Or paste logo URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleLogoUrlInput()">
+            </div>
           </div>
-          <input type="text" id="storeModalLogoUrl" class="modal-input" placeholder="Or paste image URL (https://... or data:image...)" style="margin-top: 8px; font-size: 0.8rem; padding: 6px 10px;" oninput="handleLogoUrlInput()">
+        </div>
+
+        <!-- Storefront Signboard Banner -->
+        <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">📸 Shop Banner (Physical Signboard)</label>
+            <select id="storeModalBannerPreset" onchange="applyStoreBannerPreset(this.value)" style="font-size:0.72rem; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; background:#ffffff; color:#0f172a;">
+              <option value="">Choose preset...</option>
+              <option value="/assets/stores/simukitaa-banner.jpg">🏪 Simukitaa Signboard</option>
+              <option value="/assets/stores/koda-store-banner.jpg">⚡ Koda Tech Glass Store</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 80px; height: 50px; border-radius: 8px; background: #0f172a; border: 1.5px solid #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+              <img id="storeModalBannerPreview" src="/assets/stores/koda-store-banner.jpg" alt="Banner Preview" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
+              <input type="file" id="storeModalBannerFileInput" accept="image/*" style="display:none;" onchange="handleBannerFileSelect(event)">
+              <button type="button" onclick="document.getElementById('storeModalBannerFileInput').click()" style="background:#7433df; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
+                📷 Upload Shop Photo
+              </button>
+              <input type="text" id="storeModalBannerUrl" class="modal-input" placeholder="Or paste banner image URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleBannerUrlInput()">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3276,9 +3300,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     }
 
     // =========================================================================
-    // UNIFIED STORE MANAGEMENT (CREATE, EDIT, ATTACH LOGO, DELETE)
+    // UNIFIED STORE MANAGEMENT (CREATE, EDIT, ATTACH LOGO & BANNER, DELETE)
     // =========================================================================
     let currentStoreLogoData = '';
+    let currentStoreBannerData = '';
     let currentEditStoreId = null;
 
     function openCreateStoreModal() {
@@ -3295,11 +3320,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       document.getElementById('storeModalKeywords').value = '';
       document.getElementById('storeModalLogoUrl').value = '';
       document.getElementById('storeModalLogoFileInput').value = '';
+      document.getElementById('storeModalBannerUrl').value = '';
+      document.getElementById('storeModalBannerFileInput').value = '';
       document.getElementById('btnDeleteStore').style.display = 'none';
       document.getElementById('btnSubmitStoreModal').textContent = 'Create Store';
       
       currentStoreLogoData = '';
-      document.getElementById('storeModalLogoPreview').src = '/assets/products/logo.png';
+      currentStoreBannerData = '/assets/stores/koda-store-banner.jpg';
+      document.getElementById('storeModalLogoPreview').src = '/assets/achete-icon.svg';
+      document.getElementById('storeModalBannerPreview').src = currentStoreBannerData;
       document.getElementById('storeUrlPreview').textContent = 'URL: achete.me/shopname';
       
       document.getElementById('storeModal').style.display = 'flex';
@@ -3322,9 +3351,14 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       document.getElementById('storeModalKeywords').value = (store.productKeywords || []).join(', ');
       
       currentStoreLogoData = store.logo || '';
+      currentStoreBannerData = store.banner || '/assets/stores/koda-store-banner.jpg';
       document.getElementById('storeModalLogoUrl').value = store.logo && !store.logo.startsWith('data:') ? store.logo : '';
       document.getElementById('storeModalLogoFileInput').value = '';
-      document.getElementById('storeModalLogoPreview').src = store.logo || '/assets/products/logo.png';
+      document.getElementById('storeModalLogoPreview').src = store.logo || '/assets/achete-icon.svg';
+
+      document.getElementById('storeModalBannerUrl').value = store.banner && !store.banner.startsWith('data:') ? store.banner : '';
+      document.getElementById('storeModalBannerFileInput').value = '';
+      document.getElementById('storeModalBannerPreview').src = currentStoreBannerData;
       
       document.getElementById('storeUrlPreview').textContent = `URL: achete.me/${store.slug}`;
       document.getElementById('btnDeleteStore').style.display = 'inline-block';
@@ -3363,6 +3397,40 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         currentStoreLogoData = url;
         document.getElementById('storeModalLogoPreview').src = url;
       }
+    }
+
+    function handleBannerFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file for shop banner.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentStoreBannerData = e.target.result;
+        document.getElementById('storeModalBannerPreview').src = currentStoreBannerData;
+        document.getElementById('storeModalBannerUrl').value = '';
+        showDashToast('✅ Shop banner attached successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleBannerUrlInput() {
+      const url = document.getElementById('storeModalBannerUrl').value.trim();
+      if (url) {
+        currentStoreBannerData = url;
+        document.getElementById('storeModalBannerPreview').src = url;
+      }
+    }
+
+    function applyStoreBannerPreset(presetUrl) {
+      if (!presetUrl) return;
+      currentStoreBannerData = presetUrl;
+      document.getElementById('storeModalBannerPreview').src = presetUrl;
+      document.getElementById('storeModalBannerUrl').value = presetUrl;
     }
 
     function resetStoreLogo() {
@@ -3425,6 +3493,9 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       if (currentStoreLogoData) {
         payload.logo = currentStoreLogoData;
+      }
+      if (currentStoreBannerData) {
+        payload.banner = currentStoreBannerData;
       }
 
       const btn = document.getElementById('btnSubmitStoreModal');

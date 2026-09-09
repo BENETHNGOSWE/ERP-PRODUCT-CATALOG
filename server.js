@@ -1086,7 +1086,11 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
   const storeName = store ? store.name : 'Achete Store';
   const storeTagline = store ? (store.tagline || 'Official Online Store | Fast Delivery in Dar es Salaam') : 'Your digital front door for products and ordering.';
   const storeUrl = store ? `https://achete.me/${store.slug}` : 'https://achete.me/';
-  const storeLogo = (store && store.logo && !store.logo.startsWith('data:')) ? store.logo : 'https://achete.me/assets/achete-icon.png';
+  const storeImage = (store && store.banner && !store.banner.startsWith('data:')) 
+    ? (store.banner.startsWith('http') ? store.banner : `https://achete.me${store.banner}`)
+    : ((store && store.logo && !store.logo.startsWith('data:')) 
+        ? (store.logo.startsWith('http') ? store.logo : `https://achete.me${store.logo}`) 
+        : 'https://achete.me/assets/achete-icon.png');
 
   const shopHtmlPath = path.join(__dirname, 'public', 'shop.html');
   fs.readFile(shopHtmlPath, 'utf8', (err, html) => {
@@ -1097,14 +1101,14 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
   <meta name="description" content="${escapeMetaAttr(storeTagline)}">
   <meta property="og:title" content="${escapeMetaAttr(storeName)} — Online Store">
   <meta property="og:description" content="${escapeMetaAttr(storeTagline)}">
-  <meta property="og:image" content="${escapeMetaAttr(storeLogo)}">
+  <meta property="og:image" content="${escapeMetaAttr(storeImage)}">
   <meta property="og:url" content="${escapeMetaAttr(storeUrl)}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Achete">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeMetaAttr(storeName)}">
   <meta name="twitter:description" content="${escapeMetaAttr(storeTagline)}">
-  <meta name="twitter:image" content="${escapeMetaAttr(storeLogo)}">
+  <meta name="twitter:image" content="${escapeMetaAttr(storeImage)}">
     `.trim();
 
     const modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);

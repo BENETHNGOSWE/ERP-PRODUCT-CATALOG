@@ -386,6 +386,60 @@ img {
   width: 100%;
 }
 
+/* ==========================================================================
+   STOREFRONT PHYSICAL SIGNBOARD & HERO BANNER (Image 1 Reference)
+   ========================================================================== */
+.store-hero-banner-container {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(116, 51, 223, 0.08);
+  border: 1px solid var(--border-color);
+  background: #0f172a;
+}
+
+.store-hero-banner-inner {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.store-hero-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.store-hero-banner-container:hover .store-hero-banner-img {
+  transform: scale(1.02);
+}
+
+.store-hero-banner-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.28) 100%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .store-hero-banner-container {
+    border-radius: 14px;
+    margin-bottom: 2px;
+  }
+  .store-hero-banner-inner {
+    height: clamp(95px, 28vw, 135px);
+  }
+}
+
 /* Search Bar */
 .search-bar-wrapper {
   position: relative;

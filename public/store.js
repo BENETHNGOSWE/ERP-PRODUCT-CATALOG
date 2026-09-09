@@ -247,6 +247,15 @@ const NOVA = (function () {
       });
     }
 
+    // Storefront Physical Signboard / Hero Banner
+    const bannerContainer = document.getElementById('storeHeroBannerContainer');
+    const bannerImg = document.getElementById('storeHeroBannerImg');
+    if (bannerContainer && bannerImg) {
+      const bannerSrc = store.banner || '/assets/stores/koda-store-banner.jpg';
+      bannerImg.src = bannerSrc;
+      bannerContainer.style.display = 'block';
+    }
+
     rewriteStoreLinks();
   }
 

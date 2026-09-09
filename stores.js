@@ -153,6 +153,7 @@ class StoreManager {
       pin: data.pin || '1234',
       tagline: (data.tagline || 'Official Online Store').trim(),
       logo: logo,
+      banner: data.banner || '/assets/stores/koda-store-banner.jpg',
       whatsapp: (data.whatsapp || '+255712345678').trim(),
       status: data.status === 'inactive' ? 'inactive' : 'active',
       themeColor: data.themeColor || '#0047bb',
@@ -195,6 +196,7 @@ class StoreManager {
     if (data.pin) store.pin = String(data.pin).trim();
     if (data.tagline !== undefined) store.tagline = data.tagline.trim();
     if (data.logo) store.logo = data.logo;
+    if (data.banner !== undefined) store.banner = data.banner;
     if (data.whatsapp) store.whatsapp = data.whatsapp.trim();
     if (data.status) store.status = data.status;
     if (data.themeColor) store.themeColor = data.themeColor;
