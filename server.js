@@ -1130,7 +1130,14 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
   <meta name="twitter:image" content="${escapeMetaAttr(storeImage)}">
     `.trim();
 
-    const modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);
+    const storeBanner = store ? (store.banner || '') : '';
+    if (storeBanner) {
+      modifiedHtml = modifiedHtml.replace(
+        /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
+        `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
+      );
+    }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(modifiedHtml);
   });

@@ -82,6 +82,15 @@ function sanitizeImageUrl(name, img) {
   return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
 }
 
+function generateDynamicStoreBanner(name, themeColor, tagline) {
+  const storeName = (name || 'STORE').toUpperCase().trim();
+  const initial = storeName.charAt(0) || 'S';
+  const color = themeColor || '#7433df';
+  const sub = (tagline || 'Official Online Store • Fast Local Delivery').trim();
+  
+  return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340"><rect width="1200" height="340" fill="%230f172a"/><defs><linearGradient id="bgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%25" stop-color="%231e1b4b"/><stop offset="50%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23180d2b"/></linearGradient></defs><rect width="1200" height="340" fill="url(%23bgG)"/><rect x="25" y="30" width="1150" height="280" rx="18" fill="%231e293b" stroke="%23334155" stroke-width="2"/><rect x="55" y="55" width="90" height="90" rx="14" fill="${encodeURIComponent(color)}"/><text x="100" y="118" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="60" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${encodeURIComponent(initial)}</text><text x="170" y="105" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="52" fill="%23ffffff" letter-spacing="1.5">${encodeURIComponent(storeName)}</text><text x="170" y="145" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="500" font-size="20" fill="%2394a3b8">${encodeURIComponent(sub)}</text><line x1="55" y1="205" x2="1145" y2="205" stroke="%23334155" stroke-width="1.5"/><circle cx="75" cy="242" r="6" fill="%2322c55e"/><text x="92" y="248" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="700" font-size="16" fill="%2322c55e">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>`;
+}
+
 class StoreManager {
   constructor() {
     this.stores = [];
@@ -122,22 +131,29 @@ class StoreManager {
   getStoreBySlug(slug) {
     if (!slug) return null;
     const clean = slug.trim().toLowerCase();
-    const direct = this.stores.find(s => s.slug.toLowerCase() === clean);
-    if (direct) return direct;
+    let direct = this.stores.find(s => s.slug.toLowerCase() === clean);
     
     // Alias support for legacy 'novamart' or 'achete'
-    if (clean === 'novamart') {
-      return this.stores.find(s => s.slug.toLowerCase() === 'achete') || this.stores[0];
+    if (!direct && clean === 'novamart') {
+      direct = this.stores.find(s => s.slug.toLowerCase() === 'achete') || this.stores[0];
     }
-    if (clean === 'achete') {
-      return this.stores.find(s => s.slug.toLowerCase() === 'novamart') || this.stores[0];
+    if (!direct && clean === 'achete') {
+      direct = this.stores.find(s => s.slug.toLowerCase() === 'novamart') || this.stores[0];
     }
-    return null;
+
+    if (direct && (!direct.banner || direct.banner.trim() === '')) {
+      direct.banner = generateDynamicStoreBanner(direct.name, direct.themeColor, direct.tagline);
+    }
+    return direct || null;
   }
 
   getStoreById(id) {
     const num = parseInt(id, 10);
-    return this.stores.find(s => s.id === num) || null;
+    const store = this.stores.find(s => s.id === num) || null;
+    if (store && (!store.banner || store.banner.trim() === '')) {
+      store.banner = generateDynamicStoreBanner(store.name, store.themeColor, store.tagline);
+    }
+    return store;
   }
 
   validateSlug(slug, excludeId = null) {
@@ -174,8 +190,12 @@ class StoreManager {
       logo = saveBase64ToFile(logo, `store-${nextId}-logo`);
     }
 
-    let banner = data.banner || '/assets/stores/simukitaa-banner.jpg';
-    banner = saveBase64ToFile(banner, `store-${nextId}-banner`);
+    let banner = data.banner;
+    if (banner && banner.trim()) {
+      banner = saveBase64ToFile(banner, `store-${nextId}-banner`);
+    } else {
+      banner = generateDynamicStoreBanner(data.name, data.themeColor, data.tagline);
+    }
 
     const newStore = {
       id: nextId,

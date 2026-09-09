@@ -247,12 +247,11 @@ const NOVA = (function () {
       });
     }
 
-    // Storefront Physical Signboard / Hero Banner
+    // Storefront Physical Signboard / Hero Banner (Dynamic Per Client Store)
     const bannerContainer = document.getElementById('storeHeroBannerContainer');
     const bannerImg = document.getElementById('storeHeroBannerImg');
-    if (bannerContainer && bannerImg) {
-      const bannerSrc = store.banner || '/assets/stores/simukitaa-banner.jpg';
-      bannerImg.src = bannerSrc;
+    if (bannerContainer && bannerImg && store.banner) {
+      bannerImg.src = store.banner;
       bannerContainer.style.display = 'block';
     }
 

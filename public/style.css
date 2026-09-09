@@ -387,11 +387,14 @@ img {
 }
 
 /* ==========================================================================
-   TOP STOREFRONT SIGNBOARD BANNER (Image 1 Reference — Flush Top Edge-to-Edge)
+   TOP STOREFRONT SIGNBOARD BANNER (Flush Full-Device Width)
    ========================================================================== */
 .store-top-banner {
   width: 100%;
-  background: #1e1b4b;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0f172a;
   position: relative;
   overflow: hidden;
   line-height: 0;
@@ -400,37 +403,38 @@ img {
 .store-banner-wrapper {
   width: 100%;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
   position: relative;
 }
 
 .store-banner-img {
   width: 100%;
-  height: clamp(80px, 22vw, 150px);
+  height: clamp(100px, 28vw, 190px);
   object-fit: cover;
   object-position: center;
   display: block;
+  border: none;
 }
 
 @media (min-width: 1024px) {
   .store-banner-img {
-    height: 180px;
+    height: 220px;
   }
 }
 
 /* ==========================================================================
-   STORE ACTION & SEARCH BAR (Image 1 Reference — Integrated Below Banner)
+   STORE ACTION & SEARCH BAR (Unified Seamless Page Background)
    ========================================================================== */
 .store-action-bar-wrapper {
-  background: linear-gradient(180deg, #f5eefc 0%, #f9f5fd 100%);
-  border-bottom: 1px solid #ede4fc;
-  padding: 10px 16px;
+  background: var(--bg-page);
+  padding: 10px 14px 6px;
   width: 100%;
+  max-width: 100vw;
   box-sizing: border-box;
   position: sticky;
   top: 0;
   z-index: 400;
-  box-shadow: 0 2px 10px rgba(116, 51, 223, 0.04);
 }
 
 .store-action-bar {
@@ -438,44 +442,53 @@ img {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .search-pill-container {
   flex: 1;
+  min-width: 0;
   position: relative;
   display: flex;
   align-items: center;
   background: #ffffff;
   border-radius: 9999px;
-  height: 44px;
-  padding: 0 14px;
+  height: 42px;
+  padding: 0 12px 0 14px;
   border: 1.5px solid #ede4fc;
-  box-shadow: 0 2px 8px rgba(116, 51, 223, 0.05);
+  box-shadow: 0 2px 8px rgba(116, 51, 223, 0.04);
+  box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-pill-container:focus-within {
   border-color: #7433df;
-  box-shadow: 0 0 0 3px rgba(116, 51, 223, 0.15);
+  box-shadow: 0 0 0 3px rgba(116, 51, 223, 0.12);
 }
 
 .search-pill-container .search-icon {
+  position: static !important;
   width: 18px;
   height: 18px;
+  min-width: 18px;
   stroke: #7433df;
   flex-shrink: 0;
+  margin-right: 8px;
+  display: block;
   pointer-events: none;
 }
 
 .search-pill-input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
-  padding: 0 8px;
-  font-size: 0.92rem;
+  padding: 0 !important;
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 500;
   color: #1e1b4b;
   font-family: inherit;
@@ -495,6 +508,8 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-left: 4px;
   transition: transform 0.15s ease;
 }
 
@@ -506,13 +521,14 @@ img {
 .store-action-btns {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .btn-action-circle {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   border-radius: 50%;
   background: #ffffff;
   border: 1px solid #ede4fc;
@@ -521,8 +537,9 @@ img {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .btn-action-circle:hover {
@@ -540,23 +557,25 @@ img {
 .btn-cart-pill {
   background: #7433df;
   color: #ffffff;
-  height: 42px;
-  padding: 0 16px;
+  height: 40px;
+  padding: 0 13px;
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: 700;
-  font-size: 0.9rem;
-  box-shadow: 0 4px 14px rgba(116, 51, 223, 0.3);
+  font-size: 0.88rem;
+  box-shadow: 0 4px 12px rgba(116, 51, 223, 0.28);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .btn-cart-pill:hover {
   background: #6226c2;
-  box-shadow: 0 6px 18px rgba(116, 51, 223, 0.4);
+  box-shadow: 0 6px 16px rgba(116, 51, 223, 0.38);
   transform: translateY(-1px);
 }
 
@@ -567,37 +586,55 @@ img {
 .cart-pill-badge {
   background: #ffffff;
   color: #7433df;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 800;
-  min-width: 20px;
-  height: 20px;
+  min-width: 19px;
+  height: 19px;
   border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0 4px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 @media (max-width: 480px) {
   .store-action-bar-wrapper {
-    padding: 8px 10px;
+    padding: 8px 10px 4px;
+  }
+  .store-action-bar {
+    gap: 6px;
   }
   .search-pill-container {
-    height: 40px;
-    padding: 0 10px;
+    height: 38px;
+    padding: 0 8px 0 10px;
+  }
+  .search-pill-container .search-icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    margin-right: 6px;
   }
   .search-pill-input {
-    font-size: 0.84rem;
+    font-size: 0.82rem;
   }
   .btn-action-circle {
     width: 34px;
     height: 34px;
+    min-width: 34px;
   }
   .btn-cart-pill {
-    height: 38px;
-    padding: 0 12px;
-    gap: 6px;
+    height: 36px;
+    padding: 0 10px;
+    gap: 5px;
+    font-size: 0.82rem;
+  }
+  .cart-pill-badge {
+    min-width: 17px;
+    height: 17px;
+    font-size: 0.7rem;
+    padding: 0 3px;
   }
 }
 

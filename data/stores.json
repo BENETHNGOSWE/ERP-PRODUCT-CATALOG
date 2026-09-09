@@ -7,7 +7,7 @@
     "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" fill=\"white\" font-size=\"24\" font-weight=\"bold\" text-anchor=\"middle\" dominant-baseline=\"middle\">KODA</text></svg>",
     "whatsapp": "+255710459064",
     "status": "active",
-    "themeColor": "#0047bb",
+    "themeColor": "#7433df",
     "currency": "TZS",
     "address": "Masaki, Dar es Salaam, Tanzania",
     "posConfigId": 1,
@@ -44,6 +44,41 @@
         "updatedAt": "2026-09-09T11:53:34.073Z"
       }
     },
+    "customProducts": [],
+    "banner": "/assets/stores/koda-store-banner.jpg"
+  },
+  {
+    "id": 10,
+    "name": "Ben Store",
+    "slug": "benstore",
+    "tagline": "Genuine iPhones, Samsungs & Smart Accessories",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%237433df\"/><text x=\"50%\" y=\"54%\" fill=\"white\" font-size=\"28\" font-weight=\"bold\" text-anchor=\"middle\" dominant-baseline=\"middle\">BEN</text></svg>",
+    "whatsapp": "+255710459064",
+    "status": "active",
+    "themeColor": "#7433df",
+    "currency": "TZS",
+    "address": "Kariakoo / City Mall, Dar es Salaam",
+    "posConfigId": 26,
+    "posConfigName": "Website Orders",
+    "categories": [
+      "All",
+      "Smartphones",
+      "Accessories",
+      "Audio"
+    ],
+    "productKeywords": [],
+    "productIds": [
+      143,
+      140,
+      141,
+      144,
+      147,
+      149,
+      150
+    ],
+    "createdDate": "2026-09-09",
+    "pin": "1234",
+    "inventoryOverrides": {},
     "customProducts": [],
     "banner": "/assets/stores/simukitaa-banner.jpg"
   }
