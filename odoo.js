@@ -1254,11 +1254,10 @@ async function createOdooProduct(productData, initialStock = 50, locationId = 8)
 async function ensureStoreTagInOdoo(store) {
   if (!store || !store.slug) return null;
   const tagName = store.slug.toLowerCase().trim();
-  const readableName = `Store: ${store.name || store.slug}`;
 
   try {
     const existing = await callModel('product.tag', 'search_read', [
-      ['|', ['name', '=', tagName], ['name', '=', readableName]]
+      [['name', '=', tagName]]
     ], { fields: ['id', 'name'], limit: 1 });
 
     if (existing && existing.length > 0) {
@@ -1278,17 +1277,63 @@ async function ensureStoreTagInOdoo(store) {
 }
 
 /**
+ * Remove Store Tag from Odoo ERP (product.tag) when a store is deleted
+ */
+async function removeStoreTagFromOdoo(storeSlugOrName) {
+  if (!storeSlugOrName) return false;
+  const clean = String(storeSlugOrName).toLowerCase().trim();
+  try {
+    const existing = await callModel('product.tag', 'search_read', [
+      ['|', ['name', '=', clean], ['name', 'ilike', clean]]
+    ], { fields: ['id', 'name'] });
+
+    if (existing && existing.length > 0) {
+      const idsToDelete = existing.map(t => t.id);
+      await callModel('product.tag', 'unlink', [idsToDelete]);
+      console.log(`[Odoo ERP] 🗑️ Deleted obsolete Store Tags from Odoo:`, idsToDelete);
+      return true;
+    }
+  } catch (err) {
+    console.warn(`[Odoo ERP] Could not remove Store Tag "${clean}":`, err.message);
+  }
+  return false;
+}
+
+/**
  * Sync All Stores from Achete to Odoo ERP as Product Tags & POS Configs
  */
 async function syncAllStoresToOdoo(storesList = []) {
   const results = [];
-  for (const s of storesList) {
-    try {
-      const tag = await ensureStoreTagInOdoo(s);
-      results.push({ store: s.slug, tagId: tag ? tag.id : null, synced: true });
-    } catch (e) {
-      results.push({ store: s.slug, error: e.message, synced: false });
+  try {
+    const activeSlugs = new Set(storesList.map(s => (s.slug || '').toLowerCase().trim()).filter(Boolean));
+    const allOdooTags = await callModel('product.tag', 'search_read', [[]], { fields: ['id', 'name'] });
+
+    // 1. Unlink any tags that do not belong to active stores in Achete
+    const obsoleteTagIds = [];
+    (allOdooTags || []).forEach(t => {
+      const tagName = (t.name || '').toLowerCase().trim();
+      const cleanSlug = tagName.replace(/^store:\s*/i, '').trim();
+      if (!activeSlugs.has(cleanSlug) && !activeSlugs.has(tagName)) {
+        obsoleteTagIds.push(t.id);
+      }
+    });
+
+    if (obsoleteTagIds.length > 0) {
+      await callModel('product.tag', 'unlink', [obsoleteTagIds]);
+      console.log(`[Odoo ERP] 🧹 Cleaned up ${obsoleteTagIds.length} obsolete tags from Odoo:`, obsoleteTagIds);
     }
+
+    // 2. Ensure each active store has a single clean tag
+    for (const s of storesList) {
+      try {
+        const tag = await ensureStoreTagInOdoo(s);
+        results.push({ store: s.slug, tagId: tag ? tag.id : null, synced: true });
+      } catch (e) {
+        results.push({ store: s.slug, error: e.message, synced: false });
+      }
+    }
+  } catch (err) {
+    console.error('[Odoo Tag Sync Error]:', err);
   }
   return results;
 }
@@ -1302,5 +1347,6 @@ module.exports = {
   restockOdooProduct,
   createOdooProduct,
   ensureStoreTagInOdoo,
+  removeStoreTagFromOdoo,
   syncAllStoresToOdoo
 };

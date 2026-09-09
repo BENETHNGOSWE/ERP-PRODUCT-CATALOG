@@ -24,88 +24,24 @@ if (!fs.existsSync(DATA_DIR)) {
 const DEFAULT_STORES = [
   {
     id: 1,
-    name: 'ABC Store',
-    slug: 'abcstore',
-    tagline: 'Your Daily Groceries, Snacks & Household Essentials',
-    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%230047bb"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">ABC</text></svg>',
-    whatsapp: '+255712345678',
-    status: 'active',
-    themeColor: '#0047bb',
-    currency: 'TZS',
-    address: 'Masaki, Dar es Salaam, Tanzania',
-    posConfigId: 4, // Mangi shop in Odoo
-    posConfigName: 'Mangi shop',
-    categories: ['Food', 'Drinks', 'Household', 'Cosmetics', 'Electronics'],
-    productKeywords: ['coca', 'azam', 'water', 'nivea', 'soap', 'dettol', 'rice', 'oil', 'charger', 'flour', 'bread', 'juice'],
-    createdDate: '2026-08-15'
-  },
-  {
-    id: 2,
-    name: 'ACHETE',
-    slug: 'achete',
-    tagline: 'Digital Storefront Platform | Fast Delivery in Dar es Salaam',
-    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%23081735"/><polygon points="40 16 18 52 38 52 36 68 62 32 42 32 40 16" fill="%2322c55e"/></svg>',
-    whatsapp: '+255784112233',
-    status: 'active',
-    themeColor: '#081735',
-    currency: 'TZS',
-    address: 'Kariakoo Commercial Hub, Dar es Salaam',
-    posConfigId: 1, // Website Orders in Odoo
-    posConfigName: 'Website Orders',
-    categories: ['Safety Gear', 'Head Protection', 'Eye Protection', 'Foot Protection', 'Body Protection', 'Respiratory Protection', 'Hand Protection'],
-    productKeywords: ['boot', 'titanstep', 'helmet', 'arcguard', 'glasses', 'clearvision', 'respirator', 'forcefield', 'coverall', 'chembarrier', 'harness', 'glove'],
-    createdDate: '2026-08-01'
-  },
-  {
-    id: 3,
-    name: 'Crown Shop',
-    slug: 'crownshop',
-    tagline: 'Premium Office Furniture, Electronics & Modern Appliances',
-    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%237c3aed"/><path d="M20 54 L20 30 L32 42 L40 22 L48 42 L60 30 L60 54 Z" fill="%23fbbf24"/></svg>',
-    whatsapp: '+255755998877',
-    status: 'active',
-    themeColor: '#7c3aed',
-    currency: 'TZS',
-    address: 'Posta City Centre, Dar es Salaam',
-    posConfigId: 5, // Min Market in Odoo
-    posConfigName: 'Min Market',
-    categories: ['Office Furniture', 'Kitchen materials', 'Equipments', 'Electronics'],
-    productKeywords: ['desk', 'chair', 'cabinet', 'storage', 'utensils', 'mouse', 'lamp', 'stand', 'organizer'],
-    createdDate: '2026-08-20'
-  },
-  {
-    id: 4,
-    name: 'Safari Diner & Cafe',
-    slug: 'safaridiner',
-    tagline: 'Fresh Chef Dishes, Local BBQ & Refreshing Beverages',
-    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%23d97706"/><circle cx="40" cy="40" r="22" fill="%23ffffff"/><text x="50%" y="54%" font-size="22" text-anchor="middle" dominant-baseline="middle">🍽️</text></svg>',
-    whatsapp: '+255688554433',
-    status: 'active',
-    themeColor: '#d97706',
-    currency: 'TZS',
-    address: 'Oysterbay Peninsula, Dar es Salaam',
-    posConfigId: 6, // Restaurant in Odoo
-    posConfigName: 'Restaurant',
-    categories: ['Food', 'Drinks', 'BULLY Menu', 'GGM Menu', 'Northmara Menu'],
-    productKeywords: ['chicken', 'chips', 'mayai', 'juice', 'water', 'coca', 'food'],
-    createdDate: '2026-08-25'
-  },
-  {
-    id: 9,
     name: 'Koda Store',
     slug: 'kodastore',
     tagline: 'Official Koda Store | Premium Tech & Essentials',
-    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%23081735"/><text x="50%" y="54%" fill="white" font-size="24" font-weight="bold" text-anchor="middle" dominant-baseline="middle">KODA</text></svg>',
+    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="16" fill="%23081735"/><text x="50%" y="54%" fill="white" font-size="24" font-weight="bold" text-anchor="middle" dominant-baseline="middle">KODA</text></svg>',
     whatsapp: '+255710459064',
     status: 'active',
     themeColor: '#0047bb',
     currency: 'TZS',
-    address: 'Dar es Salaam, Tanzania',
+    address: 'Masaki, Dar es Salaam, Tanzania',
     posConfigId: 1,
     posConfigName: 'Website Orders',
-    categories: ['General', 'Electronics', 'Accessories'],
-    productKeywords: ['charger', 'samsung', 'mouse'],
-    createdDate: '2026-09-07'
+    categories: ['All', 'Smartphones', 'Accessories', 'Audio'],
+    productKeywords: [],
+    productIds: [141, 140, 145, 142, 143, 144, 146],
+    createdDate: '2026-09-07',
+    pin: '1234',
+    inventoryOverrides: {},
+    customProducts: []
   }
 ];
 

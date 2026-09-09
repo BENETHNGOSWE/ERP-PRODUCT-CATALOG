@@ -96,9 +96,14 @@ app.put('/api/stores/:id', (req, res) => {
 });
 
 // 5. Delete Store
-app.delete('/api/stores/:id', (req, res) => {
+app.delete('/api/stores/:id', async (req, res) => {
   try {
     const removed = stores.deleteStore(req.params.id);
+    if (removed && removed.slug) {
+      odoo.removeStoreTagFromOdoo(removed.slug).catch(e => {
+        console.warn('[Odoo Store Tag Auto-Delete Note]:', e.message);
+      });
+    }
     res.json({
       success: true,
       message: `Store "${removed.name}" removed successfully.`,
@@ -1036,6 +1041,13 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌐 URL: http://0.0.0.0:${PORT} (Domain: achete.me)`);
   console.log(`📲 OpenWA WhatsApp Order Alerts: Enabled (Direct Send)`);
   console.log(`=======================================================`);
+
+  // Sync store tags with Odoo ERP in background
+  setTimeout(() => {
+    odoo.syncAllStoresToOdoo(stores.getAllStores())
+      .then(() => console.log('[Odoo ERP] ✅ Synced active store tags on startup.'))
+      .catch(e => console.warn('[Odoo ERP Startup Sync Notice]:', e.message));
+  }, 1500);
 });
 
 module.exports = app;
