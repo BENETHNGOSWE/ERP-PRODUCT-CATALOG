@@ -164,18 +164,22 @@ const NOVA = (function () {
 
   // Rewrite all internal links to preserve store context
   function rewriteStoreLinks() {
-    const isCustomSlug = currentSlug && currentSlug !== 'achete' && currentSlug !== 'shop';
-    const storePrefix = isCustomSlug ? `/${currentSlug}` : '';
-    const queryParam = isCustomSlug ? `?store=${currentSlug}` : '';
+    const slug = getActiveStoreSlug();
+    const isCustomSlug = slug && slug !== 'achete' && slug !== 'shop';
 
     // Cart links
     document.querySelectorAll('a[href="cart.html"], a[href="/cart"], a#btnHeaderCart, a#mobileFloatingCart').forEach(el => {
-      el.href = isCustomSlug ? `/${currentSlug}/cart` : 'cart.html';
+      el.href = isCustomSlug ? `/${slug}/cart` : '/cart';
     });
 
     // Home / Shop links
-    document.querySelectorAll('a[href="index.html"], a[href="/"], a.brand-block, a.nav-link[href="index.html"], a.cart-heading-link, .btn-outline-continue, #btnContinueShopping').forEach(el => {
-      el.href = isCustomSlug ? `/${currentSlug}` : '/shop';
+    document.querySelectorAll('a[href="index.html"], a[href="/"], a.brand-block, a.nav-link[href="index.html"], a.cart-heading-link, a#btnCartBackToShop, .btn-outline-continue, #btnContinueShopping').forEach(el => {
+      el.href = isCustomSlug ? `/${slug}` : '/';
+    });
+
+    // Confirmation links
+    document.querySelectorAll('a[href="confirmation.html"], a[href="/confirmation"]').forEach(el => {
+      el.href = isCustomSlug ? `/${slug}/confirmation` : '/confirmation';
     });
   }
 
@@ -346,22 +350,29 @@ const NOVA = (function () {
   // Submit Order directly to Server -> Odoo POS + Direct WhatsApp Dispatch
   async function submitOrderToOdoo(orderPayload) {
     try {
-      orderPayload.storeSlug = currentSlug || 'kodastore';
+      const slug = getActiveStoreSlug() || 'kodastore';
+      orderPayload.storeSlug = slug;
       if (activeStore && activeStore.whatsapp) {
         orderPayload.storeWhatsapp = activeStore.whatsapp;
-      } else {
-        orderPayload.storeWhatsapp = '+255710459064';
       }
       if (activeStore && activeStore.name) {
         orderPayload.storeName = activeStore.name;
-      } else {
-        orderPayload.storeName = 'Koda Store';
       }
-      const res = await fetch('/api/odoo/order', {
+
+      let res = await fetch(`/api/${slug}/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)
       });
+      
+      if (!res.ok) {
+        res = await fetch('/api/odoo/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderPayload)
+        });
+      }
+
       const data = await res.json();
       return data;
     } catch (err) {

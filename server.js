@@ -831,14 +831,48 @@ app.get('/api/whatsapp/logs', (req, res) => {
 // CLEAN PAGE ROUTES (EXACT SAME DESIGN & FLOW)
 // =========================================================================
 
-// Cart Page (Supports /cart, /cart.html, /:slug/cart)
+// Cart Page (Supports /cart, /cart.html, /:slug/cart with dynamic banner injection)
 app.get(['/cart', '/cart.html', '/:slug/cart'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'cart.html'));
+  const slug = req.params.slug;
+  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
+  const storeName = store ? store.name : 'Store';
+  const storeBanner = store ? (store.banner || '') : '';
+  const cartHtmlPath = path.join(__dirname, 'public', 'cart.html');
+  
+  fs.readFile(cartHtmlPath, 'utf8', (err, html) => {
+    if (err) return res.sendFile(cartHtmlPath);
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Your Cart — ${escapeMetaAttr(storeName)}</title>`);
+    if (storeBanner) {
+      modifiedHtml = modifiedHtml.replace(
+        /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
+        `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
+      );
+    }
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(modifiedHtml);
+  });
 });
 
-// Confirmation Receipt Page (Supports /confirmation, /confirmation.html, /:slug/confirmation)
+// Confirmation Receipt Page (Supports /confirmation, /confirmation.html, /:slug/confirmation with dynamic banner injection)
 app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confirmation'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
+  const slug = req.params.slug;
+  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
+  const storeName = store ? store.name : 'Store';
+  const storeBanner = store ? (store.banner || '') : '';
+  const confHtmlPath = path.join(__dirname, 'public', 'confirmation.html');
+  
+  fs.readFile(confHtmlPath, 'utf8', (err, html) => {
+    if (err) return res.sendFile(confHtmlPath);
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Order Confirmed — ${escapeMetaAttr(storeName)}</title>`);
+    if (storeBanner) {
+      modifiedHtml = modifiedHtml.replace(
+        /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
+        `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
+      );
+    }
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(modifiedHtml);
+  });
 });
 
 // Store PIN Verification Endpoint
