@@ -4,6 +4,7 @@
  */
 
 try { require('dotenv').config(); } catch (e) {}
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -1068,13 +1069,48 @@ app.get(['/', '/home', '/home.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Main Store Catalog Route (Supports /shop, /catalog, /store, /:slug)
+// Helper to escape HTML attributes for meta tags
+function escapeMetaAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Main Store Catalog Route (Supports /shop, /catalog, /store, /:slug with dynamic OpenGraph cards for Instagram Bio / Story / DM links)
 app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
   const slug = req.params.slug;
   if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json') || slug.endsWith('.html'))) {
     return next();
   }
-  res.sendFile(path.join(__dirname, 'public', 'shop.html'));
+
+  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : null;
+  const storeName = store ? store.name : 'Achete Store';
+  const storeTagline = store ? (store.tagline || 'Official Online Store | Fast Delivery in Dar es Salaam') : 'Your digital front door for products and ordering.';
+  const storeUrl = store ? `https://achete.me/${store.slug}` : 'https://achete.me/';
+  const storeLogo = (store && store.logo && !store.logo.startsWith('data:')) ? store.logo : 'https://achete.me/assets/achete-icon.png';
+
+  const shopHtmlPath = path.join(__dirname, 'public', 'shop.html');
+  fs.readFile(shopHtmlPath, 'utf8', (err, html) => {
+    if (err) return res.sendFile(shopHtmlPath);
+
+    const dynamicMeta = `
+  <title>${escapeMetaAttr(storeName)} — Official Store on Achete</title>
+  <meta name="description" content="${escapeMetaAttr(storeTagline)}">
+  <meta property="og:title" content="${escapeMetaAttr(storeName)} — Online Store">
+  <meta property="og:description" content="${escapeMetaAttr(storeTagline)}">
+  <meta property="og:image" content="${escapeMetaAttr(storeLogo)}">
+  <meta property="og:url" content="${escapeMetaAttr(storeUrl)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Achete">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeMetaAttr(storeName)}">
+  <meta name="twitter:description" content="${escapeMetaAttr(storeTagline)}">
+  <meta name="twitter:image" content="${escapeMetaAttr(storeLogo)}">
+    `.trim();
+
+    const modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(modifiedHtml);
+  });
 });
 
 // Fallback Route

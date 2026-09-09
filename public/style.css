@@ -1947,6 +1947,48 @@ img {
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Mobile In-App Native Bottom Sheet Experience (Instagram / TikTok Webview) */
+@media (max-width: 640px) {
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+
+  .modal-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    animation: bottomSheetSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  @keyframes bottomSheetSlideUp {
+    0% { transform: translateY(100%); opacity: 0.6; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-sheet-handle {
+    width: 42px;
+    height: 5px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    margin: 10px auto 4px;
+    display: block;
+  }
+
+  /* Tactile feedback for mobile buttons */
+  .btn:active, .add-to-cart-btn:active, .stepper-btn:active, .mobile-floating-cart-bar:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.08s ease !important;
+  }
+}
+
 .modal-header {
   padding: 14px 18px;
   display: flex;
