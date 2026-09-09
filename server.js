@@ -342,7 +342,11 @@ app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], as
     let odooProductId = null;
     let odooProductObj = null;
     try {
-      const createResult = await odoo.createOdooProduct(productData, initialStock);
+      const createResult = await odoo.createOdooProduct({
+        ...productData,
+        storeSlug: store.slug,
+        storeName: store.name
+      }, initialStock);
       odooProductId = createResult.productId;
       odooProductObj = createResult.product;
     } catch (odooErr) {
@@ -359,20 +363,27 @@ app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], as
         name: productData.name,
         description: productData.description
       });
+
+      return res.status(201).json({
+        success: true,
+        message: `Product "${productData.name}" created in Odoo ERP and added to your store!`,
+        productId: odooProductId,
+        product: odooProductObj || productData
+      });
     }
 
-    // 3. Register in store customProducts cache
-    const finalId = odooProductId || (1000 + Math.floor(Math.random() * 9000));
+    // 3. Fallback only if Odoo was unreachable
+    const fallbackId = (1000 + Math.floor(Math.random() * 9000));
     const result = stores.addCustomProductToStore(slug, {
       ...productData,
-      id: finalId
+      id: fallbackId
     });
 
     res.status(201).json({
       success: true,
-      message: `Product "${productData.name}" created in Odoo ERP and added to your store!`,
-      productId: finalId,
-      product: result.product || odooProductObj
+      message: `Product "${productData.name}" added to your store!`,
+      productId: fallbackId,
+      product: result.product
     });
   } catch (err) {
     console.error('[Create Store Product Error]:', err);

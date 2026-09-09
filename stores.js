@@ -301,18 +301,34 @@ class StoreManager {
       });
     }
 
-    // 4. Merge store's custom created products
+    // 4. Merge store's custom created products (Strictly avoiding duplicates by ID or Name)
     if (Array.isArray(store.customProducts) && store.customProducts.length > 0) {
       store.customProducts.forEach(cp => {
-        if (!matched.some(p => Number(p.id) === Number(cp.id))) {
+        const cpName = (cp.name || '').trim().toLowerCase();
+        const alreadyExists = matched.some(p => 
+          Number(p.id) === Number(cp.id) || 
+          ((p.name || '').trim().toLowerCase() === cpName && cpName.length > 0)
+        );
+        if (!alreadyExists) {
           matched.push({ ...cp });
         }
       });
     }
 
+    // 5. Final Deduplication Pass by ID and Name
+    const uniqueMap = new Map();
+    matched.forEach(p => {
+      const key = `${p.id}_${(p.name || '').trim().toLowerCase()}`;
+      if (!uniqueMap.has(key) && !uniqueMap.has(String(p.id))) {
+        uniqueMap.set(key, p);
+        uniqueMap.set(String(p.id), p);
+      }
+    });
+    const uniqueProducts = Array.from(new Set(uniqueMap.values()));
+
     // 6. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
-    return matched.map(prod => {
+    return uniqueProducts.map(prod => {
       const pId = String(prod.id);
       const ovr = overrides[pId];
 

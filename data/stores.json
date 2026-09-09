@@ -26,11 +26,20 @@
       142,
       143,
       144,
-      146
+      146,
+      150
     ],
     "createdDate": "2026-09-07",
     "pin": "1234",
-    "inventoryOverrides": {},
+    "inventoryOverrides": {
+      "150": {
+        "qty_available": 20,
+        "price": 75000,
+        "name": "MagSafe Battery Pack",
+        "description": "Snap-on wireless magnetic power bank",
+        "updatedAt": "2026-09-09T11:53:34.073Z"
+      }
+    },
     "customProducts": []
   }
 ]
