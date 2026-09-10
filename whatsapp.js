@@ -114,7 +114,16 @@ class WhatsAppService {
         const qty = item.quantity || item.qty || 1;
         const price = Number(item.price) || 0;
         const subtotal = qty * price;
-        return `• ${item.name} × ${qty} — TZS ${subtotal.toLocaleString('en-US')}`;
+        let stockNote = '';
+        if (typeof item.stockOnHand === 'number') {
+          if (qty > item.stockOnHand) {
+            const extra = qty - item.stockOnHand;
+            stockNote = `\n   ↳ ⚠️ [Stock: ${item.stockOnHand} on hand • Need ${extra} from partner shop]`;
+          } else {
+            stockNote = `\n   ↳ ✓ [Full ${qty} units available in stock]`;
+          }
+        }
+        return `• ${item.name} × ${qty} — TZS ${subtotal.toLocaleString('en-US')}${stockNote}`;
       }).join('\n');
     } else {
       itemsText = '• General Order Items';

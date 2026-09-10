@@ -984,15 +984,25 @@ img {
 
 /* Stock Tag directly under name */
 .product-item-stock-tag {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
   flex-shrink: 0;
   margin-top: 1px;
+}
+
+.stock-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+  display: inline-block;
+  margin-right: 5px;
+  flex-shrink: 0;
 }
 
 .product-item-stock-tag.in-stock {

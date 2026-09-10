@@ -211,7 +211,6 @@
           const p = products.find(prod => String(prod.id) === String(id));
           if (!p) return;
           const rowSubtotal = p.price * qty;
-          const stock = p.qty_available !== undefined ? p.qty_available : 50;
 
           tableHtml += `
             <tr data-id="${p.id}">
@@ -219,7 +218,7 @@
                 <img src="${p.thumb || p.image}" alt="${p.name}" class="cart-item-thumb" onerror="this.onerror=null; this.src='/assets/products/samsung_charger.png'">
                 <div class="cart-item-meta">
                   <span class="cart-item-name">${p.name}</span>
-                  <span class="cart-item-unit-price">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a; font-weight:600;">${stock} in stock</span></span>
+                  <span class="cart-item-unit-price">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a; font-weight:600;">✓ In Stock</span></span>
                 </div>
               </td>
               <td class="cart-price-cell">${NOVA.formatTZS(p.price)}</td>
@@ -227,7 +226,7 @@
                 <div class="stepper-control">
                   <button class="stepper-btn btn-minus" data-id="${p.id}" aria-label="Decrease">&minus;</button>
                   <span class="stepper-val">${qty}</span>
-                  <button class="stepper-btn btn-plus" data-id="${p.id}" ${qty >= stock ? 'disabled' : ''} aria-label="Increase">&#43;</button>
+                  <button class="stepper-btn btn-plus" data-id="${p.id}" aria-label="Increase">&#43;</button>
                 </div>
               </td>
               <td class="cart-subtotal-cell">${NOVA.formatTZS(rowSubtotal)}</td>
@@ -249,7 +248,6 @@
           const p = products.find(prod => String(prod.id) === String(id));
           if (!p) return;
           const rowSubtotal = p.price * qty;
-          const stock = p.qty_available !== undefined ? p.qty_available : 50;
 
           mobileHtml += `
             <div class="m-cart-card" data-id="${p.id}">
@@ -258,7 +256,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                   <div>
                     <h4 style="font-size:0.9rem; font-weight:600; color:#081735;">${p.name}</h4>
-                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} each</span>
+                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} each &bull; <span style="color:#16a34a; font-weight:600;">In Stock</span></span>
                   </div>
                   <button class="cart-delete-btn" data-id="${p.id}" title="Remove">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -268,7 +266,7 @@
                   <div class="stepper-control" style="padding:2px 4px;">
                     <button class="stepper-btn btn-minus" data-id="${p.id}" style="width:22px;height:22px;">&minus;</button>
                     <span class="stepper-val" style="font-size:0.85rem;">${qty}</span>
-                    <button class="stepper-btn btn-plus" data-id="${p.id}" ${qty >= stock ? 'disabled' : ''} style="width:22px;height:22px;">&#43;</button>
+                    <button class="stepper-btn btn-plus" data-id="${p.id}" style="width:22px;height:22px;">&#43;</button>
                   </div>
                   <strong style="color:#081735; font-size:0.92rem;">${NOVA.formatTZS(rowSubtotal)}</strong>
                 </div>

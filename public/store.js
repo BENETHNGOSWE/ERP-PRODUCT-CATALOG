@@ -262,19 +262,11 @@ const NOVA = (function () {
     rewriteStoreLinks();
   }
 
-  // Update Cart Quantity
+  // Update Cart Quantity (Supports bulk quantities without artificial customer-side limits)
   function updateItemQty(id, delta) {
     const cart = getCart();
     const strId = String(id);
     const current = cart[strId] || 0;
-    const prod = liveProducts.find(p => String(p.id) === strId);
-
-    if (delta > 0 && prod && prod.qty_available !== undefined) {
-      if (current + delta > prod.qty_available && prod.qty_available > 0) {
-        showToast(`⚠️ Only ${prod.qty_available} units available in stock!`, 'danger');
-        return cart;
-      }
-    }
 
     const next = Math.max(0, current + delta);
     if (next === 0) {

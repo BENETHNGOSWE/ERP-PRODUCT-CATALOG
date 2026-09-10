@@ -535,23 +535,12 @@
         filtered.forEach(p => {
           const strId = String(p.id);
           const qty = cart[strId] || 0;
-          const stock = typeof p.qty_available === 'number' ? p.qty_available : 0;
-          
-          let stockClass = 'in-stock';
-          let stockText = `${stock} in stock`;
-          if (stock <= 0) {
-            stockClass = 'out-stock';
-            stockText = 'Out of stock';
-          } else if (stock <= 5) {
-            stockClass = 'low-stock';
-            stockText = `Only ${stock} left`;
-          }
 
           html += `
-            <article class="product-item-card ${stock <= 0 ? 'out-of-stock' : ''}" data-id="${p.id}">
+            <article class="product-item-card" data-id="${p.id}">
               <div class="product-item-left" onclick="openProductDetailModal('${p.id}')">
                 <div class="product-item-thumb-wrap" title="Click to view details">
-                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
+                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%237433df\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
                 </div>
                 <div class="product-item-meta">
                   <h3 class="product-item-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
@@ -562,11 +551,11 @@
                 </div>
               </div>
               <div class="product-item-right-wrap">
-                <span class="product-item-stock-tag ${stockClass}">${stockText}</span>
+                <span class="product-item-stock-tag in-stock"><span class="stock-dot"></span>In Stock</span>
                 <div class="stepper-horizontal">
                   <button class="stepper-btn-h btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
                   <span class="stepper-val-h" id="qty-${p.id}">${qty}</span>
-                  <button class="stepper-btn-h btn-plus" data-id="${p.id}" ${stock <= qty && stock > 0 ? 'disabled' : (stock <= 0 ? 'disabled' : '')} title="Increase quantity">&#43;</button>
+                  <button class="stepper-btn-h btn-plus" data-id="${p.id}" title="Increase quantity">&#43;</button>
                 </div>
               </div>
             </article>
@@ -591,17 +580,6 @@
         const currentInCart = cart[String(p.id)] || 0;
         detailModalQty = currentInCart > 0 ? currentInCart : 1;
 
-        const stock = typeof p.qty_available === 'number' ? p.qty_available : 0;
-        let stockClass = 'in-stock';
-        let stockText = `${stock} in stock`;
-        if (stock <= 0) {
-          stockClass = 'out-stock';
-          stockText = 'Out of stock';
-        } else if (stock <= 5) {
-          stockClass = 'low-stock';
-          stockText = `Only ${stock} left`;
-        }
-
         const imgEl = document.getElementById('detailModalImg');
         if (imgEl) {
           imgEl.src = p.thumb || p.image;
@@ -613,8 +591,8 @@
 
         const stockTagEl = document.getElementById('detailModalStockTag');
         if (stockTagEl) {
-          stockTagEl.className = `product-item-stock-tag ${stockClass}`;
-          stockTagEl.textContent = stockText;
+          stockTagEl.className = 'product-item-stock-tag in-stock';
+          stockTagEl.innerHTML = '<span class="stock-dot"></span>In Stock &bull; Bulk Orders Welcome';
         }
 
         const priceEl = document.getElementById('detailModalPrice');
@@ -658,13 +636,8 @@
 
       window.updateDetailModalQty = function(delta) {
         if (!currentDetailProduct) return;
-        const stock = typeof currentDetailProduct.qty_available === 'number' ? currentDetailProduct.qty_available : 50;
         const newQty = detailModalQty + delta;
         if (newQty < 1) return;
-        if (stock > 0 && newQty > stock) {
-          NOVA.showToast(`⚠️ Only ${stock} units available in stock!`, 'danger');
-          return;
-        }
         detailModalQty = newQty;
         updateDetailModalUI();
       };
@@ -676,13 +649,12 @@
 
         const btnTextEl = document.getElementById('detailModalBtnText');
         const addBtn = document.getElementById('detailModalAddToCartBtn');
-        const stock = typeof currentDetailProduct.qty_available === 'number' ? currentDetailProduct.qty_available : 50;
         
         if (addBtn) {
-          addBtn.disabled = stock <= 0;
+          addBtn.disabled = false;
         }
         if (btnTextEl) {
-          btnTextEl.textContent = stock <= 0 ? 'Out of Stock' : 'Add to Cart';
+          btnTextEl.textContent = 'Add to Cart';
         }
       }
 

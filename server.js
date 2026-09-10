@@ -580,7 +580,22 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     orderData.orderNumber = finalOrderId;
     orderData.receiptNumber = finalReceipt;
 
-    // 1. Immediately Dispatch WhatsApp Order Notification in parallel (non-blocking)
+    // 1. Enrich items with merchant stock on hand intelligence for WhatsApp alert
+    const enrichedItems = (orderData.items || []).map(item => {
+      let stockOnHand = 50;
+      if (item.id) {
+        const prodStock = stores.getStoreProductStock(storeContext.id, item.id);
+        if (prodStock && typeof prodStock.qty_available === 'number') {
+          stockOnHand = prodStock.qty_available;
+        }
+      }
+      return {
+        ...item,
+        stockOnHand
+      };
+    });
+
+    // 2. Immediately Dispatch WhatsApp Order Notification in parallel (non-blocking)
     const waNotificationPromise = (async () => {
       try {
         const res = await whatsapp.sendOrderNotification(storeContext, {
@@ -591,7 +606,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
             phone: customerPhone,
             deliveryAddress: deliveryAddress
           },
-          items: orderData.items,
+          items: enrichedItems,
           totalAmount: finalTotal
         });
         console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${storeContext.whatsapp}!`);
@@ -602,7 +617,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       }
     })();
 
-    // 2. Create POS Order in Odoo ERP & Deduct Stock in parallel
+    // 3. Create POS Order in Odoo ERP & Deduct Stock in parallel
     const odooOrderPromise = (async () => {
       let odooResult = { odooOrderId: null, receiptNumber: finalReceipt };
       try {
