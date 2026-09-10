@@ -6,6 +6,7 @@
 try { require('dotenv').config(); } catch (e) {}
 const fs = require('fs');
 const express = require('express');
+const compression = require('compression');
 const cors = require('cors');
 const path = require('path');
 const odoo = require('./odoo');
@@ -16,29 +17,51 @@ const orders = require('./orders');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// High-speed Gzip/Deflate compression for all responses
+app.use(compression({ level: 6, threshold: 256 }));
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Static Assets
+// Static Assets with Cache-Control headers
+const staticCacheOptions = {
+  maxAge: '1d',
+  etag: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    } else if (filePath.match(/\.(css|js|png|jpg|jpeg|svg|ico|woff2)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    }
+  }
+};
+
 app.use('/assets/stores', (req, res, next) => {
   const filePath = path.join(__dirname, 'public', 'assets', 'stores', req.path);
   if (fs.existsSync(filePath)) {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
     return res.sendFile(filePath);
   }
   const uploadPath = path.join(__dirname, 'data', 'uploads', req.path);
   if (fs.existsSync(uploadPath)) {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
     return res.sendFile(uploadPath);
   }
   next();
 });
-app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets'), staticCacheOptions));
+app.use(express.static(path.join(__dirname, 'public'), staticCacheOptions));
 
 // Nested Static Asset Fallbacks for dynamic subpaths (e.g., /:slug/style.css, /:slug/store.js, /:slug/assets/*)
-app.get('/:slug/style.css', (req, res) => res.sendFile(path.join(__dirname, 'public', 'style.css')));
-app.get('/:slug/store.js', (req, res) => res.sendFile(path.join(__dirname, 'public', 'store.js')));
-app.use('/:slug/assets', express.static(path.join(__dirname, 'public', 'assets')));
+app.get('/:slug/style.css', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, 'public', 'style.css'));
+});
+app.get('/:slug/store.js', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, 'public', 'store.js'));
+});
+app.use('/:slug/assets', express.static(path.join(__dirname, 'public', 'assets'), staticCacheOptions));
 
 // =========================================================================
 // MULTI-CLIENT STORE API ROUTES & BACKUP RECOVERY

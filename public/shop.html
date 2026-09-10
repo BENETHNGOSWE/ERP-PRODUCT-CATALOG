@@ -12,6 +12,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -154,8 +156,8 @@
           </svg>
         </button>
 
-        <!-- Cart Pill Button -->
-        <a href="cart.html" class="btn-cart-pill" id="btnHeaderCart" aria-label="View Cart">
+        <!-- Cart Pill Button (Instant 0ms Drawer) -->
+        <a href="javascript:void(0)" onclick="openCartDrawer()" class="btn-cart-pill" id="btnHeaderCart" aria-label="View Cart">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
             <circle cx="9" cy="21" r="1"/>
             <circle cx="20" cy="21" r="1"/>
@@ -257,8 +259,8 @@
     </div>
   </main>
 
-  <!-- Mobile Floating Cart Bar (Navigates directly to dedicated Cart page) -->
-  <a href="cart.html" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
+  <!-- Mobile Floating Cart Bar (Opens Instant 0ms Cart Drawer) -->
+  <a href="javascript:void(0)" onclick="openCartDrawer()" class="mobile-floating-cart-bar" id="mobileFloatingCart" style="display:none;">
     <div class="float-cart-info">
       <div class="float-cart-icon-wrap">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -271,9 +273,62 @@
       <span class="float-cart-text">Cart</span>
     </div>
     <div class="float-view-cart-btn">
-      <span>View Cart &rarr;</span>
+      <span id="mobileFloatTotal">View Cart &rarr;</span>
     </div>
   </a>
+
+  <!-- Instant Cart Sheet / Popup Drawer (0ms Latency for Mobile & Instagram) -->
+  <div class="cart-sheet-overlay" id="cartDrawerModal" onclick="if(event.target === this) closeCartDrawer()">
+    <div class="cart-sheet-panel" onclick="event.stopPropagation()">
+      <div class="cart-sheet-header">
+        <div class="cart-sheet-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7433df" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span>Your Cart</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="btn-clear-cart" onclick="NOVA.resetCart(); renderStoreView(); renderCartDrawer();" title="Clear Cart">Clear</button>
+          <button type="button" class="cart-sheet-close-btn" onclick="closeCartDrawer()">&times;</button>
+        </div>
+      </div>
+
+      <div class="cart-sheet-body" id="cartDrawerBody">
+        <!-- Dynamically populated cart items -->
+      </div>
+
+      <div class="cart-sheet-footer">
+        <div class="summary-rows" style="margin-bottom: 14px;">
+          <div class="summary-row">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-val" id="drawerSubtotal">TZS 0</span>
+          </div>
+          <div class="summary-row discount-row">
+            <span class="summary-label">Discount</span>
+            <span class="summary-val discount-val" id="drawerDiscount">TZS 0</span>
+          </div>
+          <div class="summary-row total-row">
+            <span class="summary-label">Total</span>
+            <span class="summary-val total-val" id="drawerTotal">TZS 0</span>
+          </div>
+        </div>
+
+        <div class="mobile-number-box" style="margin-bottom: 14px;">
+          <label for="drawerCustomerPhone" class="input-label">Mobile Number</label>
+          <div class="phone-input-wrapper">
+            <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+            <input type="tel" id="drawerCustomerPhone" class="phone-input" placeholder="+255 7XX XXX XXX" value="+255 712 345 678" autocomplete="tel">
+          </div>
+          <p class="phone-hint">Order confirmation will be sent directly via WhatsApp/SMS.</p>
+        </div>
+
+        <button type="button" class="btn-place-order" id="btnDrawerPlaceOrder" onclick="handleDrawerCheckout()">
+          PLACE ORDER
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Product Details & Quick View Popup Modal -->
   <div class="prod-detail-overlay" id="productDetailModal" onclick="if(event.target === this) closeProductDetailModal()">
@@ -577,6 +632,7 @@
 
         listContainer.innerHTML = html;
         NOVA.updateHeaderCartBadge();
+        if (typeof window.renderCartDrawer === 'function') window.renderCartDrawer();
       }
 
       // Product Detail Modal State & Handlers
@@ -903,6 +959,192 @@
       };
       window.closeModal = function(id) {
         document.getElementById(id).classList.remove('active');
+      };
+
+      // Instant Cart Drawer Controller (0ms Latency for Mobile & Instagram)
+      window.openCartDrawer = function() {
+        renderCartDrawer();
+        const drawerPhone = document.getElementById('drawerCustomerPhone');
+        if (drawerPhone) {
+          drawerPhone.value = phoneInput?.value || NOVA.getPhone() || '+255 712 345 678';
+        }
+        document.getElementById('cartDrawerModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      };
+
+      window.closeCartDrawer = function() {
+        document.getElementById('cartDrawerModal').classList.remove('active');
+        document.body.style.overflow = '';
+      };
+
+      window.renderCartDrawer = function() {
+        const cart = NOVA.getCart();
+        const products = NOVA.getProducts();
+        const totals = NOVA.calculateTotals(cart);
+        const drawerBody = document.getElementById('cartDrawerBody');
+        const drawerSubtotal = document.getElementById('drawerSubtotal');
+        const drawerDiscount = document.getElementById('drawerDiscount');
+        const drawerTotal = document.getElementById('drawerTotal');
+        const btnDrawerPlaceOrder = document.getElementById('btnDrawerPlaceOrder');
+
+        if (drawerSubtotal) drawerSubtotal.textContent = NOVA.formatTZS(totals.subtotal);
+        if (drawerDiscount) drawerDiscount.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
+        if (drawerTotal) drawerTotal.textContent = NOVA.formatTZS(totals.total);
+
+        if (btnDrawerPlaceOrder) {
+          btnDrawerPlaceOrder.disabled = totals.itemCount === 0;
+        }
+
+        const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
+
+        if (!drawerBody) return;
+
+        if (items.length === 0) {
+          drawerBody.innerHTML = `
+            <div style="text-align:center; padding: 48px 20px; color: #64748b;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin: 0 auto 12px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              <h3 style="font-size: 1.05rem; color: #1e293b; margin-bottom: 6px; font-weight: 700;">Your cart is empty</h3>
+              <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;">Select items from the catalog to start your order.</p>
+              <button type="button" class="btn-outline-continue" style="display:inline-flex; width:auto; margin:0 auto; padding:8px 18px;" onclick="closeCartDrawer()">&larr; Browse Catalog</button>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        items.forEach(([id, qty]) => {
+          const p = (products || []).find(prod => String(prod.id) === String(id));
+          if (!p) return;
+          const rowSubtotal = (Number(p.price) || 0) * qty;
+
+          html += `
+            <div class="m-cart-card" data-id="${escapeAttr(p.id)}" style="margin-bottom: 12px;">
+              <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeAttr(p.name)}" class="cart-item-thumb" onerror="this.onerror=null; this.src='/assets/products/samsung_charger.png'">
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                  <div>
+                    <h4 style="font-size:0.9rem; font-weight:700; color:#0f172a; line-height:1.25; margin-bottom:2px;">${escapeHtml(p.name)}</h4>
+                    <span style="font-size:0.78rem; color:#64748b;">${NOVA.formatTZS(p.price)} &bull; <span style="color:#16a34a; font-weight:600;">✓ In Stock</span></span>
+                  </div>
+                  <button type="button" class="cart-delete-btn" onclick="NOVA.removeItem('${escapeAttr(p.id)}'); renderStoreView(); renderCartDrawer();" title="Remove">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                  <div class="stepper-control">
+                    <button type="button" class="stepper-btn btn-minus" onclick="NOVA.updateItemQty('${escapeAttr(p.id)}', -1); renderStoreView(); renderCartDrawer();">&minus;</button>
+                    <span class="stepper-val">${qty}</span>
+                    <button type="button" class="stepper-btn btn-plus" onclick="NOVA.updateItemQty('${escapeAttr(p.id)}', 1); renderStoreView(); renderCartDrawer();">&#43;</button>
+                  </div>
+                  <strong style="color:#0f172a; font-size:0.92rem; font-weight:700; white-space:nowrap;">${NOVA.formatTZS(rowSubtotal)}</strong>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        drawerBody.innerHTML = html;
+      };
+
+      window.handleDrawerCheckout = async function() {
+        const totals = NOVA.calculateTotals();
+        if (totals.itemCount === 0) {
+          NOVA.showToast('⚠️ Your cart is empty. Add products first!', 'danger');
+          return;
+        }
+
+        const btn = document.getElementById('btnDrawerPlaceOrder');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = `<span class="loading-spinner"></span> <span>Processing Order...</span>`;
+        }
+
+        const drawerPhoneEl = document.getElementById('drawerCustomerPhone');
+        const phoneVal = drawerPhoneEl?.value.trim() || phoneInput?.value.trim() || '+255 712 345 678';
+        NOVA.savePhone(phoneVal);
+
+        const cart = NOVA.getCart();
+        let products = NOVA.getProducts();
+        if (!products || products.length === 0) {
+          await NOVA.loadOdooProducts();
+          products = NOVA.getProducts();
+        }
+
+        const orderItems = [];
+        for (const [id, qty] of Object.entries(cart)) {
+          if (qty > 0) {
+            const p = (products || []).find(item => String(item.id) === String(id));
+            if (p) {
+              orderItems.push({
+                id: p.id,
+                name: p.name,
+                price: Number(p.price) || 0,
+                qty: qty,
+                quantity: qty,
+                subtotal: (Number(p.price) || 0) * qty
+              });
+            } else {
+              orderItems.push({
+                id: id,
+                name: `Product #${id}`,
+                price: 0,
+                qty: qty,
+                quantity: qty,
+                subtotal: 0
+              });
+            }
+          }
+        }
+
+        const orderId = 'NM-' + Math.floor(1000 + Math.random() * 9000);
+        NOVA.showToast('Submitting order to Odoo ERP...');
+
+        let odooResult = null;
+        try {
+          odooResult = await NOVA.submitOrderToOdoo({
+            orderId: orderId,
+            customerPhone: phoneVal,
+            customerName: `Customer (${phoneVal})`,
+            items: orderItems,
+            totalAmount: totals.total
+          });
+        } catch (netErr) {
+          console.error('Order submission error:', netErr);
+        }
+
+        if (!odooResult || !odooResult.success) {
+          NOVA.showToast('⚠️ Failed to place order in Odoo POS: ' + (odooResult && odooResult.error ? odooResult.error : 'Connection error. Please try again.'), 'danger');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'PLACE ORDER';
+          }
+          return;
+        }
+
+        const confirmedOrder = {
+          orderId: orderId,
+          odooOrderId: odooResult && odooResult.order ? odooResult.order.odooOrderId : null,
+          odooOrderName: odooResult && odooResult.order ? odooResult.order.odooOrderName : null,
+          receiptNumber: odooResult && odooResult.order ? odooResult.order.receiptNumber : null,
+          storeSlug: odooResult && odooResult.order ? odooResult.order.storeSlug : NOVA.getStoreSlug(),
+          storeName: odooResult && odooResult.order ? odooResult.order.storeName : ((NOVA.getStore() && NOVA.getStore().name) || 'Store'),
+          storeWhatsapp: odooResult && odooResult.order ? odooResult.order.storeWhatsapp : ((NOVA.getStore() && NOVA.getStore().whatsapp) || '+255712345678'),
+          waLink: odooResult && odooResult.order ? odooResult.order.waLink : null,
+          totalPaid: totals.total,
+          subtotal: totals.subtotal,
+          discount: totals.discount,
+          itemCount: totals.itemCount,
+          phone: phoneVal,
+          items: orderItems,
+          status: 'Order Placed & Confirmed in Odoo',
+          date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+        };
+
+        NOVA.saveLatestOrder(confirmedOrder);
+        NOVA.resetCart();
+
+        const slug = NOVA.getStoreSlug();
+        const targetUrl = (slug && slug !== 'achete' && slug !== 'shop') ? `/${slug}/confirmation` : 'confirmation.html';
+        window.location.href = `${targetUrl}?orderId=${encodeURIComponent(confirmedOrder.orderId)}`;
       };
 
       // Initial Instant Render (Zero-latency from pre-injected server payload / cache)

@@ -387,6 +387,34 @@ function callModel(model, method, args, kwargs = {}, timeoutMs = 12000) {
 }
 
 // Map Odoo Product to Catalog Format
+function saveBase64ProductImage(id, base64Data) {
+  try {
+    const productsDir = path.join(__dirname, 'public', 'assets', 'products');
+    if (!fs.existsSync(productsDir)) {
+      fs.mkdirSync(productsDir, { recursive: true });
+    }
+    
+    let clean = base64Data;
+    let ext = 'png';
+    if (base64Data.startsWith('data:image/')) {
+      const match = base64Data.match(/^data:image\/([a-zA-Z0-9+]+);base64,/);
+      if (match) {
+        ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+        clean = base64Data.replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, '');
+      }
+    }
+    
+    const fileName = `prod_${id}.${ext}`;
+    const filePath = path.join(productsDir, fileName);
+    fs.writeFileSync(filePath, Buffer.from(clean, 'base64'));
+    return `/assets/products/${fileName}`;
+  } catch (e) {
+    console.warn(`[Image Cache Warning for Product ${id}]:`, e.message);
+    return null;
+  }
+}
+
+// Map Odoo Product to Catalog Format
 function mapProduct(p, categMap, tagMap = {}) {
   let category = 'General';
   if (p.pos_categ_ids && p.pos_categ_ids.length > 0) {
@@ -404,14 +432,21 @@ function mapProduct(p, categMap, tagMap = {}) {
     });
   }
 
-  // Exact image from Odoo or custom uploaded data
+  // Exact image from Odoo or custom uploaded data (Optimized to static disk files for sub-10ms initial page load)
   let image = '';
-  if (p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20) {
-    image = p.image_1920.startsWith('data:') ? p.image_1920 : `data:image/png;base64,${p.image_1920}`;
-  } else if (p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20) {
-    image = p.image_128.startsWith('data:') ? p.image_128 : `data:image/png;base64,${p.image_128}`;
+  if (p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20) {
+    const saved = saveBase64ProductImage(p.id, p.image_128);
+    image = saved || (p.image_128.startsWith('data:') ? p.image_128 : `data:image/png;base64,${p.image_128}`);
+  } else if (p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20) {
+    const saved = saveBase64ProductImage(p.id, p.image_1920);
+    image = saved || (p.image_1920.startsWith('data:') ? p.image_1920 : `data:image/png;base64,${p.image_1920}`);
   } else if (p.image && typeof p.image === 'string' && p.image.length > 5) {
-    image = p.image;
+    if (p.image.startsWith('data:image/') && p.image.length > 2000) {
+      const saved = saveBase64ProductImage(p.id, p.image);
+      image = saved || p.image;
+    } else {
+      image = p.image;
+    }
   } else {
     // Generate an elegant SVG placeholder badge with initial letter and product name
     const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
