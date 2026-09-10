@@ -33,9 +33,13 @@
     "createdDate": "2026-09-07",
     "pin": "1234",
     "inventoryOverrides": {
+      "144": {
+        "qty_available": 30,
+        "updatedAt": "2026-09-10T08:31:49.145Z"
+      },
       "148": {
         "qty_available": 0,
-        "updatedAt": "2026-09-10T08:14:02.330Z"
+        "updatedAt": "2026-09-10T08:32:02.962Z"
       },
       "150": {
         "price": 75000,

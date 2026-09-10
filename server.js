@@ -543,7 +543,9 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       store = stores.getAllStores().find(s => s.slug.toLowerCase() === slug.toLowerCase() || s.name.toLowerCase() === slug.toLowerCase()) || stores.getAllStores()[0];
     }
 
-    const storeWhatsapp = orderData.storeWhatsapp || (store && store.whatsapp) || '+255710459064';
+    const storeWhatsapp = (store && store.whatsapp && !store.whatsapp.includes('12345678'))
+      ? store.whatsapp
+      : ((orderData.storeWhatsapp && !orderData.storeWhatsapp.includes('12345678')) ? orderData.storeWhatsapp : '+255710459064');
     const storeName = orderData.storeName || (store && store.name) || 'Store';
 
     const storeContext = {
@@ -600,7 +602,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     // 2. Immediately Dispatch WhatsApp Order Notification in parallel (non-blocking)
     const waNotificationPromise = (async () => {
       try {
-        const res = await whatsapp.sendOrderNotification(storeContext, {
+        const orderPayload = {
           orderNumber: finalOrderId,
           receiptNumber: finalReceipt,
           customer: {
@@ -610,9 +612,22 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
           },
           items: enrichedItems,
           totalAmount: finalTotal
-        });
-        console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to ${storeContext.whatsapp}!`);
-        return res;
+        };
+
+        // Send Merchant Alert
+        const storeRes = await whatsapp.sendOrderNotification(storeContext, orderPayload);
+        console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to merchant ${storeContext.whatsapp}!`);
+
+        // If customer phone is provided and differs from store, also send customer receipt
+        const normStore = whatsapp.normalizePhone(storeContext.whatsapp);
+        const normCust = whatsapp.normalizePhone(customerPhone);
+        if (normCust && normCust.length >= 9 && normCust !== '255712345678' && normCust !== normStore) {
+          whatsapp.sendCustomerReceipt(customerPhone, storeContext, orderPayload)
+            .then(() => console.log(`[WhatsApp Auto-Dispatch] Confirmation sent to customer ${customerPhone}!`))
+            .catch(cErr => console.warn('[WhatsApp Customer Receipt Notice]:', cErr.message));
+        }
+
+        return storeRes;
       } catch (waErr) {
         console.warn('[WhatsApp Gateway Warning]:', waErr.message);
         return { success: false, error: waErr.message };

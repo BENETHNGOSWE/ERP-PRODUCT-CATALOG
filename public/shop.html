@@ -297,7 +297,7 @@
 
         <!-- Quick Bulk Quantity Presets -->
         <div class="bulk-preset-wrapper">
-          <span class="bulk-preset-label">⚡ Quick Quantity:</span>
+          <span class="bulk-preset-label">Quick Quantity:</span>
           <div class="bulk-preset-pills">
             <button type="button" class="bulk-pill active" onclick="setDetailModalQty(1)">1</button>
             <button type="button" class="bulk-pill" onclick="setDetailModalQty(5)">5</button>
@@ -318,13 +318,13 @@
 
       <div class="prod-detail-footer">
         <div class="prod-detail-action-row">
-          <div class="stepper-horizontal" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:3px 6px;">
-            <button class="stepper-btn-h" id="detailModalMinusBtn" onclick="updateDetailModalQty(-1)">&minus;</button>
-            <input type="number" class="stepper-input-h" id="detailModalQtyInput" value="1" min="1" inputmode="numeric" onfocus="this.select()" onchange="setDetailModalQty(this.value)" oninput="setDetailModalQty(this.value)" style="border:none; background:transparent; font-size:1.1rem; width:54px;">
-            <button class="stepper-btn-h" id="detailModalPlusBtn" onclick="updateDetailModalQty(1)">&#43;</button>
+          <div class="prod-detail-stepper">
+            <button type="button" class="stepper-btn-h" id="detailModalMinusBtn" onclick="updateDetailModalQty(-1)">&minus;</button>
+            <input type="number" class="prod-detail-qty-input" id="detailModalQtyInput" value="1" min="1" inputmode="numeric" onfocus="this.select()" onchange="setDetailModalQty(this.value)" oninput="setDetailModalQty(this.value)">
+            <button type="button" class="stepper-btn-h" id="detailModalPlusBtn" onclick="updateDetailModalQty(1)">&#43;</button>
           </div>
           <button type="button" class="prod-detail-btn-cart" id="detailModalAddToCartBtn" onclick="submitDetailModalCart()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <span id="detailModalBtnText">Add to Cart</span>
           </button>
         </div>

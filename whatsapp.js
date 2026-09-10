@@ -149,6 +149,94 @@ Action Required: Please process and confirm this order.`
   }
 
   /**
+   * Build Customer Order Confirmation Message
+   */
+  formatCustomerReceipt(store, order) {
+    const storeName = store ? store.name : 'Store';
+    const storeWa = store ? (store.whatsapp || '+255710459064') : '+255710459064';
+    const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
+    const custName = order.customer ? (order.customer.name || 'Customer') : (order.customerName || 'Customer');
+    const delivery = order.customer ? (order.customer.deliveryAddress || (store && store.address) || 'Dar es Salaam') : 'Dar es Salaam';
+
+    let itemsText = '';
+    const items = order.items || [];
+    if (items.length > 0) {
+      itemsText = items.map(item => {
+        const qty = item.quantity || item.qty || 1;
+        const price = Number(item.price) || 0;
+        const subtotal = qty * price;
+        return `• ${item.name} × ${qty} — TZS ${subtotal.toLocaleString('en-US')}`;
+      }).join('\n');
+    } else {
+      itemsText = '• General Order Items';
+    }
+
+    const totalFormatted = (Number(order.totalAmount) || 0).toLocaleString('en-US');
+
+    return (
+`✅ *ORDER CONFIRMATION #${orderRef}*
+Hello *${custName}*, thank you for your order at *${storeName}*!
+
+*Your Order:*
+${itemsText}
+
+*Total: TZS ${totalFormatted}*
+*Delivery Address:* ${delivery}
+
+Your order has been received and our team is preparing it for delivery/pickup.
+📞 Store WhatsApp: ${storeWa}`
+    );
+  }
+
+  /**
+   * Send Customer Order Receipt Directly in Background
+   */
+  async sendCustomerReceipt(targetPhone, store, order) {
+    const cleanPhone = this.normalizePhone(targetPhone);
+    const messageText = this.formatCustomerReceipt(store, order);
+    const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
+
+    const logEntry = {
+      id: `WA-CUST-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+      storeId: store ? store.id : 'unknown',
+      storeSlug: store ? store.slug : 'unknown',
+      storeName: store ? store.name : 'Store',
+      recipientPhone: targetPhone,
+      cleanPhone: cleanPhone,
+      orderRef: orderRef,
+      messagePreview: messageText,
+      status: 'pending',
+      gateway: this.config.provider,
+      sentAt: new Date().toISOString(),
+      error: null
+    };
+
+    try {
+      let dispatchResult = null;
+      if (this.config.provider === 'openwa' || this.config.openwaUrl) {
+        dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
+      } else if (this.config.provider === 'meta') {
+        dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+      } else if (this.config.provider === 'ultramsg') {
+        dispatchResult = await this.sendUltraMsg(cleanPhone, messageText);
+      } else if (this.config.gatewayUrl) {
+        dispatchResult = await this.sendCustomWebhook(cleanPhone, messageText, orderRef);
+      }
+
+      logEntry.status = 'sent';
+      logEntry.response = dispatchResult;
+      messageLogs.unshift(logEntry);
+      return { success: true, result: dispatchResult };
+    } catch (err) {
+      logEntry.status = 'failed';
+      logEntry.error = err.message;
+      messageLogs.unshift(logEntry);
+      throw err;
+    }
+  }
+
+  /**
    * Send Order Notification Directly in Background via Active Gateway Provider
    */
   async sendOrderNotification(store, order) {

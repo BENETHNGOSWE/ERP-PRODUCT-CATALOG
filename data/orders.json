@@ -1,5 +1,77 @@
 [
   {
+    "id": 11,
+    "orderId": "ORD-2961",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-ORD-2961",
+    "receiptNumber": "Order WEB-ORD-2961",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Customer Juma",
+      "phone": "+255710459064",
+      "deliveryAddress": "Masaki, Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": "148",
+        "name": "Apple Headset",
+        "price": 450000,
+        "qty": 5,
+        "subtotal": 2250000
+      }
+    ],
+    "itemCount": 5,
+    "subtotal": 2250000,
+    "discount": 0,
+    "totalAmount": 2250000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23ORD-2961*%0ATotal%3A%20TZS%202250000%0ACustomer%3A%20Customer%20Juma",
+    "createdAt": "2026-09-10T08:32:02.962Z",
+    "dateFormatted": "10 Sept 2026, 08:32"
+  },
+  {
+    "id": 10,
+    "orderId": "ORD-9131",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-ORD-9131",
+    "receiptNumber": "Order WEB-ORD-9131",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Beneth Test",
+      "phone": "+255710459064",
+      "deliveryAddress": "Masaki, Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": "144",
+        "name": "Samsung Note 20 Ultra",
+        "price": 650000,
+        "qty": 20,
+        "subtotal": 13000000
+      }
+    ],
+    "itemCount": 20,
+    "subtotal": 13000000,
+    "discount": 0,
+    "totalAmount": 13000000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23ORD-9131*%0ATotal%3A%20TZS%2013000000%0ACustomer%3A%20Beneth%20Test",
+    "createdAt": "2026-09-10T08:31:49.146Z",
+    "dateFormatted": "10 Sept 2026, 08:31"
+  },
+  {
     "id": 9,
     "orderId": "ORD-2315",
     "odooOrderId": null,
