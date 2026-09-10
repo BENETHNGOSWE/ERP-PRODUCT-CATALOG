@@ -223,9 +223,9 @@
               </td>
               <td class="cart-price-cell">${NOVA.formatTZS(p.price)}</td>
               <td class="cart-qty-cell">
-                <div class="stepper-control" style="gap:4px;">
+                <div class="stepper-control">
                   <button class="stepper-btn btn-minus" data-id="${p.id}" aria-label="Decrease">&minus;</button>
-                  <input type="number" class="stepper-input-h stepper-cart-input" data-id="${p.id}" value="${qty}" min="1" inputmode="numeric" title="Type bulk quantity" style="width:48px; height:28px; font-size:0.9rem;" onfocus="this.select()">
+                  <span class="stepper-val">${qty}</span>
                   <button class="stepper-btn btn-plus" data-id="${p.id}" aria-label="Increase">&#43;</button>
                 </div>
               </td>
@@ -263,10 +263,10 @@
                   </button>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                  <div class="stepper-control" style="padding:2px 4px; gap:4px;">
-                    <button class="stepper-btn btn-minus" data-id="${p.id}" style="width:24px;height:24px;">&minus;</button>
-                    <input type="number" class="stepper-input-h stepper-cart-input" data-id="${p.id}" value="${qty}" min="1" inputmode="numeric" title="Type bulk quantity" style="width:42px; height:24px; font-size:0.85rem;" onfocus="this.select()">
-                    <button class="stepper-btn btn-plus" data-id="${p.id}" style="width:24px;height:24px;">&#43;</button>
+                  <div class="stepper-control">
+                    <button class="stepper-btn btn-minus" data-id="${p.id}">&minus;</button>
+                    <span class="stepper-val">${qty}</span>
+                    <button class="stepper-btn btn-plus" data-id="${p.id}">&#43;</button>
                   </div>
                   <strong style="color:#081735; font-size:0.92rem;">${NOVA.formatTZS(rowSubtotal)}</strong>
                 </div>
@@ -278,29 +278,6 @@
       }
 
       // Event Delegation
-      document.addEventListener('change', (e) => {
-        const cartInput = e.target.closest('.stepper-cart-input');
-        if (cartInput) {
-          const id = cartInput.getAttribute('data-id');
-          const val = Math.max(0, parseInt(cartInput.value, 10) || 0);
-          if (val === 0) {
-            NOVA.removeItem(id);
-          } else {
-            NOVA.setItemQty(id, val);
-          }
-          renderCart();
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const cartInput = e.target.closest('.stepper-cart-input');
-          if (cartInput) {
-            cartInput.blur();
-          }
-        }
-      });
-
       document.addEventListener('click', (e) => {
         const plus = e.target.closest('.btn-plus');
         if (plus) {
