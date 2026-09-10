@@ -519,15 +519,60 @@
       color: #64748b;
     }
 
-    /* Middle Grid (3 Columns) */
+    /* Middle Grid: Responsive Grid for Large Desktop, Laptop, Tablet, and Mobile */
     .middle-grid {
       display: grid;
-      grid-template-columns: 2fr 1.2fr 1.4fr;
+      grid-template-columns: repeat(12, 1fr);
       gap: 18px;
       width: 100%;
     }
 
-    @media (max-width: 1200px) { .middle-grid { grid-template-columns: 1fr; } }
+    .middle-grid > .dash-card:nth-child(1) {
+      grid-column: span 6; /* Sales Chart */
+    }
+    .middle-grid > .dash-card:nth-child(2) {
+      grid-column: span 3; /* Orders Summary */
+    }
+    .middle-grid > .dash-card:nth-child(3) {
+      grid-column: span 3; /* Top Selling Products */
+    }
+
+    /* Large Laptop / Desktop (> 1400px) */
+    @media (min-width: 1400px) {
+      .middle-grid > .dash-card:nth-child(1) { grid-column: span 5; }
+      .middle-grid > .dash-card:nth-child(2) { grid-column: span 3; }
+      .middle-grid > .dash-card:nth-child(3) { grid-column: span 4; }
+    }
+
+    /* Tablet Landscape & Standard Laptops (769px - 1280px) */
+    @media (max-width: 1280px) and (min-width: 769px) {
+      .middle-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .middle-grid > .dash-card:nth-child(1) {
+        grid-column: 1 / -1; /* Sales Chart spans full width across top */
+      }
+      .middle-grid > .dash-card:nth-child(2) {
+        grid-column: 1; /* Orders Summary on left */
+      }
+      .middle-grid > .dash-card:nth-child(3) {
+        grid-column: 2; /* Top Selling Products on right */
+      }
+    }
+
+    /* Mobile & Portrait Tablets (< 768px) */
+    @media (max-width: 768px) {
+      .middle-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .middle-grid > .dash-card {
+        width: 100%;
+        grid-column: auto !important;
+      }
+    }
 
     .dash-card {
       background: #ffffff;
@@ -2958,7 +3003,12 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       document.getElementById('salesChartTitle').textContent = chartTitle;
 
-      const maxAmount = Math.max(...series.map(d => d.amount), 50000);
+      const points = series.map((d, i) => {
+        const amt = Number(d.amount !== undefined ? d.amount : (d.value !== undefined ? d.value : 0)) || 0;
+        return { label: d.label, amount: amt };
+      });
+
+      const maxAmount = Math.max(...points.map(d => d.amount), 50000);
       const width = 540;
       const height = 220;
       const padLeft = 65;
@@ -2968,18 +3018,18 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const plotWidth = width - padLeft - padRight;
       const plotHeight = height - padTop - padBottom;
 
-      const stepX = plotWidth / (series.length - 1 || 1);
+      const stepX = plotWidth / (points.length - 1 || 1);
 
-      const points = series.map((d, i) => {
+      const plotPoints = points.map((d, i) => {
         const x = padLeft + (i * stepX);
         const y = padTop + plotHeight - ((d.amount / maxAmount) * (plotHeight - 10));
         return { x, y, label: d.label, amount: d.amount };
       });
 
-      let pathD = `M ${points[0].x} ${points[0].y}`;
-      for (let i = 1; i < points.length; i++) {
-        const prev = points[i - 1];
-        const curr = points[i];
+      let pathD = `M ${plotPoints[0].x} ${plotPoints[0].y}`;
+      for (let i = 1; i < plotPoints.length; i++) {
+        const prev = plotPoints[i - 1];
+        const curr = plotPoints[i];
         const cx1 = prev.x + (curr.x - prev.x) / 2;
         const cy1 = prev.y;
         const cx2 = prev.x + (curr.x - prev.x) / 2;
@@ -2987,8 +3037,8 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         pathD += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`;
       }
 
-      const areaD = `${pathD} L ${points[points.length - 1].x} ${padTop + plotHeight} L ${points[0].x} ${padTop + plotHeight} Z`;
-      const highestPoint = points.reduce((prev, curr) => (curr.amount > prev.amount ? curr : prev), points[0]);
+      const areaD = `${pathD} L ${plotPoints[plotPoints.length - 1].x} ${padTop + plotHeight} L ${plotPoints[0].x} ${padTop + plotHeight} Z`;
+      const highestPoint = plotPoints.reduce((prev, curr) => (curr.amount > prev.amount ? curr : prev), plotPoints[0]);
 
       container.innerHTML = `
         <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
@@ -3010,7 +3060,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           <path d="${areaD}" fill="url(#chartGradient)" />
           <path d="${pathD}" fill="none" stroke="#0047bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 
-          ${points.map(p => `
+          ${plotPoints.map(p => `
             <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#ffffff" stroke="#0047bb" stroke-width="2.5" />
             <text x="${p.x}" y="${padTop + plotHeight + 18}" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle" font-family="inherit">${p.label}</text>
           `).join('')}
@@ -3030,47 +3080,61 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const container = document.getElementById('donutContainer');
       if (!container) return;
 
-      const sum = summary || { completed: { count: 14, percentage: 100 }, inProgress: { count: 0, percentage: 0 }, cancelled: { count: 0, percentage: 0 }, total: 14 };
-      const total = sum.total || 14;
-      const compPct = sum.completed ? sum.completed.percentage : 100;
-      const progPct = sum.inProgress ? sum.inProgress.percentage : 0;
-      const cancPct = sum.cancelled ? sum.cancelled.percentage : 0;
+      const total = Number(summary?.total) || 0;
+      const completedCount = Number(summary?.completed?.count ?? summary?.completed ?? 0);
+      const inProgressCount = Number(summary?.inProgress?.count ?? summary?.inProgress ?? 0);
+      const cancelledCount = Number(summary?.cancelled?.count ?? summary?.cancelled ?? 0);
 
-      const r = 50;
+      const calcTotal = total > 0 ? total : (completedCount + inProgressCount + cancelledCount);
+      const displayTotal = calcTotal > 0 ? calcTotal : 0;
+
+      const compPct = displayTotal > 0 ? Math.round((completedCount / displayTotal) * 100) : (completedCount > 0 ? 100 : 0);
+      const progPct = displayTotal > 0 ? Math.round((inProgressCount / displayTotal) * 100) : 0;
+      const cancPct = displayTotal > 0 ? Math.round((cancelledCount / displayTotal) * 100) : 0;
+
+      const r = 44;
       const circ = 2 * Math.PI * r;
       const compDash = (compPct / 100) * circ;
       const progDash = (progPct / 100) * circ;
       const cancDash = (cancPct / 100) * circ;
 
       container.innerHTML = `
-        <div style="position: relative; width: 130px; height: 130px;">
-          <svg viewBox="0 0 130 130" style="width:100%; height:100%; transform: rotate(-90deg);">
-            <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#f1f5f9" stroke-width="14"/>
-            <circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#16a34a" stroke-width="14" stroke-dasharray="${compDash} ${circ}" stroke-dashoffset="0" stroke-linecap="round"/>
-            ${progDash > 0 ? `<circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#2563eb" stroke-width="14" stroke-dasharray="${progDash} ${circ}" stroke-dashoffset="${-compDash}" stroke-linecap="round"/>` : ''}
-            ${cancDash > 0 ? `<circle cx="65" cy="65" r="${r}" fill="transparent" stroke="#ef4444" stroke-width="14" stroke-dasharray="${cancDash} ${circ}" stroke-dashoffset="${-(compDash + progDash)}" stroke-linecap="round"/>` : ''}
-          </svg>
-          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <span style="font-size: 1.4rem; font-weight: 800; color: #081735; line-height: 1;">${total}</span>
-            <span style="font-size: 0.68rem; color: #64748b; font-weight: 600;">Total Orders</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 14px; flex-wrap: wrap;">
+          <div style="position: relative; width: 110px; height: 110px; flex-shrink: 0; margin: 0 auto;">
+            <svg viewBox="0 0 110 110" style="width:100%; height:100%; transform: rotate(-90deg);">
+              <circle cx="55" cy="55" r="${r}" fill="transparent" stroke="#f1f5f9" stroke-width="12"/>
+              <circle cx="55" cy="55" r="${r}" fill="transparent" stroke="#16a34a" stroke-width="12" stroke-dasharray="${compDash} ${circ}" stroke-dashoffset="0" stroke-linecap="round"/>
+              ${progDash > 0 ? `<circle cx="55" cy="55" r="${r}" fill="transparent" stroke="#2563eb" stroke-width="12" stroke-dasharray="${progDash} ${circ}" stroke-dashoffset="${-compDash}" stroke-linecap="round"/>` : ''}
+              ${cancDash > 0 ? `<circle cx="55" cy="55" r="${r}" fill="transparent" stroke="#ef4444" stroke-width="12" stroke-dasharray="${cancDash} ${circ}" stroke-dashoffset="${-(compDash + progDash)}" stroke-linecap="round"/>` : ''}
+            </svg>
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+              <span style="font-size: 1.3rem; font-weight: 800; color: #081735; line-height: 1;">${displayTotal}</span>
+              <span style="font-size: 0.65rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 2px;">Orders</span>
+            </div>
           </div>
-        </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
-            <span style="font-weight: 600; color: #1e293b;">Completed</span>
-            <span style="color: #64748b; margin-left: auto;">${sum.completed.count} (${compPct}%)</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
-            <span style="font-weight: 600; color: #1e293b;">On Progress</span>
-            <span style="color: #64748b; margin-left: auto;">${sum.inProgress.count} (${progPct}%)</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
-            <span style="font-weight: 600; color: #1e293b;">Cancelled</span>
-            <span style="color: #64748b; margin-left: auto;">${sum.cancelled.count} (${cancPct}%)</span>
+          <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 140px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a; flex-shrink: 0;"></span>
+                <span style="font-weight: 600; color: #1e293b;">Completed</span>
+              </div>
+              <span style="color: #64748b; font-weight: 700;">${completedCount} <span style="font-weight: 500; font-size: 0.75rem;">(${compPct}%)</span></span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563eb; flex-shrink: 0;"></span>
+                <span style="font-weight: 600; color: #1e293b;">On Progress</span>
+              </div>
+              <span style="color: #64748b; font-weight: 700;">${inProgressCount} <span style="font-weight: 500; font-size: 0.75rem;">(${progPct}%)</span></span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0;"></span>
+                <span style="font-weight: 600; color: #1e293b;">Cancelled</span>
+              </div>
+              <span style="color: #64748b; font-weight: 700;">${cancelledCount} <span style="font-weight: 500; font-size: 0.75rem;">(${cancPct}%)</span></span>
+            </div>
           </div>
         </div>
       `;
@@ -3085,18 +3149,24 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         return;
       }
 
-      container.innerHTML = topSelling.map(item => `
-        <div class="top-product-item">
-          <div class="top-product-left">
-            <img src="${item.image || '/assets/products/coca_cola.png'}" alt="${item.name}" class="top-product-img" onerror="this.src='/assets/products/coca_cola.png'">
-            <div style="display:flex; flex-direction:column; min-width:0;">
-              <span class="top-product-name" title="${item.name}">${item.name}</span>
-              <span style="font-size:0.72rem; color:#64748b;">${formatTZS(item.revenue)}</span>
+      container.innerHTML = topSelling.map(item => {
+        const units = item.soldUnits !== undefined ? item.soldUnits : (item.unitsSold !== undefined ? item.unitsSold : (item.quantity || 0));
+        const revenue = Number(item.revenue || item.price * units || 0);
+        const img = item.image || item.thumb || '/assets/products/samsung_charger.png';
+
+        return `
+          <div class="top-product-item">
+            <div class="top-product-left">
+              <img src="${escapeAttr(img)}" alt="${escapeAttr(item.name)}" class="top-product-img" onerror="this.onerror=null; this.src='/assets/products/samsung_charger.png'">
+              <div style="display:flex; flex-direction:column; min-width:0;">
+                <span class="top-product-name" title="${escapeAttr(item.name)}">${escapeHtml(item.name)}</span>
+                <span style="font-size:0.75rem; color:#64748b; font-weight:600;">${formatTZS(revenue)}</span>
+              </div>
             </div>
+            <span class="top-product-sold">${units} sold</span>
           </div>
-          <span class="top-product-sold">${item.unitsSold} sold</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderStoresTable() {

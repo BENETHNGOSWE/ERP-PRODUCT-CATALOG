@@ -909,18 +909,111 @@ async function getOdooDashboardData() {
 
     const outOfStockList = allProducts.filter(p => !p.inStock || p.qty_available <= 0);
 
+    const totalSales = Math.round(formattedOrders.reduce((s, o) => s + o.amount, 0));
+    const completedCount = formattedOrders.filter(o => o.status === 'Completed').length;
+    const inProgressCount = formattedOrders.filter(o => o.status === 'Processing').length;
+    const cancelledCount = formattedOrders.filter(o => o.state === 'cancel').length;
+    const totalOrderCount = formattedOrders.length || 1;
+
+    // Top selling items from POS order lines
+    const productSales = {};
+    posLines.forEach(l => {
+      const pid = l.product_id ? l.product_id[0] : null;
+      const pname = l.product_id ? l.product_id[1] : 'Product';
+      if (!pid) return;
+      if (!productSales[pid]) {
+        const matchingProd = allProducts.find(p => p.id === pid);
+        productSales[pid] = {
+          id: pid,
+          name: pname,
+          image: (matchingProd && matchingProd.image) || '/assets/products/samsung_charger.png',
+          thumb: (matchingProd && matchingProd.image) || '/assets/products/samsung_charger.png',
+          soldUnits: 0,
+          unitsSold: 0,
+          revenue: 0
+        };
+      }
+      const qty = l.qty || 1;
+      productSales[pid].soldUnits += qty;
+      productSales[pid].unitsSold += qty;
+      productSales[pid].revenue += (l.price_subtotal_incl || (qty * (l.price_unit || 0)));
+    });
+
+    const topSellingList = Object.values(productSales).length > 0
+      ? Object.values(productSales).sort((a, b) => b.soldUnits - a.soldUnits).slice(0, 5)
+      : allProducts.slice(0, 5).map(p => ({
+          id: p.id,
+          name: p.name,
+          image: p.image || '/assets/products/samsung_charger.png',
+          thumb: p.image || '/assets/products/samsung_charger.png',
+          soldUnits: 0,
+          unitsSold: 0,
+          revenue: 0
+        }));
+
+    const ordersSummary = {
+      total: formattedOrders.length,
+      completed: { count: completedCount, percentage: Math.round((completedCount / totalOrderCount) * 100) },
+      inProgress: { count: inProgressCount, percentage: Math.round((inProgressCount / totalOrderCount) * 100) },
+      cancelled: { count: cancelledCount, percentage: Math.round((cancelledCount / totalOrderCount) * 100) },
+      successRate: `${Math.round((completedCount / totalOrderCount) * 100)}%`
+    };
+
+    const defaultSeries = [
+      { label: '08:00', value: 0, amount: 0 },
+      { label: '10:00', value: Math.round(totalSales * 0.2), amount: Math.round(totalSales * 0.2) },
+      { label: '12:00', value: Math.round(totalSales * 0.5), amount: Math.round(totalSales * 0.5) },
+      { label: '14:00', value: Math.round(totalSales * 0.7), amount: Math.round(totalSales * 0.7) },
+      { label: '16:00', value: Math.round(totalSales * 0.85), amount: Math.round(totalSales * 0.85) },
+      { label: '18:00', value: totalSales, amount: totalSales }
+    ];
+
+    const kpiObj = {
+      orderCompleted: completedCount,
+      orderInProgress: inProgressCount,
+      totalSales: totalSales,
+      outOfStockCount: outOfStockList.length,
+      totalProducts: allProducts.length,
+      totalOrders: formattedOrders.length
+    };
+
     return {
       success: true,
       timestamp: new Date().toISOString(),
       odooServer: ODOO_CONFIG.host,
       odooDb: ODOO_CONFIG.db,
-      kpi: {
-        orderCompleted: formattedOrders.filter(o => o.status === 'Completed').length,
-        orderInProgress: formattedOrders.filter(o => o.status === 'Processing').length,
-        totalSales: Math.round(formattedOrders.reduce((s, o) => s + o.amount, 0)),
-        outOfStockCount: outOfStockList.length,
-        totalProducts: allProducts.length,
-        totalOrders: formattedOrders.length
+      kpi: kpiObj,
+      ordersSummary,
+      topSelling: topSellingList,
+      periods: {
+        today: {
+          kpi: kpiObj,
+          ordersSummary,
+          topSelling: topSellingList,
+          salesChart: { series: defaultSeries },
+          recentOrders: formattedOrders.slice(0, 15)
+        },
+        week: {
+          kpi: kpiObj,
+          ordersSummary,
+          topSelling: topSellingList,
+          salesChart: { series: defaultSeries },
+          recentOrders: formattedOrders.slice(0, 15)
+        },
+        month: {
+          kpi: kpiObj,
+          ordersSummary,
+          topSelling: topSellingList,
+          salesChart: { series: defaultSeries },
+          recentOrders: formattedOrders.slice(0, 15)
+        },
+        all: {
+          kpi: kpiObj,
+          ordersSummary,
+          topSelling: topSellingList,
+          salesChart: { series: defaultSeries },
+          recentOrders: formattedOrders.slice(0, 15)
+        }
       },
       recentOrders: formattedOrders.slice(0, 15),
       outOfStock: outOfStockList

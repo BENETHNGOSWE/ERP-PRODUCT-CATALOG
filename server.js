@@ -1057,22 +1057,28 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
     periodOrders.forEach(o => {
       (o.items || []).forEach(it => {
         const id = it.id || it.productId || it.name;
+        const storeProd = storeProducts.find(sp => Number(sp.id) === Number(id));
+        const prodImg = (storeProd && (storeProd.image || storeProd.thumb)) || it.image || it.thumb || '/assets/products/samsung_charger.png';
+
         if (!itemMap[id]) {
           itemMap[id] = {
             id: it.id || it.productId,
-            name: it.name,
-            sku: it.sku || `SKU-${id}`,
-            category: it.category || 'General',
-            image: it.image || '/assets/products/samsung_charger.png',
+            name: it.name || (storeProd ? storeProd.name : `Product #${id}`),
+            sku: it.sku || (storeProd ? (storeProd.default_code || storeProd.sku) : `SKU-${id}`),
+            category: it.category || (storeProd ? storeProd.category : 'General'),
+            image: prodImg,
+            thumb: prodImg,
             soldUnits: 0,
+            unitsSold: 0,
             revenue: 0,
             profit: 0,
-            price: Number(it.price) || 0
+            price: Number(it.price || (storeProd ? storeProd.price : 0)) || 0
           };
         }
         const qty = Number(it.quantity || it.qty || 1);
         itemMap[id].soldUnits += qty;
-        const lineTotal = qty * (Number(it.price) || 0);
+        itemMap[id].unitsSold += qty;
+        const lineTotal = qty * (Number(it.price || itemMap[id].price) || 0);
         itemMap[id].revenue += lineTotal;
         itemMap[id].profit += lineTotal * 0.28;
       });
@@ -1084,22 +1090,22 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
     let series = [];
     if (periodLabel === 'today') {
       const hours = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-      series = hours.map((h, i) => ({
-        label: h,
-        value: Math.round(totalSales * ((i + 1) / (hours.length * 1.5))) || (i === hours.length - 1 ? totalSales : 0)
-      }));
+      series = hours.map((h, i) => {
+        const val = Math.round(totalSales * ((i + 1) / (hours.length * 1.5))) || (i === hours.length - 1 ? totalSales : 0);
+        return { label: h, value: val, amount: val };
+      });
     } else if (periodLabel === 'week') {
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      series = days.map((d, i) => ({
-        label: d,
-        value: Math.round(totalSales / days.length)
-      }));
+      series = days.map((d, i) => {
+        const val = Math.round(totalSales / days.length);
+        return { label: d, value: val, amount: val };
+      });
     } else {
       const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-      series = weeks.map((w, i) => ({
-        label: w,
-        value: Math.round(totalSales / weeks.length)
-      }));
+      series = weeks.map((w, i) => {
+        const val = Math.round(totalSales / weeks.length);
+        return { label: w, value: val, amount: val };
+      });
     }
 
     return {
@@ -1112,18 +1118,20 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
       },
       ordersSummary: {
         total: periodOrders.length,
-        completed,
-        inProgress,
-        cancelled,
+        completed: { count: completed, percentage: periodOrders.length > 0 ? Math.round((completed / periodOrders.length) * 100) : 100 },
+        inProgress: { count: inProgress, percentage: periodOrders.length > 0 ? Math.round((inProgress / periodOrders.length) * 100) : 0 },
+        cancelled: { count: cancelled, percentage: periodOrders.length > 0 ? Math.round((cancelled / periodOrders.length) * 100) : 0 },
         successRate: periodOrders.length > 0 ? `${Math.round((completed / periodOrders.length) * 100)}%` : '100%'
       },
-      topSelling: topSelling.length > 0 ? topSelling : storeProducts.slice(0, 3).map(p => ({
+      topSelling: topSelling.length > 0 ? topSelling : storeProducts.slice(0, 5).map(p => ({
         id: p.id,
         name: p.name,
         sku: p.default_code || p.sku || 'SKU-01',
         category: p.category || 'General',
-        image: p.image || '/assets/products/samsung_charger.png',
+        image: p.image || p.thumb || '/assets/products/samsung_charger.png',
+        thumb: p.image || p.thumb || '/assets/products/samsung_charger.png',
         soldUnits: 0,
+        unitsSold: 0,
         revenue: 0,
         profit: 0,
         price: p.price || 0
@@ -1153,6 +1161,12 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
   };
 
   const outOfStockProducts = storeProducts.filter(p => (Number(p.qty_available) || 0) <= 0);
+  const periodsData = {
+    today: buildPeriodData(todayOrders, 'today'),
+    week: buildPeriodData(weekOrders, 'week'),
+    month: buildPeriodData(monthOrders, 'month'),
+    all: buildPeriodData(allOrders, 'all')
+  };
 
   return {
     success: true,
@@ -1165,12 +1179,10 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
       address: store.address,
       status: store.status
     },
-    periods: {
-      today: buildPeriodData(todayOrders, 'today'),
-      week: buildPeriodData(weekOrders, 'week'),
-      month: buildPeriodData(monthOrders, 'month'),
-      all: buildPeriodData(allOrders, 'all')
-    },
+    periods: periodsData,
+    ordersSummary: periodsData.today.ordersSummary,
+    topSelling: periodsData.today.topSelling,
+    salesChart: periodsData.today.salesChart,
     kpi: {
       totalRevenue: calcSum(storeOrders),
       totalOrders: storeOrders.length,
