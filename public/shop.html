@@ -567,7 +567,7 @@
                 <span class="product-item-stock-tag in-stock"><span class="stock-dot"></span>In Stock</span>
                 <div class="stepper-horizontal">
                   <button class="stepper-btn-h btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
-                  <input type="number" class="stepper-input-h stepper-card-input" data-id="${p.id}" id="qty-${p.id}" value="${qty}" min="0" step="1" inputmode="numeric" title="Type bulk quantity directly" onclick="event.stopPropagation()" onfocus="this.select()">
+                  <span class="stepper-val-h" id="qty-${p.id}">${qty}</span>
                   <button class="stepper-btn-h btn-plus" data-id="${p.id}" title="Increase quantity">&#43;</button>
                 </div>
               </div>
@@ -699,29 +699,6 @@
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeProductDetailModal();
-        }
-      });
-
-      // Direct editable numeric inputs on product cards
-      document.addEventListener('change', (e) => {
-        const cardInput = e.target.closest('.stepper-card-input');
-        if (cardInput) {
-          const id = cardInput.getAttribute('data-id');
-          const val = Math.max(0, parseInt(cardInput.value, 10) || 0);
-          NOVA.setItemQty(id, val);
-          const products = NOVA.getProducts();
-          const p = products.find(x => String(x.id) === String(id));
-          if (p && val > 0) NOVA.showToast(`Updated ${p.name} qty to ${val}`);
-          renderStoreView();
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const cardInput = e.target.closest('.stepper-card-input');
-          if (cardInput) {
-            cardInput.blur();
-          }
         }
       });
 

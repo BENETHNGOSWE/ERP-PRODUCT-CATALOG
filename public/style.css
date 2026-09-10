@@ -1024,11 +1024,12 @@ img {
 }
 
 .product-item-price {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--accent-price); /* Warm golden amber price */
   margin-top: 2px;
   line-height: 1.2;
+  white-space: nowrap !important;
 }
 
 /* View Details link button with tactile button shape (matching stepper/cart box style) */
@@ -1070,9 +1071,9 @@ img {
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
-  margin-left: 10px;
+  margin-left: 8px;
 }
 
 .product-item-stepper-wrap {
@@ -1084,25 +1085,26 @@ img {
 .stepper-horizontal {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   user-select: none;
 }
 
 .stepper-btn-h {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   color: var(--navy-dark);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  padding: 0;
 }
 
 .stepper-btn-h:hover:not(:disabled) {
@@ -1125,9 +1127,13 @@ img {
 }
 
 .stepper-val-h {
-  font-size: 0.96rem;
+  font-size: 0.92rem;
   font-weight: 800;
   color: var(--navy-dark);
+  min-width: 16px;
+  text-align: center;
+  line-height: 1;
+}
   min-width: 18px;
   text-align: center;
   line-height: 1;
@@ -2215,6 +2221,50 @@ img {
   .confirm-actions-centered {
     flex-direction: column;
     align-items: center;
+  }
+
+  .product-item-card {
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+  .product-item-left {
+    gap: 10px;
+  }
+  .product-item-thumb-wrap {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 10px;
+  }
+  .product-item-title {
+    font-size: 0.90rem;
+  }
+  .product-item-price {
+    font-size: 0.92rem;
+    white-space: nowrap !important;
+  }
+  .btn-open-product {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    margin-top: 3px;
+  }
+  .product-item-right-wrap {
+    margin-left: 4px;
+    gap: 6px;
+  }
+  .stepper-horizontal {
+    gap: 4px;
+  }
+  .stepper-btn-h {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+    border-radius: 7px;
+  }
+  .stepper-val-h {
+    font-size: 0.88rem;
+    min-width: 14px;
   }
 }
 
