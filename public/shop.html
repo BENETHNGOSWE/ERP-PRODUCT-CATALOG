@@ -380,7 +380,7 @@
       let currentCategory = 'All';
       let currentSearch = '';
       let currentSort = 'popular';
-      let isLoadingCatalog = true;
+      let isLoadingCatalog = false;
 
       function escapeHtml(str) {
         if (!str) return '';
@@ -905,15 +905,16 @@
         document.getElementById(id).classList.remove('active');
       };
 
-      // Initial Render & Stock fetch
+      // Initial Instant Render (Zero-latency from pre-injected server payload / cache)
+      if (typeof NOVA.applyStoreBranding === 'function') {
+        NOVA.applyStoreBranding(NOVA.getStore());
+      }
       renderStoreView();
+
+      // Silent background live stock sync (non-blocking, keeps prices & stock realtime)
       NOVA.loadOdooProducts().then(() => {
-        isLoadingCatalog = false;
         renderStoreView();
-      }).catch(() => {
-        isLoadingCatalog = false;
-        renderStoreView();
-      });
+      }).catch(() => {});
     })();
   </script>
 </body>

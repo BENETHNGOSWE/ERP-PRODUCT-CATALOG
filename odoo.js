@@ -504,13 +504,44 @@ const DEFAULT_SEED_PRODUCTS = [
 ];
 
 // In-memory cache for sub-millisecond response times initialized with verified catalog
+const ODOO_CACHE_FILE = path.join(__dirname, 'data', 'odoo_products_cache.json');
 let cachedProducts = [...DEFAULT_SEED_PRODUCTS];
 let cachedCategories = ['All', 'Smartphones', 'Accessories', 'Audio', 'Safety Gear', 'General'];
 let cachedTags = [];
 let lastFetchTime = Date.now();
-const CACHE_TTL = 8000; // 8 seconds TTL
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes TTL (Instant Stale-While-Revalidate)
 let authUid = null;
 let isSyncing = false;
+
+// Load persistent disk cache on startup
+function loadDiskCache() {
+  try {
+    if (fs.existsSync(ODOO_CACHE_FILE)) {
+      const raw = fs.readFileSync(ODOO_CACHE_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (data && Array.isArray(data.products) && data.products.length > 0) {
+        cachedProducts = data.products;
+        cachedCategories = Array.isArray(data.categories) && data.categories.length > 0 ? data.categories : cachedCategories;
+        lastFetchTime = data.timestamp || Date.now();
+        console.log(`[Odoo Cache] ⚡ Loaded ${cachedProducts.length} products from disk cache.`);
+      }
+    }
+  } catch (e) {
+    console.warn('[Odoo Cache] Note loading disk cache:', e.message);
+  }
+}
+
+function saveDiskCache() {
+  try {
+    fs.writeFileSync(ODOO_CACHE_FILE, JSON.stringify({
+      products: cachedProducts,
+      categories: cachedCategories,
+      timestamp: lastFetchTime
+    }, null, 2), 'utf8');
+  } catch (e) {}
+}
+
+loadDiskCache();
 
 // Create Secure XML-RPC Clients
 const commonClient = xmlrpc.createSecureClient({
@@ -627,19 +658,9 @@ function mapProduct(p, categMap, tagMap = {}) {
   };
 }
 
-// Fetch Products from Odoo with In-Memory Caching
-async function fetchOdooProducts(forceRefresh = false) {
-  const now = Date.now();
-  if (!forceRefresh && cachedProducts.length > 0 && (now - lastFetchTime) < CACHE_TTL) {
-    return {
-      products: cachedProducts,
-      categories: cachedCategories,
-      cached: true,
-      timestamp: lastFetchTime
-    };
-  }
-
-  if (isSyncing && cachedProducts.length > 0) {
+// Synchronize products from Odoo in parallel
+async function syncOdooProductsInBackground() {
+  if (isSyncing) {
     return {
       products: cachedProducts,
       categories: cachedCategories,
@@ -650,64 +671,63 @@ async function fetchOdooProducts(forceRefresh = false) {
 
   isSyncing = true;
   try {
-    // 1. Fetch Categories
-    const posCategories = await callModel('pos.category', 'search_read', [[]], {
-      fields: ['id', 'name', 'parent_id']
-    });
+    // 1. Run all 3 XML-RPC calls in parallel for ultra-fast background sync
+    const [posCategories, tags, products] = await Promise.all([
+      callModel('pos.category', 'search_read', [[]], {
+        fields: ['id', 'name', 'parent_id']
+      }).catch(e => { console.warn('[Odoo] Categories sync note:', e.message); return []; }),
+      callModel('product.tag', 'search_read', [[]], {
+        fields: ['id', 'name']
+      }).catch(e => { console.warn('[Odoo] Tags sync note:', e.message); return []; }),
+      callModel('product.product', 'search_read', [
+        [['available_in_pos', '=', true]]
+      ], {
+        fields: [
+          'id',
+          'name',
+          'list_price',
+          'qty_available',
+          'pos_categ_ids',
+          'categ_id',
+          'description',
+          'description_sale',
+          'image_128',
+          'image_1920',
+          'barcode',
+          'default_code',
+          'product_tag_ids',
+          'type'
+        ],
+        limit: 250
+      }).catch(e => { console.warn('[Odoo] Products sync note:', e.message); return []; })
+    ]);
 
     const categMap = {};
-    posCategories.forEach(c => {
+    (posCategories || []).forEach(c => {
       categMap[c.id] = c.name;
     });
 
-    // 2. Fetch Product Tags
     const tagMap = {};
-    try {
-      const tags = await callModel('product.tag', 'search_read', [[]], {
-        fields: ['id', 'name']
+    cachedTags = tags || [];
+    (tags || []).forEach(t => {
+      tagMap[t.id] = t.name;
+    });
+
+    if (Array.isArray(products) && products.length > 0) {
+      const mappedProducts = products.map(p => mapProduct(p, categMap, tagMap));
+
+      // Extract unique categories
+      const categoriesSet = new Set(['All']);
+      mappedProducts.forEach(p => {
+        if (p.category) categoriesSet.add(p.category);
       });
-      cachedTags = tags || [];
-      (tags || []).forEach(t => {
-        tagMap[t.id] = t.name;
-      });
-    } catch (tagErr) {
-      console.warn('[Odoo] Product tags lookup notice:', tagErr.message);
+
+      cachedProducts = mappedProducts;
+      cachedCategories = Array.from(categoriesSet);
+      lastFetchTime = Date.now();
+      saveDiskCache();
+      console.log(`[Odoo ERP] ⚡ Cached ${cachedProducts.length} live products successfully.`);
     }
-
-    // 3. Fetch Products available in POS
-    const products = await callModel('product.product', 'search_read', [
-      [['available_in_pos', '=', true]]
-    ], {
-      fields: [
-        'id',
-        'name',
-        'list_price',
-        'qty_available',
-        'pos_categ_ids',
-        'categ_id',
-        'description',
-        'description_sale',
-        'image_128',
-        'image_1920',
-        'barcode',
-        'default_code',
-        'product_tag_ids',
-        'type'
-      ],
-      limit: 250
-    });
-
-    const mappedProducts = products.map(p => mapProduct(p, categMap, tagMap));
-
-    // Extract unique categories
-    const categoriesSet = new Set(['All']);
-    mappedProducts.forEach(p => {
-      if (p.category) categoriesSet.add(p.category);
-    });
-
-    cachedProducts = mappedProducts;
-    cachedCategories = Array.from(categoriesSet);
-    lastFetchTime = Date.now();
 
     return {
       products: cachedProducts,
@@ -716,16 +736,39 @@ async function fetchOdooProducts(forceRefresh = false) {
       timestamp: lastFetchTime
     };
   } catch (err) {
-    console.error('[Odoo Fetch Notice]:', err.message);
+    console.warn('[Odoo Fetch Warning]:', err.message);
     return {
       products: cachedProducts.length > 0 ? cachedProducts : DEFAULT_SEED_PRODUCTS,
-      categories: cachedCategories.length > 0 ? cachedCategories : ['All', 'Smartphones', 'Accessories', 'Audio', 'Safety Gear', 'General'],
+      categories: cachedCategories.length > 0 ? cachedCategories : ['All', 'Smartphones', 'Accessories', 'Audio', 'General'],
       cached: true,
       error: err.message
     };
   } finally {
     isSyncing = false;
   }
+}
+
+// Fetch Products from Odoo with Instant Stale-While-Revalidate Engine
+async function fetchOdooProducts(forceRefresh = false) {
+  const now = Date.now();
+  const isStale = (now - lastFetchTime) > CACHE_TTL;
+
+  // 1. If not forced and we have cache: ALWAYS return instantly (< 1ms)
+  if (!forceRefresh && cachedProducts && cachedProducts.length > 0) {
+    // If stale, refresh silently in the background without making the user wait
+    if (isStale && !isSyncing) {
+      syncOdooProductsInBackground().catch(() => {});
+    }
+    return {
+      products: cachedProducts,
+      categories: cachedCategories,
+      cached: true,
+      timestamp: lastFetchTime
+    };
+  }
+
+  // 2. If forced refresh requested, run sync
+  return await syncOdooProductsInBackground();
 }
 
 // Helper to resolve Product to Odoo integer ID

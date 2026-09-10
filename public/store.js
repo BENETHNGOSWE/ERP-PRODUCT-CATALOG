@@ -43,17 +43,30 @@ const NOVA = (function () {
 
   const currentSlug = getActiveStoreSlug();
 
-  let activeStore = {
-    name: 'KODA STORE',
-    slug: currentSlug || 'kodastore',
-    logo: '/assets/achete-icon.svg',
-    tagline: 'Official Store | Fast Delivery in Dar es Salaam',
-    address: 'Masaki, Dar es Salaam',
-    whatsapp: '+255710459064'
-  };
+  let activeStore = (typeof window !== 'undefined' && window.__INITIAL_STORE__ && window.__INITIAL_STORE__.slug)
+    ? window.__INITIAL_STORE__
+    : {
+        name: 'KODA STORE',
+        slug: currentSlug || 'kodastore',
+        logo: '/assets/achete-icon.svg',
+        tagline: 'Official Store | Fast Delivery in Dar es Salaam',
+        address: 'Masaki, Dar es Salaam',
+        whatsapp: '+255710459064'
+      };
 
-  let liveProducts = [];
-  let liveCategories = ['All'];
+  let liveProducts = (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_PRODUCTS__) && window.__INITIAL_PRODUCTS__.length > 0)
+    ? window.__INITIAL_PRODUCTS__
+    : (function() {
+        try {
+          const cached = localStorage.getItem(`achete_${currentSlug}_prods`);
+          if (cached) return JSON.parse(cached);
+        } catch (e) {}
+        return [];
+      })();
+
+  let liveCategories = (typeof window !== 'undefined' && Array.isArray(window.__INITIAL_CATEGORIES__) && window.__INITIAL_CATEGORIES__.length > 0)
+    ? window.__INITIAL_CATEGORIES__
+    : ['All'];
 
   // Default initial cart starts at ZERO items
   const DEFAULT_CART = {};
@@ -199,8 +212,11 @@ const NOVA = (function () {
           activeStore = { ...activeStore, ...data.store };
           applyStoreBranding(activeStore);
         }
-        if (data.products) {
+        if (data.products && Array.isArray(data.products) && data.products.length > 0) {
           liveProducts = data.products;
+          try {
+            localStorage.setItem(`achete_${currentSlug}_prods`, JSON.stringify(data.products));
+          } catch (e) {}
         }
         if (data.categories) {
           liveCategories = data.categories;

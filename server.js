@@ -1202,7 +1202,7 @@ function escapeMetaAttr(str) {
 }
 
 // Main Store Catalog Route (Supports /shop, /catalog, /store, /:slug with dynamic OpenGraph cards for Instagram Bio / Story / DM links)
-app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
+app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   const slug = req.params.slug;
   if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json') || slug.endsWith('.html'))) {
     return next();
@@ -1217,6 +1217,18 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
     : ((store && store.logo && !store.logo.startsWith('data:')) 
         ? (store.logo.startsWith('http') ? store.logo : `https://achete.me${store.logo}`) 
         : 'https://achete.me/assets/achete-icon.png');
+
+  // Instant pre-cached products lookup for this store (< 1ms)
+  let storeProducts = [];
+  let catList = ['All'];
+  try {
+    const odooRes = await odoo.fetchOdooProducts(false);
+    const allProds = odooRes.products || [];
+    storeProducts = store ? stores.filterProductsForStore(allProds, store) : allProds;
+    const catSet = new Set(['All']);
+    storeProducts.forEach(p => { if (p.category) catSet.add(p.category); });
+    catList = Array.from(catSet);
+  } catch (e) {}
 
   const shopHtmlPath = path.join(__dirname, 'public', 'shop.html');
   fs.readFile(shopHtmlPath, 'utf8', (err, html) => {
@@ -1235,6 +1247,11 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], (req, res, next) => {
   <meta name="twitter:title" content="${escapeMetaAttr(storeName)}">
   <meta name="twitter:description" content="${escapeMetaAttr(storeTagline)}">
   <meta name="twitter:image" content="${escapeMetaAttr(storeImage)}">
+  <script id="__INITIAL_DATA__">
+    window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
+    window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
+    window.__INITIAL_CATEGORIES__ = ${JSON.stringify(catList)};
+  </script>
     `.trim();
 
     let modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);
