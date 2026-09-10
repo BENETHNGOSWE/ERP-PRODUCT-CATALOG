@@ -251,11 +251,21 @@ const NOVA = (function () {
       });
     }
 
-    // Storefront Physical Signboard / Hero Banner (Dynamic Per Client Store)
+    // Storefront Physical Signboard / Hero Banner (Dynamic Per Client Store with Self-Healing Fallback)
     const bannerContainer = document.getElementById('storeHeroBannerContainer');
     const bannerImg = document.getElementById('storeHeroBannerImg');
-    if (bannerContainer && bannerImg && store.banner) {
-      bannerImg.src = store.banner;
+    if (bannerContainer && bannerImg) {
+      if (store.banner && store.banner.trim()) {
+        bannerImg.src = store.banner;
+      }
+      bannerImg.onerror = function() {
+        const initial = (store.name || 'S').trim().charAt(0).toUpperCase();
+        const color = store.themeColor || '#7433df';
+        const name = (store.name || 'Store').toUpperCase();
+        const tag = (store.tagline || 'Official Online Store • Fast Delivery in Dar es Salaam').trim();
+        this.onerror = null;
+        this.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="250" viewBox="0 0 1500 250"><rect width="1500" height="250" fill="%230f172a"/><defs><linearGradient id="bgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%25" stop-color="%231e1b4b"/><stop offset="50%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23180d2b"/></linearGradient></defs><rect width="1500" height="250" fill="url(%23bgG)"/><rect x="25" y="25" width="1450" height="200" rx="14" fill="%231e293b" stroke="%23334155" stroke-width="2"/><rect x="50" y="45" width="70" height="70" rx="12" fill="${encodeURIComponent(color)}"/><text x="85" y="93" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="46" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${encodeURIComponent(initial)}</text><text x="140" y="82" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="44" fill="%23ffffff" letter-spacing="1.5">${encodeURIComponent(name)}</text><text x="140" y="116" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="500" font-size="18" fill="%2394a3b8">${encodeURIComponent(tag)}</text><line x1="50" y1="160" x2="1450" y2="160" stroke="%23334155" stroke-width="1.5"/><circle cx="70" cy="188" r="5" fill="%2322c55e"/><text x="86" y="193" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="700" font-size="15" fill="%2322c55e">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>`;
+      };
       bannerContainer.style.display = 'block';
     }
 

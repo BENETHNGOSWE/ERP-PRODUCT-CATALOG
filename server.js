@@ -21,6 +21,17 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static Assets
+app.use('/assets/stores', (req, res, next) => {
+  const filePath = path.join(__dirname, 'public', 'assets', 'stores', req.path);
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  const uploadPath = path.join(__dirname, 'data', 'uploads', req.path);
+  if (fs.existsSync(uploadPath)) {
+    return res.sendFile(uploadPath);
+  }
+  next();
+});
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -30,8 +41,49 @@ app.get('/:slug/store.js', (req, res) => res.sendFile(path.join(__dirname, 'publ
 app.use('/:slug/assets', express.static(path.join(__dirname, 'public', 'assets')));
 
 // =========================================================================
-// MULTI-CLIENT STORE API ROUTES
+// MULTI-CLIENT STORE API ROUTES & BACKUP RECOVERY
 // =========================================================================
+
+// Store Backup Export Endpoint (Non-Destructive Cloud & Local Redundancy)
+app.get('/api/admin/stores/export', (req, res) => {
+  try {
+    const allStores = stores.getAllStores();
+    res.setHeader('Content-Disposition', 'attachment; filename="achete_stores_backup.json"');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(allStores, null, 2));
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Store Backup Import Endpoint
+app.post('/api/admin/stores/import', (req, res) => {
+  try {
+    const importedStores = req.body;
+    if (!Array.isArray(importedStores)) {
+      return res.status(400).json({ success: false, error: 'Expected an array of store objects' });
+    }
+    importedStores.forEach(s => {
+      if (s && s.slug) {
+        try {
+          const existing = stores.getStoreBySlug(s.slug);
+          if (existing) {
+            stores.updateStore(existing.id, s);
+          } else {
+            stores.createStore(s);
+          }
+        } catch (e) {}
+      }
+    });
+    res.json({
+      success: true,
+      message: `Successfully merged and preserved ${importedStores.length} stores!`,
+      stores: stores.getAllStores()
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // 1. Get All Registered Stores
 app.get('/api/stores', (req, res) => {

@@ -4,6 +4,9 @@ node_modules/
 *.log
 .env
 .gitconfig
+*.zip
 uploads/
-/assets/
-nova-mart-pos-catalog.zip
+assets/
+data/stores.persistent.json
+data/stores_backup.json
+
