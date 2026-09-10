@@ -416,6 +416,41 @@ class StoreManager {
   }
 
   /**
+   * Get stock on hand for a specific product in a specific store
+   */
+  getStoreProductStock(idOrSlug, productId) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) return { qty_available: 50, inStock: true };
+
+    const pIdStr = String(productId);
+    const pIdNum = Number(productId);
+
+    // 1. Check custom products
+    if (Array.isArray(store.customProducts)) {
+      const custom = store.customProducts.find(p => Number(p.id) === pIdNum);
+      if (custom && custom.qty_available !== undefined) {
+        return {
+          qty_available: Number(custom.qty_available) || 0,
+          inStock: (Number(custom.qty_available) || 0) > 0
+        };
+      }
+    }
+
+    // 2. Check store inventory overrides
+    if (store.inventoryOverrides && store.inventoryOverrides[pIdStr]) {
+      const ovr = store.inventoryOverrides[pIdStr];
+      if (ovr.qty_available !== undefined) {
+        return {
+          qty_available: Number(ovr.qty_available) || 0,
+          inStock: (Number(ovr.qty_available) || 0) > 0
+        };
+      }
+    }
+
+    return { qty_available: 50, inStock: true };
+  }
+
+  /**
    * Update stock and/or price specifically for this store
    * Supports:
    * - addQty (e.g. +10 received stock)

@@ -583,12 +583,14 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
     // 1. Enrich items with merchant stock on hand intelligence for WhatsApp alert
     const enrichedItems = (orderData.items || []).map(item => {
       let stockOnHand = 50;
-      if (item.id) {
-        const prodStock = stores.getStoreProductStock(storeContext.id, item.id);
-        if (prodStock && typeof prodStock.qty_available === 'number') {
-          stockOnHand = prodStock.qty_available;
+      try {
+        if (item.id && typeof stores.getStoreProductStock === 'function') {
+          const prodStock = stores.getStoreProductStock(storeContext.id, item.id);
+          if (prodStock && typeof prodStock.qty_available === 'number') {
+            stockOnHand = prodStock.qty_available;
+          }
         }
-      }
+      } catch (e) {}
       return {
         ...item,
         stockOnHand
@@ -636,20 +638,11 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       console.warn('[Store Stock Deduct Warning]:', deductErr.message);
     }
 
-    // Wait for both to complete or timeout safely
-    const [waResSettled, odooResSettled] = await Promise.allSettled([
-      waNotificationPromise,
-      odooOrderPromise
-    ]);
-
-    const waResult = waResSettled.status === 'fulfilled' ? waResSettled.value : { success: false };
-    const odooOrderResult = odooResSettled.status === 'fulfilled' ? odooResSettled.value : { odooOrderId: null, receiptNumber: finalReceipt };
-
-    // 3. Persist Order in Local Database (data/orders.json)
+    // 4. Persist Order in Local Database (data/orders.json)
     const recorded = orders.recordOrder({
       orderId: finalOrderId,
-      odooOrderId: odooOrderResult ? odooOrderResult.odooOrderId : null,
-      receiptNumber: (odooOrderResult && odooOrderResult.receiptNumber) || finalReceipt,
+      odooOrderId: null,
+      receiptNumber: finalReceipt,
       storeId: storeContext.id,
       storeSlug: storeContext.slug,
       storeName: storeContext.name,
@@ -662,8 +655,8 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       subtotal: orderData.subtotal || finalTotal,
       discount: orderData.discount || 0,
       totalAmount: finalTotal,
-      whatsappStatus: waResult && waResult.success ? 'Sent' : 'Dispatched',
-      waLink: waResult ? waResult.waLink : null
+      whatsappStatus: 'Dispatched',
+      waLink: `https://api.whatsapp.com/send?phone=${storeContext.whatsapp.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`*ORDER #${finalOrderId}*\nTotal: TZS ${finalTotal}\nCustomer: ${customerName}`)}`
     });
 
     res.status(201).json({
@@ -672,15 +665,13 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       order: {
         id: recorded ? recorded.id : 1,
         orderId: finalOrderId,
-        odooOrderId: odooOrderResult ? odooOrderResult.odooOrderId : null,
-        odooOrderName: odooOrderResult ? (odooOrderResult.orderName || odooOrderResult.receiptNumber) : finalReceipt,
-        receiptNumber: (odooOrderResult && odooOrderResult.receiptNumber) || finalReceipt,
+        odooOrderId: null,
+        odooOrderName: finalReceipt,
+        receiptNumber: finalReceipt,
         storeSlug: storeContext.slug,
         storeName: storeContext.name,
         storeWhatsapp: storeContext.whatsapp,
-        totalAmount: finalTotal,
-        whatsapp: waResult,
-        waLink: waResult ? waResult.waLink : null
+        totalAmount: finalTotal
       }
     });
   } catch (err) {

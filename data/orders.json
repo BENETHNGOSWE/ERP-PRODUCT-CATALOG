@@ -1,5 +1,77 @@
 [
   {
+    "id": 8,
+    "orderId": "ORD-0941",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-ORD-0941",
+    "receiptNumber": "Order WEB-ORD-0941",
+    "storeId": 10,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Kariakoo Wholesale Client",
+      "phone": "+255710459064",
+      "deliveryAddress": "Kariakoo / City Mall, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 140,
+        "name": "iPhone 15 Pro 256GB",
+        "price": 50000,
+        "qty": 10,
+        "subtotal": 500000
+      }
+    ],
+    "itemCount": 10,
+    "subtotal": 500000,
+    "discount": 0,
+    "totalAmount": 500000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23ORD-0941*%0ATotal%3A%20TZS%20500000%0ACustomer%3A%20Kariakoo%20Wholesale%20Client",
+    "createdAt": "2026-09-10T08:00:10.957Z",
+    "dateFormatted": "10 Sept 2026, 08:00"
+  },
+  {
+    "id": 7,
+    "orderId": "ORD-2744",
+    "odooOrderId": 24,
+    "odooOrderName": "Order WEB-ORD-2744",
+    "receiptNumber": "Order WEB-ORD-2744",
+    "storeId": 10,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Kariakoo Wholesale Client",
+      "phone": "+255710459064",
+      "deliveryAddress": "Kariakoo / City Mall, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 140,
+        "name": "iPhone 15 Pro 256GB",
+        "price": 50000,
+        "qty": 10,
+        "subtotal": 500000
+      }
+    ],
+    "itemCount": 10,
+    "subtotal": 500000,
+    "discount": 0,
+    "totalAmount": 500000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": null,
+    "createdAt": "2026-09-10T07:59:12.764Z",
+    "dateFormatted": "10 Sept 2026, 07:59"
+  },
+  {
     "id": 6,
     "orderId": "ORD-0639",
     "odooOrderId": 20,

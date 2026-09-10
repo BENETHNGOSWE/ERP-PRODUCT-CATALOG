@@ -79,6 +79,10 @@
     "createdDate": "2026-09-09",
     "pin": "1234",
     "inventoryOverrides": {
+      "140": {
+        "qty_available": 30,
+        "updatedAt": "2026-09-10T08:00:10.956Z"
+      },
       "NaN": {
         "qty_available": 49,
         "updatedAt": "2026-09-09T17:43:20.650Z"
