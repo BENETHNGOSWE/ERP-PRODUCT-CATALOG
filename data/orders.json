@@ -1,5 +1,41 @@
 [
   {
+    "id": 9,
+    "orderId": "ORD-2315",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-ORD-2315",
+    "receiptNumber": "Order WEB-ORD-2315",
+    "storeId": 9,
+    "storeSlug": "kodastore",
+    "storeName": "Koda Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 1,
+    "customer": {
+      "name": "Juma Test Wholesale",
+      "phone": "+255712000111",
+      "deliveryAddress": "Masaki, Dar es Salaam, Tanzania"
+    },
+    "items": [
+      {
+        "id": "148",
+        "name": "Apple Headset",
+        "price": 450000,
+        "qty": 30,
+        "subtotal": 13500000
+      }
+    ],
+    "itemCount": 30,
+    "subtotal": 13500000,
+    "discount": 0,
+    "totalAmount": 13500000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23ORD-2315*%0ATotal%3A%20TZS%2013500000%0ACustomer%3A%20Juma%20Test%20Wholesale",
+    "createdAt": "2026-09-10T08:14:02.331Z",
+    "dateFormatted": "10 Sept 2026, 08:14"
+  },
+  {
     "id": 8,
     "orderId": "ORD-0941",
     "odooOrderId": null,

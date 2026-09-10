@@ -374,9 +374,17 @@ const NOVA = (function () {
   }
 
   function setItemQty(productId, targetQty) {
-    const current = getCart()[String(productId)] || 0;
-    const delta = Number(targetQty) - current;
-    return updateItemQty(productId, delta);
+    const cart = getCart();
+    const strId = String(productId);
+    const qty = Math.max(0, parseInt(targetQty, 10) || 0);
+    if (qty === 0) {
+      delete cart[strId];
+    } else {
+      cart[strId] = qty;
+    }
+    saveCart(cart);
+    updateHeaderCartBadge();
+    return cart;
   }
 
   return {

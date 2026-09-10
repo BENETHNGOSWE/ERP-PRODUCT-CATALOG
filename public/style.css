@@ -1133,6 +1133,89 @@ img {
   line-height: 1;
 }
 
+.stepper-input-h {
+  width: 44px;
+  height: 34px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: var(--navy-dark);
+  font-size: 0.96rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  -moz-appearance: textfield;
+}
+
+.stepper-input-h::-webkit-outer-spin-button,
+.stepper-input-h::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper-input-h:focus {
+  border-color: #7433df;
+  box-shadow: 0 0 0 2px rgba(116, 51, 223, 0.15);
+  background: #ffffff;
+}
+
+/* Quick Bulk Quantity Selector Pills */
+.bulk-preset-wrapper {
+  margin: 10px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bulk-preset-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bulk-preset-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.bulk-pill {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #1e1b4b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bulk-pill:hover {
+  background: #ede4fc;
+  border-color: #c4b5fd;
+  color: #7433df;
+  transform: translateY(-1px);
+}
+
+.bulk-pill:active {
+  transform: scale(0.95);
+}
+
+.bulk-pill.active {
+  background: #7433df;
+  border-color: #7433df;
+  color: #ffffff;
+}
+
 /* Order Summary Sticky Panel (Image 2 Style - Desktop Only) */
 .order-summary-panel {
   position: sticky;

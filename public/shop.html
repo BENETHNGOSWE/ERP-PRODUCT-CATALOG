@@ -295,6 +295,19 @@
           <span id="detailModalSku" style="font-size:0.75rem; color:#64748b; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-weight:600;">SKU: ---</span>
         </div>
 
+        <!-- Quick Bulk Quantity Presets -->
+        <div class="bulk-preset-wrapper">
+          <span class="bulk-preset-label">⚡ Quick Quantity:</span>
+          <div class="bulk-preset-pills">
+            <button type="button" class="bulk-pill active" onclick="setDetailModalQty(1)">1</button>
+            <button type="button" class="bulk-pill" onclick="setDetailModalQty(5)">5</button>
+            <button type="button" class="bulk-pill" onclick="setDetailModalQty(10)">10</button>
+            <button type="button" class="bulk-pill" onclick="setDetailModalQty(20)">20</button>
+            <button type="button" class="bulk-pill" onclick="setDetailModalQty(50)">50</button>
+            <button type="button" class="bulk-pill" onclick="setDetailModalQty(100)">100</button>
+          </div>
+        </div>
+
         <div class="prod-detail-desc-box">
           <div class="prod-detail-desc-heading">Description &amp; Details</div>
           <p id="detailModalDesc" class="prod-detail-desc-text">
@@ -305,9 +318,9 @@
 
       <div class="prod-detail-footer">
         <div class="prod-detail-action-row">
-          <div class="stepper-horizontal" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:4px 8px;">
+          <div class="stepper-horizontal" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:3px 6px;">
             <button class="stepper-btn-h" id="detailModalMinusBtn" onclick="updateDetailModalQty(-1)">&minus;</button>
-            <span class="stepper-val-h" id="detailModalQtyVal" style="min-width:24px; font-size:1.1rem;">1</span>
+            <input type="number" class="stepper-input-h" id="detailModalQtyInput" value="1" min="1" inputmode="numeric" onfocus="this.select()" onchange="setDetailModalQty(this.value)" oninput="setDetailModalQty(this.value)" style="border:none; background:transparent; font-size:1.1rem; width:54px;">
             <button class="stepper-btn-h" id="detailModalPlusBtn" onclick="updateDetailModalQty(1)">&#43;</button>
           </div>
           <button type="button" class="prod-detail-btn-cart" id="detailModalAddToCartBtn" onclick="submitDetailModalCart()">
@@ -554,7 +567,7 @@
                 <span class="product-item-stock-tag in-stock"><span class="stock-dot"></span>In Stock</span>
                 <div class="stepper-horizontal">
                   <button class="stepper-btn-h btn-minus" data-id="${p.id}" ${qty === 0 ? 'disabled' : ''} title="Decrease quantity">&minus;</button>
-                  <span class="stepper-val-h" id="qty-${p.id}">${qty}</span>
+                  <input type="number" class="stepper-input-h stepper-card-input" data-id="${p.id}" id="qty-${p.id}" value="${qty}" min="0" step="1" inputmode="numeric" title="Type bulk quantity directly" onclick="event.stopPropagation()" onfocus="this.select()">
                   <button class="stepper-btn-h btn-plus" data-id="${p.id}" title="Increase quantity">&#43;</button>
                 </div>
               </div>
@@ -634,18 +647,34 @@
         document.body.style.overflow = '';
       };
 
+      window.setDetailModalQty = function(val) {
+        if (!currentDetailProduct) return;
+        const newQty = Math.max(1, parseInt(val, 10) || 1);
+        detailModalQty = newQty;
+        updateDetailModalUI();
+      };
+
       window.updateDetailModalQty = function(delta) {
         if (!currentDetailProduct) return;
-        const newQty = detailModalQty + delta;
-        if (newQty < 1) return;
+        const newQty = Math.max(1, detailModalQty + delta);
         detailModalQty = newQty;
         updateDetailModalUI();
       };
 
       function updateDetailModalUI() {
         if (!currentDetailProduct) return;
-        const qtyValEl = document.getElementById('detailModalQtyVal');
-        if (qtyValEl) qtyValEl.textContent = detailModalQty;
+        const qtyInput = document.getElementById('detailModalQtyInput');
+        if (qtyInput) qtyInput.value = detailModalQty;
+
+        // Update active highlight on quick bulk presets
+        document.querySelectorAll('.bulk-pill').forEach(pill => {
+          const pillVal = parseInt(pill.textContent.trim(), 10);
+          if (pillVal === detailModalQty) {
+            pill.classList.add('active');
+          } else {
+            pill.classList.remove('active');
+          }
+        });
 
         const btnTextEl = document.getElementById('detailModalBtnText');
         const addBtn = document.getElementById('detailModalAddToCartBtn');
@@ -654,7 +683,7 @@
           addBtn.disabled = false;
         }
         if (btnTextEl) {
-          btnTextEl.textContent = 'Add to Cart';
+          btnTextEl.textContent = `Add ${detailModalQty} to Cart`;
         }
       }
 
@@ -670,6 +699,29 @@
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeProductDetailModal();
+        }
+      });
+
+      // Direct editable numeric inputs on product cards
+      document.addEventListener('change', (e) => {
+        const cardInput = e.target.closest('.stepper-card-input');
+        if (cardInput) {
+          const id = cardInput.getAttribute('data-id');
+          const val = Math.max(0, parseInt(cardInput.value, 10) || 0);
+          NOVA.setItemQty(id, val);
+          const products = NOVA.getProducts();
+          const p = products.find(x => String(x.id) === String(id));
+          if (p && val > 0) NOVA.showToast(`Updated ${p.name} qty to ${val}`);
+          renderStoreView();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const cardInput = e.target.closest('.stepper-card-input');
+          if (cardInput) {
+            cardInput.blur();
+          }
         }
       });
 
