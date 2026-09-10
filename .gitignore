@@ -9,4 +9,5 @@ uploads/
 assets/
 data/stores.persistent.json
 data/stores_backup.json
+data/odoo_products_cache.json
 

@@ -124,7 +124,7 @@ const DEFAULT_SEED_STORES = [
     posConfigName: 'Website Orders',
     categories: ['All', 'Smartphones', 'Accessories', 'Audio'],
     productKeywords: [],
-    productIds: [141, 140, 145, 142, 143, 144, 146, 150, 148],
+    productIds: [148, 149, 141, 140, 150, 145, 146, 147, 144],
     createdDate: '2026-09-07',
     pin: '1234',
     inventoryOverrides: {},
@@ -146,7 +146,7 @@ const DEFAULT_SEED_STORES = [
     posConfigName: 'Website Orders',
     categories: ['All', 'Smartphones', 'Accessories', 'Audio'],
     productKeywords: [],
-    productIds: [143, 140, 141, 144, 147, 149, 150],
+    productIds: [151, 152, 153, 154, 155, 143],
     createdDate: '2026-09-09',
     pin: '1234',
     inventoryOverrides: {},
@@ -431,6 +431,8 @@ class StoreManager {
     if (!store) return allProducts;
 
     const matched = [];
+    const storeSlug = (store.slug || '').toLowerCase().trim();
+    const storeName = (store.name || '').toLowerCase().trim();
 
     // 1. Match products directly assigned by Product ID
     if (Array.isArray(store.productIds) && store.productIds.length > 0) {
@@ -443,31 +445,37 @@ class StoreManager {
     }
 
     // 2. Match products tagged with this store's slug or name in Odoo ERP
-    const storeSlug = (store.slug || '').toLowerCase();
-    const storeName = (store.name || '').toLowerCase();
     allProducts.forEach(p => {
       const alreadyIn = matched.some(m => Number(m.id) === Number(p.id));
       if (!alreadyIn) {
-        const pTags = Array.isArray(p.tags) ? p.tags.map(t => String(t).toLowerCase()) : [];
-        if (pTags.includes(storeSlug) || pTags.includes(storeName) || (p.store_slug && p.store_slug.toLowerCase() === storeSlug)) {
+        const pTags = Array.isArray(p.tags) ? p.tags.map(t => String(t).toLowerCase()) : 
+                      (Array.isArray(p.productTags) ? p.productTags.map(t => String(t).toLowerCase()) : []);
+        const pName = (p.name || '').toLowerCase();
+        
+        const isTagged = pTags.includes(storeSlug) || pTags.includes(storeName) || (p.store_slug && p.store_slug.toLowerCase() === storeSlug);
+        const isNameMatched = storeSlug && (pName.startsWith(storeSlug + ' ') || pName.startsWith(storeSlug + '-') || pName.includes(` ${storeSlug} `) || pName.endsWith(` ${storeSlug}`));
+
+        if (isTagged || isNameMatched) {
           matched.push({ ...p });
         }
       }
     });
 
-    // 3. Match by Product Keywords if specified
+    // 3. Match by Product Keywords if specified (only if keywords are non-empty)
     if (Array.isArray(store.productKeywords) && store.productKeywords.length > 0) {
       const keywords = store.productKeywords.map(k => k.toLowerCase().trim()).filter(Boolean);
-      const byKeywords = allProducts.filter(p => {
-        const pName = (p.name || '').toLowerCase();
-        const pCat = (p.category || '').toLowerCase();
-        return keywords.some(k => pName.includes(k) || pCat.includes(k));
-      });
-      byKeywords.forEach(p => {
-        if (!matched.some(m => Number(m.id) === Number(p.id))) {
-          matched.push({ ...p });
-        }
-      });
+      if (keywords.length > 0) {
+        const byKeywords = allProducts.filter(p => {
+          const pName = (p.name || '').toLowerCase();
+          const pCat = (p.category || '').toLowerCase();
+          return keywords.some(k => pName.includes(k) || pCat.includes(k));
+        });
+        byKeywords.forEach(p => {
+          if (!matched.some(m => Number(m.id) === Number(p.id))) {
+            matched.push({ ...p });
+          }
+        });
+      }
     }
 
     // 4. Merge store's custom created products (Strictly avoiding duplicates by ID or Name)
@@ -484,16 +492,14 @@ class StoreManager {
       });
     }
 
-    // 5. Final Deduplication Pass by ID and Name
+    // 5. Final Deduplication Pass by ID
     const uniqueMap = new Map();
     matched.forEach(p => {
-      const key = `${p.id}_${(p.name || '').trim().toLowerCase()}`;
-      if (!uniqueMap.has(key) && !uniqueMap.has(String(p.id))) {
-        uniqueMap.set(key, p);
-        uniqueMap.set(String(p.id), p);
+      if (!uniqueMap.has(Number(p.id))) {
+        uniqueMap.set(Number(p.id), p);
       }
     });
-    const uniqueProducts = Array.from(new Set(uniqueMap.values()));
+    const uniqueProducts = Array.from(uniqueMap.values());
 
     // 6. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
@@ -504,7 +510,7 @@ class StoreManager {
       const isCustomStoreProd = Array.isArray(store.customProducts) && store.customProducts.some(cp => Number(cp.id) === Number(prod.id));
       const baseStock = Number(prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 0));
 
-      // Real-time stock parity: For Odoo products, live Odoo ERP qty_available is authoritative across all screens
+      // Real-time stock parity: Live Odoo ERP qty_available is authoritative across all screens unless overridden
       const storeStock = (!isCustomStoreProd && prod.qty_available !== undefined)
         ? Number(prod.qty_available)
         : (ovr && ovr.qty_available !== undefined ? Number(ovr.qty_available) : baseStock);

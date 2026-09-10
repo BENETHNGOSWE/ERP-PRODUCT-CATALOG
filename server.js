@@ -543,8 +543,17 @@ app.get('/api/odoo/template.csv', (req, res) => {
 // 6. Get Products Filtered Strictly for a Client Store (Product Separation)
 app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
   try {
-    const slug = req.params.slug || req.query.store || 'achete';
-    const store = stores.getStoreBySlug(slug) || stores.getAllStores()[0];
+    const slug = req.params.slug || req.query.store;
+    let store = null;
+    if (slug && slug !== 'achete' && slug !== 'shop' && slug !== 'catalog' && slug !== 'all') {
+      store = stores.getStoreBySlug(slug) || stores.getStoreById(slug);
+    }
+    if (!store && req.query.store) {
+      store = stores.getStoreBySlug(req.query.store) || stores.getStoreById(req.query.store);
+    }
+    if (!store) {
+      store = stores.getAllStores()[0];
+    }
 
     const forceRefresh = req.query.refresh === 'true' || req.query.force === 'true';
     const odooResult = await odoo.fetchOdooProducts(forceRefresh);
@@ -566,6 +575,7 @@ app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/product
         name: store.name,
         slug: store.slug,
         logo: store.logo,
+        banner: store.banner,
         tagline: store.tagline,
         whatsapp: store.whatsapp,
         themeColor: store.themeColor,
@@ -905,16 +915,27 @@ app.get('/api/whatsapp/logs', (req, res) => {
 // =========================================================================
 
 // Cart Page (Supports /cart, /cart.html, /:slug/cart with dynamic banner injection)
-app.get(['/cart', '/cart.html', '/:slug/cart'], (req, res) => {
+app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
   const slug = req.params.slug;
   const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
   const storeName = store ? store.name : 'Store';
   const storeBanner = store ? (store.banner || '') : '';
   const cartHtmlPath = path.join(__dirname, 'public', 'cart.html');
+
+  let storeProducts = [];
+  try {
+    const odooRes = await odoo.fetchOdooProducts(false);
+    const allProds = odooRes.products || [];
+    storeProducts = store ? stores.filterProductsForStore(allProds, store) : allProds;
+  } catch (e) {}
   
   fs.readFile(cartHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(cartHtmlPath);
-    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Your Cart — ${escapeMetaAttr(storeName)}</title>`);
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Your Cart — ${escapeMetaAttr(storeName)}</title>
+  <script id="__INITIAL_DATA__">
+    window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
+    window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
+  </script>`);
     if (storeBanner) {
       modifiedHtml = modifiedHtml.replace(
         /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
@@ -927,16 +948,27 @@ app.get(['/cart', '/cart.html', '/:slug/cart'], (req, res) => {
 });
 
 // Confirmation Receipt Page (Supports /confirmation, /confirmation.html, /:slug/confirmation with dynamic banner injection)
-app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confirmation'], (req, res) => {
+app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confirmation'], async (req, res) => {
   const slug = req.params.slug;
   const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
   const storeName = store ? store.name : 'Store';
   const storeBanner = store ? (store.banner || '') : '';
   const confHtmlPath = path.join(__dirname, 'public', 'confirmation.html');
+
+  let storeProducts = [];
+  try {
+    const odooRes = await odoo.fetchOdooProducts(false);
+    const allProds = odooRes.products || [];
+    storeProducts = store ? stores.filterProductsForStore(allProds, store) : allProds;
+  } catch (e) {}
   
   fs.readFile(confHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(confHtmlPath);
-    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Order Confirmed — ${escapeMetaAttr(storeName)}</title>`);
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Order Confirmed — ${escapeMetaAttr(storeName)}</title>
+  <script id="__INITIAL_DATA__">
+    window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
+    window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
+  </script>`);
     if (storeBanner) {
       modifiedHtml = modifiedHtml.replace(
         /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
