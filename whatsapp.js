@@ -153,38 +153,27 @@ Action Required: Please process and confirm this order.`
    */
   formatCustomerReceipt(store, order) {
     const storeName = store ? store.name : 'Store';
-    const storeWa = store ? (store.whatsapp || '+255710459064') : '+255710459064';
+    const rawStoreWa = store ? (store.whatsapp || '+255710459064') : '+255710459064';
+    const cleanStoreWa = this.normalizePhone(rawStoreWa);
     const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
-    const custName = order.customer ? (order.customer.name || 'Customer') : (order.customerName || 'Customer');
-    const delivery = order.customer ? (order.customer.deliveryAddress || (store && store.address) || 'Dar es Salaam') : 'Dar es Salaam';
-
-    let itemsText = '';
-    const items = order.items || [];
-    if (items.length > 0) {
-      itemsText = items.map(item => {
-        const qty = item.quantity || item.qty || 1;
-        const price = Number(item.price) || 0;
-        const subtotal = qty * price;
-        return `• ${item.name} × ${qty} — TZS ${subtotal.toLocaleString('en-US')}`;
-      }).join('\n');
-    } else {
-      itemsText = '• General Order Items';
-    }
-
-    const totalFormatted = (Number(order.totalAmount) || 0).toLocaleString('en-US');
+    const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US');
 
     return (
-`✅ *ORDER CONFIRMATION #${orderRef}*
-Hello *${custName}*, thank you for your order at *${storeName}*!
+`🧾 ACHETE NOTIFICATIONS
+Official Order Receipt
 
-*Your Order:*
-${itemsText}
+Hello, your order on achete.me has been received!
 
-*Total: TZS ${totalFormatted}*
-*Delivery Address:* ${delivery}
+🏪 Merchant: ${storeName}
+📦 Order #: ${orderRef}
+💰 Total: TZS ${totalFormatted}
 
-Your order has been received and our team is preparing it for delivery/pickup.
-📞 Store WhatsApp: ${storeWa}`
+----------------------------------------
+📞 Store Direct Contact:
+${storeName} is preparing your package. To chat directly with the seller:
+👉 WhatsApp: https://wa.me/${cleanStoreWa}
+----------------------------------------
+Sent via achete.me Platform`
     );
   }
 
