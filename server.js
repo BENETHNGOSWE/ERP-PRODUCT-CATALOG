@@ -25,6 +25,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Canonical Host & Protocol Redirect Middleware (Enforces https://achete.me/ canonical domain)
 app.use((req, res, next) => {
+  // Normalize double/multiple consecutive slashes (e.g. //sitemap.xml -> /sitemap.xml)
+  if (req.url && req.url.includes('//')) {
+    req.url = req.url.replace(/\/{2,}/g, '/');
+  }
+
   const host = req.headers.host || '';
   const proto = req.headers['x-forwarded-proto'];
 
