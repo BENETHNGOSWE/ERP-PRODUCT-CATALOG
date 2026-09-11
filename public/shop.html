@@ -693,6 +693,19 @@
 
         document.getElementById('productDetailModal').classList.add('active');
         document.body.style.overflow = 'hidden';
+
+        // GA4 E-Commerce: View Item Event
+        if (typeof gtag === 'function') {
+          gtag('event', 'view_item', {
+            currency: 'TZS',
+            value: Number(p.price || 0),
+            items: [{
+              item_id: String(p.id),
+              item_name: p.name,
+              price: Number(p.price || 0)
+            }]
+          });
+        }
       };
 
       window.closeProductDetailModal = function() {
@@ -744,10 +757,26 @@
 
       window.submitDetailModalCart = function() {
         if (!currentDetailProduct) return;
-        NOVA.setItemQty(currentDetailProduct.id, detailModalQty);
-        NOVA.showToast(`Added ${detailModalQty} × ${currentDetailProduct.name} to cart!`);
+        const addedQty = detailModalQty;
+        const targetProd = currentDetailProduct;
+        NOVA.setItemQty(targetProd.id, addedQty);
+        NOVA.showToast(`Added ${addedQty} × ${targetProd.name} to cart!`);
         renderStoreView();
         closeProductDetailModal();
+
+        // GA4 E-Commerce: Add to Cart Event
+        if (typeof gtag === 'function') {
+          gtag('event', 'add_to_cart', {
+            currency: 'TZS',
+            value: Number(targetProd.price || 0) * addedQty,
+            items: [{
+              item_id: String(targetProd.id),
+              item_name: targetProd.name,
+              price: Number(targetProd.price || 0),
+              quantity: addedQty
+            }]
+          });
+        }
       };
 
       // Keyboard support

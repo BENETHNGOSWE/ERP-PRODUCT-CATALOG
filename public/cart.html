@@ -18,6 +18,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6TVKBHRTTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6TVKBHRTTN');
+  </script>
 </head>
 <body>
 
@@ -414,6 +422,21 @@
 
           NOVA.saveLatestOrder(confirmedOrder);
           NOVA.resetCart();
+
+          // GA4 E-Commerce: Purchase Event
+          if (typeof gtag === 'function') {
+            gtag('event', 'purchase', {
+              transaction_id: confirmedOrder.orderId,
+              value: confirmedOrder.totalPaid || 0,
+              currency: 'TZS',
+              items: (confirmedOrder.items || []).map(item => ({
+                item_id: String(item.id),
+                item_name: item.name,
+                price: Number(item.price || 0),
+                quantity: Number(item.qty || item.quantity || 1)
+              }))
+            });
+          }
 
           // Direct clean transition to order confirmation (WhatsApp alert dispatched by backend)
           const slug = NOVA.getStoreSlug();

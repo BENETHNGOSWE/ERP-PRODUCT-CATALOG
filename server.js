@@ -1696,6 +1696,15 @@ function buildStorefrontSeoHead(store, storeProducts, query = {}) {
   <!-- Google Site Verification -->
   <meta name="google-site-verification" content="UsJ9oKh4vYKcNmJl2z9J9y_LQKv_78USpwQDirkxDRw">
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6TVKBHRTTN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6TVKBHRTTN');
+  </script>
+
   <!-- Schema.org Structured Data -->
   <script type="application/ld+json">
   ${JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : { '@context': 'https://schema.org', '@graph': jsonLd })}
