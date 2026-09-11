@@ -1689,7 +1689,7 @@ function buildStorefrontSeoHead(store, storeProducts, query = {}) {
   <meta name="twitter:image" content="${escapeMetaAttr(ogImage)}">
 
   <!-- Google Site Verification -->
-  <meta name="google-site-verification" content="achete-platform-webmaster-verification-2026">
+  <meta name="google-site-verification" content="UsJ9oKh4vYKcNmJl2z9J9y_LQKv_78USpwQDirkxDRw">
 
   <!-- Schema.org Structured Data -->
   <script type="application/ld+json">
