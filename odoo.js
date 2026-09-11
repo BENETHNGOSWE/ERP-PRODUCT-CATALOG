@@ -414,6 +414,34 @@ function saveBase64ProductImage(id, base64Data) {
   }
 }
 
+// Helper: Save SVG placeholder to static disk file
+function saveSvgProductImage(id, svgContent) {
+  try {
+    const productsDir = path.join(__dirname, 'public', 'assets', 'products');
+    if (!fs.existsSync(productsDir)) {
+      fs.mkdirSync(productsDir, { recursive: true });
+    }
+    const fileName = `prod_${id}.svg`;
+    const filePath = path.join(productsDir, fileName);
+    fs.writeFileSync(filePath, svgContent, 'utf8');
+    return `/assets/products/${fileName}`;
+  } catch (e) {
+    console.warn(`[SVG Image Cache Warning for Product ${id}]:`, e.message);
+    return `/assets/products/prod_${id}.svg`;
+  }
+}
+
+// Helper: Check if product is a clean public item (filters out tests/drafts)
+function isPublicProduct(product) {
+  if (!product || !product.name) return false;
+  const nameLower = product.name.toLowerCase().trim();
+  if (nameLower.includes('test') || nameLower.includes('dummy') || nameLower.includes('draft') || nameLower.includes('iphone 18')) {
+    return false;
+  }
+  if (product.active === false || product.is_published === false) return false;
+  return true;
+}
+
 // Map Odoo Product to Catalog Format
 function mapProduct(p, categMap, tagMap = {}) {
   let category = 'General';
@@ -436,24 +464,25 @@ function mapProduct(p, categMap, tagMap = {}) {
   let image = '';
   if (p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20) {
     const saved = saveBase64ProductImage(p.id, p.image_128);
-    image = saved || (p.image_128.startsWith('data:') ? p.image_128 : `data:image/png;base64,${p.image_128}`);
+    image = saved || `/assets/products/prod_${p.id}.png`;
   } else if (p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20) {
     const saved = saveBase64ProductImage(p.id, p.image_1920);
-    image = saved || (p.image_1920.startsWith('data:') ? p.image_1920 : `data:image/png;base64,${p.image_1920}`);
+    image = saved || `/assets/products/prod_${p.id}.png`;
   } else if (p.image && typeof p.image === 'string' && p.image.length > 5) {
-    if (p.image.startsWith('data:image/') && p.image.length > 2000) {
+    if (p.image.startsWith('data:image/') && p.image.length > 200) {
       const saved = saveBase64ProductImage(p.id, p.image);
-      image = saved || p.image;
+      image = saved || `/assets/products/prod_${p.id}.png`;
     } else {
       image = p.image;
     }
   } else {
-    // Generate an elegant SVG placeholder badge with initial letter and product name
+    // Generate an elegant SVG placeholder badge saved to disk
     const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
     const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
     const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
     const bgColor = bgColors[colorIndex];
-    image = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${bgColor}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+    image = saveSvgProductImage(p.id, svgContent) || `/assets/products/prod_${p.id}.svg`;
   }
 
   const inStock = p.qty_available > 0;

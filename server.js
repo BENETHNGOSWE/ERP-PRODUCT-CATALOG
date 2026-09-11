@@ -108,6 +108,17 @@ Sitemap: https://achete.me/sitemap.xml
   res.send(robotsTxt);
 });
 
+// Helper: Check if product is a clean public item (filters out tests/drafts)
+function isPublicProduct(product) {
+  if (!product || !product.name) return false;
+  const nameLower = product.name.toLowerCase().trim();
+  if (nameLower.includes('test') || nameLower.includes('dummy') || nameLower.includes('draft') || nameLower.includes('iphone 18')) {
+    return false;
+  }
+  if (product.active === false || product.is_published === false) return false;
+  return true;
+}
+
 // 2. Dynamic XML Sitemap (Auto-updates with public stores, categories & products)
 app.get('/sitemap.xml', async (req, res) => {
   try {
@@ -138,7 +149,7 @@ app.get('/sitemap.xml', async (req, res) => {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
-    // Core Public Marketing URLs
+    // 1. Canonical Homepage (Only https://achete.me/)
     xml += `  <url>\n`;
     xml += `    <loc>${baseUrl}/</loc>\n`;
     xml += `    <lastmod>${todayDate}</lastmod>\n`;
@@ -146,24 +157,19 @@ app.get('/sitemap.xml', async (req, res) => {
     xml += `    <priority>1.0</priority>\n`;
     xml += `  </url>\n`;
 
-    xml += `  <url>\n`;
-    xml += `    <loc>${baseUrl}/home</loc>\n`;
-    xml += `    <lastmod>${todayDate}</lastmod>\n`;
-    xml += `    <changefreq>weekly</changefreq>\n`;
-    xml += `    <priority>0.8</priority>\n`;
-    xml += `  </url>\n`;
-
-    // Public Storefronts, Categories & Products
+    // 2. Public Storefronts, Categories & Products
     for (const store of activeStores) {
       const storeSlug = encodeURIComponent(store.slug);
-      const storeProducts = stores.filterProductsForStore(allProducts, store);
+      const rawStoreProducts = stores.filterProductsForStore(allProducts, store);
+      const storeProducts = rawStoreProducts.filter(isPublicProduct);
+      const storeLastMod = (store.updatedAt || store.createdDate || '2026-09-10').split('T')[0];
       const storeLogoUrl = (store.logo && !store.logo.startsWith('data:')) ? (store.logo.startsWith('http') ? store.logo : `${baseUrl}${store.logo}`) : '';
       const storeBannerUrl = (store.banner && !store.banner.startsWith('data:')) ? (store.banner.startsWith('http') ? store.banner : `${baseUrl}${store.banner}`) : '';
 
       // Store Main URL
       xml += `  <url>\n`;
       xml += `    <loc>${baseUrl}/${storeSlug}</loc>\n`;
-      xml += `    <lastmod>${todayDate}</lastmod>\n`;
+      xml += `    <lastmod>${storeLastMod}</lastmod>\n`;
       xml += `    <changefreq>daily</changefreq>\n`;
       xml += `    <priority>0.9</priority>\n`;
       if (storeBannerUrl || storeLogoUrl) {
@@ -180,7 +186,7 @@ app.get('/sitemap.xml', async (req, res) => {
         if (!cat || cat.toLowerCase() === 'all') continue;
         xml += `  <url>\n`;
         xml += `    <loc>${baseUrl}/${storeSlug}?category=${encodeURIComponent(cat)}</loc>\n`;
-        xml += `    <lastmod>${todayDate}</lastmod>\n`;
+        xml += `    <lastmod>${storeLastMod}</lastmod>\n`;
         xml += `    <changefreq>weekly</changefreq>\n`;
         xml += `    <priority>0.7</priority>\n`;
         xml += `  </url>\n`;
@@ -188,13 +194,14 @@ app.get('/sitemap.xml', async (req, res) => {
 
       // Store Products
       for (const prod of storeProducts) {
+        const prodLastMod = (prod.write_date || prod.updatedAt || storeLastMod).split('T')[0];
         const prodImgUrl = (prod.image && !prod.image.startsWith('data:')) 
           ? (prod.image.startsWith('http') ? prod.image : `${baseUrl}${prod.image}`)
-          : `${baseUrl}/assets/products/samsung_charger.png`;
+          : `${baseUrl}/assets/products/prod_${prod.id}.png`;
 
         xml += `  <url>\n`;
         xml += `    <loc>${baseUrl}/${storeSlug}?product=${prod.id}</loc>\n`;
-        xml += `    <lastmod>${todayDate}</lastmod>\n`;
+        xml += `    <lastmod>${prodLastMod}</lastmod>\n`;
         xml += `    <changefreq>weekly</changefreq>\n`;
         xml += `    <priority>0.8</priority>\n`;
         if (prodImgUrl) {
@@ -230,6 +237,11 @@ const staticCacheOptions = {
     }
   }
 };
+
+// Permanent 301 redirects for legacy homepage duplicates (/home, /home.html, /index.html)
+app.get(['/home', '/home.html', '/index.html'], (req, res) => {
+  return res.redirect(301, '/');
+});
 
 app.use('/assets/stores', (req, res, next) => {
   const filePath = path.join(__dirname, 'public', 'assets', 'stores', req.path);
@@ -1486,8 +1498,13 @@ app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
 });
 
-// Platform Homepage (Official Snippe-inspired Achete Website)
-app.get(['/', '/home', '/home.html'], (req, res) => {
+// Permanent 301 redirects for legacy homepage duplicates (/home, /home.html, /index.html)
+app.get(['/home', '/home.html', '/index.html'], (req, res) => {
+  return res.redirect(301, '/');
+});
+
+// Canonical Homepage
+app.get('/', (req, res) => {
   if (req.query.store) {
     const store = stores.getStoreBySlug(req.query.store);
     if (store) return res.redirect(301, `/${store.slug}`);
@@ -1551,7 +1568,7 @@ function buildStorefrontSeoHead(store, storeProducts, query = {}) {
     
     const prodImg = (targetProduct.image && !targetProduct.image.startsWith('data:'))
       ? (targetProduct.image.startsWith('http') ? targetProduct.image : `${baseUrl}${targetProduct.image}`)
-      : defaultShareImage;
+      : `${baseUrl}/assets/products/prod_${targetProduct.id}.png`;
     ogImage = prodImg;
     ogType = 'product';
 
@@ -1705,7 +1722,8 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   try {
     const odooRes = await odoo.fetchOdooProducts(false);
     const allProds = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
-    storeProducts = stores.filterProductsForStore(allProds, store);
+    const rawProds = stores.filterProductsForStore(allProds, store);
+    storeProducts = rawProds.filter(isPublicProduct);
     const catSet = new Set(['All']);
     storeProducts.forEach(p => { if (p.category) catSet.add(p.category); });
     catList = Array.from(catSet);
@@ -1724,7 +1742,7 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   </script>
     `.trim();
 
-    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `${dynamicSeoMeta}\n${initialDataScript}`);
+    let modifiedHtml = html.replace(/<!-- SEO_HEAD_INJECTION -->|<title>.*?<\/title>/i, `${dynamicSeoMeta}\n${initialDataScript}`);
     
     if (storeBanner) {
       modifiedHtml = modifiedHtml.replace(

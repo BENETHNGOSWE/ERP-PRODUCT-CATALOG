@@ -6,8 +6,7 @@
   <meta name="theme-color" content="#7433df">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>ACHETE.ME — Online Store</title>
-  <meta name="description" content="Shop quality products with fast delivery in Dar es Salaam on achete.me.">
+  <!-- SEO_HEAD_INJECTION -->
   <link rel="icon" type="image/svg+xml" href="/assets/achete-icon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
@@ -336,7 +335,7 @@
       <button type="button" class="prod-detail-close" onclick="closeProductDetailModal()">&times;</button>
       
       <div class="prod-detail-hero">
-        <img id="detailModalImg" src="" alt="Product Image" class="prod-detail-hero-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\'><rect width=\'300\' height=\'300\' rx=\'24\' fill=\'%230047bb\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'72\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
+        <img id="detailModalImg" src="" alt="Product Image" class="prod-detail-hero-img" onerror="this.onerror=null; this.src='/assets/products/prod_placeholder.svg'">
       </div>
 
       <div class="prod-detail-body">
@@ -608,7 +607,7 @@
             <article class="product-item-card" data-id="${p.id}">
               <div class="product-item-left" onclick="openProductDetailModal('${p.id}')">
                 <div class="product-item-thumb-wrap" title="Click to view details">
-                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' rx=\'12\' fill=\'%237433df\'/><text x=\'50%\' y=\'54%\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'36\' fill=\'%23ffffff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>P</text></svg>'">
+                  <img src="${escapeAttr(p.thumb || p.image)}" alt="${escapeHtml(p.name)}" class="product-item-thumb" loading="lazy" onerror="this.onerror=null; this.src='/assets/products/prod_placeholder.svg'">
                 </div>
                 <div class="product-item-meta">
                   <h3 class="product-item-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
