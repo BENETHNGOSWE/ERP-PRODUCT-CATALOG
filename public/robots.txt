@@ -3,8 +3,6 @@
 
 User-agent: *
 Allow: /
-Allow: /home
-Allow: /home.html
 Allow: /shop
 Allow: /catalog
 Allow: /assets/

@@ -476,13 +476,18 @@ function mapProduct(p, categMap, tagMap = {}) {
       image = p.image;
     }
   } else {
-    // Generate an elegant SVG placeholder badge saved to disk
-    const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
-    const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
-    const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
-    const bgColor = bgColors[colorIndex];
-    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${bgColor}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
-    image = saveSvgProductImage(p.id, svgContent) || `/assets/products/prod_${p.id}.svg`;
+    // Prefer static PNG product image file
+    const pngPath = path.join(__dirname, 'public', 'assets', 'products', `prod_${p.id}.png`);
+    if (fs.existsSync(pngPath)) {
+      image = `/assets/products/prod_${p.id}.png`;
+    } else {
+      const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
+      const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+      const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
+      const bgColor = bgColors[colorIndex];
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${bgColor}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+      image = saveSvgProductImage(p.id, svgContent) || `/assets/products/prod_${p.id}.png`;
+    }
   }
 
   const inStock = p.qty_available > 0;

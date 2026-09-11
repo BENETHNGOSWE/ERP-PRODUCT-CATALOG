@@ -70,8 +70,6 @@ app.get('/robots.txt', (req, res) => {
 
 User-agent: *
 Allow: /
-Allow: /home
-Allow: /home.html
 Allow: /shop
 Allow: /catalog
 Allow: /assets/
@@ -1173,7 +1171,6 @@ app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
   fs.readFile(cartHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(cartHtmlPath);
     let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Your Cart — ${escapeMetaAttr(storeName)}</title>
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <script id="__INITIAL_DATA__">
     window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
     window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
@@ -1219,7 +1216,6 @@ app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confir
   fs.readFile(confHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(confHtmlPath);
     let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Order Confirmed — ${escapeMetaAttr(storeName)}</title>
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <script id="__INITIAL_DATA__">
     window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
     window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
@@ -1610,6 +1606,20 @@ function buildStorefrontSeoHead(store, storeProducts, query = {}) {
     ogDescription = metaDescription;
   }
 
+  // Accurate price range calculation for Store Structured Data
+  let minPrice = 0;
+  let maxPrice = 0;
+  if (storeProducts.length > 0) {
+    const validPrices = storeProducts.map(p => Number(p.price) || 0).filter(pr => pr > 0);
+    if (validPrices.length > 0) {
+      minPrice = Math.min(...validPrices);
+      maxPrice = Math.max(...validPrices);
+    }
+  }
+  const formattedPriceRange = (minPrice > 0 && maxPrice > 0)
+    ? `TZS ${minPrice.toLocaleString()} - TZS ${maxPrice.toLocaleString()}`
+    : 'TZS 25,000 - TZS 2,695,000';
+
   // Store / OnlineStore Schema
   const storeSchema = {
     '@context': 'https://schema.org',
@@ -1620,7 +1630,7 @@ function buildStorefrontSeoHead(store, storeProducts, query = {}) {
     'description': storeTagline,
     'telephone': store.whatsapp || '+255710459064',
     'currenciesAccepted': 'TZS',
-    'priceRange': '$$',
+    'priceRange': formattedPriceRange,
     'paymentAccepted': 'Cash on Delivery, Mobile Money (M-Pesa, Tigo Pesa, Airtel Money)',
     'address': {
       '@type': 'PostalAddress',
