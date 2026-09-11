@@ -1,0 +1,37 @@
+# Achete Platform Robots.txt
+# Canonical: https://achete.me/
+
+User-agent: *
+Allow: /
+Allow: /home
+Allow: /home.html
+Allow: /shop
+Allow: /catalog
+Allow: /assets/
+Allow: /uploads/
+
+# Disallow Private Administrative & Merchant Dashboard Routes
+Disallow: /api/
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /dashboard
+Disallow: /dashboard.html
+Disallow: /*/admin
+Disallow: /*/dashboard
+
+# Disallow Transactional & Private Checkout Routes
+Disallow: /cart
+Disallow: /cart.html
+Disallow: /*/cart
+Disallow: /confirmation
+Disallow: /confirmation.html
+Disallow: /*/confirmation
+Disallow: /order-success
+Disallow: /*/order-success
+
+# Disallow Preview Tools
+Disallow: /odoo-preview
+Disallow: /odoo_preview.html
+
+# XML Sitemap
+Sitemap: https://achete.me/sitemap.xml

@@ -23,6 +23,201 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Canonical Host & Protocol Redirect Middleware (Enforces https://achete.me/ canonical domain)
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  const proto = req.headers['x-forwarded-proto'];
+
+  // Only apply 301 domain normalization for live achete.me host
+  if (host.toLowerCase().includes('achete.me')) {
+    const isWww = host.toLowerCase().startsWith('www.');
+    const isHttp = proto === 'http';
+
+    if (isWww || isHttp) {
+      const cleanHost = host.replace(/^www\./i, '');
+      const targetUrl = `https://${cleanHost}${req.originalUrl}`;
+      return res.redirect(301, targetUrl);
+    }
+  }
+
+  // Normalize trailing slashes (except root "/")
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    const query = req.url.slice(req.path.length);
+    const safepath = req.path.slice(0, -1);
+    return res.redirect(301, safepath + query);
+  }
+
+  next();
+});
+
+// API Private Headers Middleware
+app.use('/api', (req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+  next();
+});
+
+// Google Search Console & Webmaster Verification File Handler
+app.get('/google:code.html', (req, res) => {
+  const code = req.params.code;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`google-site-verification: google${code}.html`);
+});
+
+// 1. Robots.txt (Plain text Allow/Disallow rules with sitemap link)
+app.get('/robots.txt', (req, res) => {
+  const robotsTxt = `# Achete Digital Commerce Platform Robots.txt
+# Canonical: https://achete.me/
+
+User-agent: *
+Allow: /
+Allow: /home
+Allow: /home.html
+Allow: /shop
+Allow: /catalog
+Allow: /assets/
+Allow: /uploads/
+
+# Disallow Administrative & Merchant Dashboard Routes
+Disallow: /api/
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /dashboard
+Disallow: /dashboard.html
+Disallow: /*/admin
+Disallow: /*/dashboard
+
+# Disallow Transactional & Private Checkout Routes
+Disallow: /cart
+Disallow: /cart.html
+Disallow: /*/cart
+Disallow: /confirmation
+Disallow: /confirmation.html
+Disallow: /*/confirmation
+Disallow: /order-success
+Disallow: /*/order-success
+
+# Disallow Preview Tools
+Disallow: /odoo-preview
+Disallow: /odoo_preview.html
+
+# XML Sitemap
+Sitemap: https://achete.me/sitemap.xml
+`;
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+  res.send(robotsTxt);
+});
+
+// 2. Dynamic XML Sitemap (Auto-updates with public stores, categories & products)
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const activeStores = stores.getAllStores().filter(s => s.status !== 'inactive');
+    
+    // Fetch live products from Odoo ERP cache
+    let allProducts = [];
+    try {
+      const odooRes = await odoo.fetchOdooProducts(false);
+      allProducts = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
+    } catch (e) {
+      console.warn('[Sitemap XML] Error fetching live products for sitemap:', e.message);
+    }
+
+    const todayDate = new Date().toISOString().split('T')[0];
+    const baseUrl = 'https://achete.me';
+
+    const escapeXml = (unsafe) => {
+      if (!unsafe) return '';
+      return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    };
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
+
+    // Core Public Marketing URLs
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/</loc>\n`;
+    xml += `    <lastmod>${todayDate}</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>1.0</priority>\n`;
+    xml += `  </url>\n`;
+
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/home</loc>\n`;
+    xml += `    <lastmod>${todayDate}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `  </url>\n`;
+
+    // Public Storefronts, Categories & Products
+    for (const store of activeStores) {
+      const storeSlug = encodeURIComponent(store.slug);
+      const storeProducts = stores.filterProductsForStore(allProducts, store);
+      const storeLogoUrl = (store.logo && !store.logo.startsWith('data:')) ? (store.logo.startsWith('http') ? store.logo : `${baseUrl}${store.logo}`) : '';
+      const storeBannerUrl = (store.banner && !store.banner.startsWith('data:')) ? (store.banner.startsWith('http') ? store.banner : `${baseUrl}${store.banner}`) : '';
+
+      // Store Main URL
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/${storeSlug}</loc>\n`;
+      xml += `    <lastmod>${todayDate}</lastmod>\n`;
+      xml += `    <changefreq>daily</changefreq>\n`;
+      xml += `    <priority>0.9</priority>\n`;
+      if (storeBannerUrl || storeLogoUrl) {
+        xml += `    <image:image>\n`;
+        xml += `      <image:loc>${escapeXml(storeBannerUrl || storeLogoUrl)}</image:loc>\n`;
+        xml += `      <image:title>${escapeXml(store.name)} Storefront</image:title>\n`;
+        xml += `    </image:image>\n`;
+      }
+      xml += `  </url>\n`;
+
+      // Store Categories
+      const categories = Array.isArray(store.categories) ? store.categories : ['Smartphones', 'Accessories', 'Audio'];
+      for (const cat of categories) {
+        if (!cat || cat.toLowerCase() === 'all') continue;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/${storeSlug}?category=${encodeURIComponent(cat)}</loc>\n`;
+        xml += `    <lastmod>${todayDate}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        xml += `  </url>\n`;
+      }
+
+      // Store Products
+      for (const prod of storeProducts) {
+        const prodImgUrl = (prod.image && !prod.image.startsWith('data:')) 
+          ? (prod.image.startsWith('http') ? prod.image : `${baseUrl}${prod.image}`)
+          : `${baseUrl}/assets/products/samsung_charger.png`;
+
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/${storeSlug}?product=${prod.id}</loc>\n`;
+        xml += `    <lastmod>${todayDate}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.8</priority>\n`;
+        if (prodImgUrl) {
+          xml += `    <image:image>\n`;
+          xml += `      <image:loc>${escapeXml(prodImgUrl)}</image:loc>\n`;
+          xml += `      <image:title>${escapeXml(prod.name)}</image:title>\n`;
+          xml += `    </image:image>\n`;
+        }
+        xml += `  </url>\n`;
+      }
+    }
+
+    xml += `</urlset>`;
+
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.send(xml);
+  } catch (err) {
+    console.error('[Sitemap XML Error]:', err);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // Static Assets with Cache-Control headers
 const staticCacheOptions = {
   maxAge: '1d',
@@ -940,7 +1135,18 @@ app.get('/api/whatsapp/logs', (req, res) => {
 // Cart Page (Supports /cart, /cart.html, /:slug/cart with dynamic banner injection)
 app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
   const slug = req.params.slug;
-  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
+  let store = null;
+  if (slug) {
+    store = stores.getStoreBySlug(slug);
+    if (!store) {
+      return res.status(404)
+        .setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+        .sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+  } else {
+    store = stores.getAllStores()[0];
+  }
+
   const storeName = store ? store.name : 'Store';
   const storeBanner = store ? (store.banner || '') : '';
   const cartHtmlPath = path.join(__dirname, 'public', 'cart.html');
@@ -955,6 +1161,7 @@ app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
   fs.readFile(cartHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(cartHtmlPath);
     let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Your Cart — ${escapeMetaAttr(storeName)}</title>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <script id="__INITIAL_DATA__">
     window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
     window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
@@ -965,6 +1172,7 @@ app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
         `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
       );
     }
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(modifiedHtml);
   });
@@ -973,7 +1181,18 @@ app.get(['/cart', '/cart.html', '/:slug/cart'], async (req, res) => {
 // Confirmation Receipt Page (Supports /confirmation, /confirmation.html, /:slug/confirmation with dynamic banner injection)
 app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confirmation'], async (req, res) => {
   const slug = req.params.slug;
-  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : (stores.getAllStores()[0]);
+  let store = null;
+  if (slug) {
+    store = stores.getStoreBySlug(slug);
+    if (!store) {
+      return res.status(404)
+        .setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+        .sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+  } else {
+    store = stores.getAllStores()[0];
+  }
+
   const storeName = store ? store.name : 'Store';
   const storeBanner = store ? (store.banner || '') : '';
   const confHtmlPath = path.join(__dirname, 'public', 'confirmation.html');
@@ -988,6 +1207,7 @@ app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confir
   fs.readFile(confHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(confHtmlPath);
     let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `<title>Order Confirmed — ${escapeMetaAttr(storeName)}</title>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <script id="__INITIAL_DATA__">
     window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
     window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
@@ -998,6 +1218,7 @@ app.get(['/confirmation', '/confirmation.html', '/order-success', '/:slug/confir
         `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
       );
     }
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(modifiedHtml);
   });
@@ -1246,52 +1467,245 @@ app.get('/api/:slug/dashboard-data', async (req, res) => {
 
 // Executive Admin Dashboard (Supports /dashboard, /admin, /:slug/dashboard, /:slug/admin)
 app.get(['/dashboard', '/dashboard.html', '/admin', '/admin.html', '/:slug/dashboard', '/:slug/admin'], (req, res) => {
+  const slug = req.params.slug;
+  if (slug) {
+    const store = stores.getStoreBySlug(slug);
+    if (!store) {
+      return res.status(404)
+        .setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+        .sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+  }
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // Odoo ERP Integration Preview
 app.get(['/odoo-preview', '/odoo_preview.html'], (req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   res.sendFile(path.join(__dirname, 'public', 'odoo_preview.html'));
 });
 
 // Platform Homepage (Official Snippe-inspired Achete Website)
 app.get(['/', '/home', '/home.html'], (req, res) => {
   if (req.query.store) {
-    return res.sendFile(path.join(__dirname, 'public', 'shop.html'));
+    const store = stores.getStoreBySlug(req.query.store);
+    if (store) return res.redirect(301, `/${store.slug}`);
   }
+  res.setHeader('X-Robots-Tag', 'index, follow');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Helper to escape HTML attributes for meta tags
 function escapeMetaAttr(str) {
   if (!str) return '';
-  return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
-// Main Store Catalog Route (Supports /shop, /catalog, /store, /:slug with dynamic OpenGraph cards for Instagram Bio / Story / DM links)
+// Helper: Build dynamic SEO Head, OpenGraph, Twitter Card, and Schema.org JSON-LD
+function buildStorefrontSeoHead(store, storeProducts, query = {}) {
+  const baseUrl = 'https://achete.me';
+  const storeName = store ? store.name : 'Achete Store';
+  const storeTagline = store ? (store.tagline || 'Official Online Store | Fast Delivery in Dar es Salaam') : 'Your digital front door for products and ordering.';
+  const storeSlug = store ? store.slug : '';
+  const storeUrl = store ? `${baseUrl}/${storeSlug}` : `${baseUrl}/`;
+
+  const rawBanner = store ? store.banner : '';
+  const rawLogo = store ? store.logo : '';
+  const storeBannerUrl = (rawBanner && !rawBanner.startsWith('data:'))
+    ? (rawBanner.startsWith('http') ? rawBanner : `${baseUrl}${rawBanner}`)
+    : '';
+  const storeLogoUrl = (rawLogo && !rawLogo.startsWith('data:'))
+    ? (rawLogo.startsWith('http') ? rawLogo : `${baseUrl}${rawLogo}`)
+    : `${baseUrl}/assets/products/logo.png`;
+  const defaultShareImage = storeBannerUrl || storeLogoUrl;
+
+  let pageTitle = `${storeName} — Buy Online in Dar es Salaam | Achete Storefront`;
+  let metaDescription = `Shop ${storeName} on Achete. Browse ${storeProducts.length} verified products with direct WhatsApp ordering and fast doorstep delivery in Dar es Salaam.`;
+  let canonicalUrl = storeUrl;
+  let ogTitle = `${storeName} — Official Store on Achete`;
+  let ogDescription = storeTagline;
+  let ogImage = defaultShareImage;
+  let ogType = 'website';
+  let jsonLd = [];
+
+  // 1. Check if specific product is queried (?product=151)
+  const productId = query.product;
+  let targetProduct = null;
+  if (productId) {
+    targetProduct = storeProducts.find(p => String(p.id) === String(productId));
+  }
+
+  if (targetProduct) {
+    const formattedPrice = `TZS ${Number(targetProduct.price || 0).toLocaleString()}`;
+    pageTitle = `${targetProduct.name} — ${storeName} | Achete`;
+    metaDescription = `Buy ${targetProduct.name} (${formattedPrice}) from ${storeName}. In stock with fast delivery in Dar es Salaam and instant WhatsApp ordering.`;
+    canonicalUrl = `${storeUrl}?product=${targetProduct.id}`;
+    ogTitle = `${targetProduct.name} — ${storeName}`;
+    ogDescription = targetProduct.description || `Order ${targetProduct.name} for ${formattedPrice} from ${storeName}. Fast WhatsApp checkout.`;
+    
+    const prodImg = (targetProduct.image && !targetProduct.image.startsWith('data:'))
+      ? (targetProduct.image.startsWith('http') ? targetProduct.image : `${baseUrl}${targetProduct.image}`)
+      : defaultShareImage;
+    ogImage = prodImg;
+    ogType = 'product';
+
+    // Product & Offer Schema JSON-LD
+    jsonLd.push({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      '@id': `${canonicalUrl}#product`,
+      'name': targetProduct.name,
+      'image': [prodImg],
+      'description': metaDescription,
+      'sku': targetProduct.default_code || targetProduct.sku || `PROD-${targetProduct.id}`,
+      'brand': {
+        '@type': 'Brand',
+        'name': storeName
+      },
+      'offers': {
+        '@type': 'Offer',
+        'url': canonicalUrl,
+        'priceCurrency': 'TZS',
+        'price': targetProduct.price || 0,
+        'priceValidUntil': '2027-12-31',
+        'itemCondition': 'https://schema.org/NewCondition',
+        'availability': (Number(targetProduct.qty_available) || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        'seller': {
+          '@type': 'Organization',
+          'name': storeName,
+          'url': storeUrl
+        }
+      }
+    });
+  } else if (query.category && query.category.toLowerCase() !== 'all') {
+    // 2. Check if specific category is queried (?category=Smartphones)
+    const categoryName = query.category;
+    pageTitle = `${categoryName} Products — ${storeName} | Achete`;
+    metaDescription = `Browse ${categoryName} products from ${storeName} on Achete. Verified stock, instant WhatsApp ordering, and quick delivery in Dar es Salaam.`;
+    canonicalUrl = `${storeUrl}?category=${encodeURIComponent(categoryName)}`;
+    ogTitle = `${categoryName} — ${storeName}`;
+    ogDescription = metaDescription;
+  }
+
+  // Store / OnlineStore Schema
+  const storeSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'OnlineStore',
+    '@id': `${storeUrl}#store`,
+    'name': storeName,
+    'url': storeUrl,
+    'description': storeTagline,
+    'telephone': store.whatsapp || '+255710459064',
+    'currenciesAccepted': 'TZS',
+    'priceRange': '$$',
+    'paymentAccepted': 'Cash on Delivery, Mobile Money (M-Pesa, Tigo Pesa, Airtel Money)',
+    'address': {
+      '@type': 'PostalAddress',
+      'addressLocality': 'Dar es Salaam',
+      'streetAddress': store.address || 'Dar es Salaam, Tanzania',
+      'addressCountry': 'TZ'
+    }
+  };
+  if (storeLogoUrl) storeSchema.logo = storeLogoUrl;
+  if (storeBannerUrl) storeSchema.image = storeBannerUrl;
+  jsonLd.push(storeSchema);
+
+  // ItemList Schema for the store's catalog
+  if (storeProducts.length > 0 && !targetProduct) {
+    jsonLd.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      'itemListElement': storeProducts.slice(0, 30).map((p, idx) => ({
+        '@type': 'ListItem',
+        'position': idx + 1,
+        'item': {
+          '@type': 'Product',
+          'name': p.name,
+          'url': `${storeUrl}?product=${p.id}`,
+          'offers': {
+            '@type': 'Offer',
+            'price': p.price || 0,
+            'priceCurrency': 'TZS'
+          }
+        }
+      }))
+    });
+  }
+
+  return `
+  <title>${escapeMetaAttr(pageTitle)}</title>
+  <meta name="description" content="${escapeMetaAttr(metaDescription)}">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="${escapeMetaAttr(canonicalUrl)}">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="${escapeMetaAttr(ogType)}">
+  <meta property="og:url" content="${escapeMetaAttr(canonicalUrl)}">
+  <meta property="og:title" content="${escapeMetaAttr(ogTitle)}">
+  <meta property="og:description" content="${escapeMetaAttr(ogDescription)}">
+  <meta property="og:image" content="${escapeMetaAttr(ogImage)}">
+  <meta property="og:site_name" content="Achete">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="${escapeMetaAttr(canonicalUrl)}">
+  <meta name="twitter:title" content="${escapeMetaAttr(ogTitle)}">
+  <meta name="twitter:description" content="${escapeMetaAttr(ogDescription)}">
+  <meta name="twitter:image" content="${escapeMetaAttr(ogImage)}">
+
+  <!-- Google Site Verification -->
+  <meta name="google-site-verification" content="achete-platform-webmaster-verification-2026">
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  ${JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : { '@context': 'https://schema.org', '@graph': jsonLd })}
+  </script>
+  `.trim();
+}
+
+// Main Store Catalog Route (Strict Store Isolation, Dedicated SEO & 404 on Unknown Routes)
 app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   const slug = req.params.slug;
-  if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json') || slug.endsWith('.html'))) {
+  if (slug && (slug.endsWith('.js') || slug.endsWith('.css') || slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.jpeg') || slug.endsWith('.svg') || slug.endsWith('.ico') || slug.endsWith('.json') || slug.endsWith('.txt') || slug.endsWith('.xml') || slug.endsWith('.html'))) {
     return next();
   }
 
-  const store = slug ? (stores.getStoreBySlug(slug) || stores.getAllStores()[0]) : null;
-  const storeName = store ? store.name : 'Achete Store';
-  const storeTagline = store ? (store.tagline || 'Official Online Store | Fast Delivery in Dar es Salaam') : 'Your digital front door for products and ordering.';
-  const storeUrl = store ? `https://achete.me/${store.slug}` : 'https://achete.me/';
-  const storeImage = (store && store.banner && !store.banner.startsWith('data:')) 
-    ? (store.banner.startsWith('http') ? store.banner : `https://achete.me${store.banner}`)
-    : ((store && store.logo && !store.logo.startsWith('data:')) 
-        ? (store.logo.startsWith('http') ? store.logo : `https://achete.me${store.logo}`) 
-        : 'https://achete.me/assets/achete-icon.png');
+  let store = null;
+  if (slug) {
+    store = stores.getStoreBySlug(slug);
+    // If slug is provided but does not match any store, return genuine 404
+    if (!store || store.status === 'inactive') {
+      return res.status(404)
+        .setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+        .sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+  } else {
+    // /shop, /catalog, /store without slug
+    if (req.query.store) {
+      store = stores.getStoreBySlug(req.query.store);
+      if (store) return res.redirect(301, `/${store.slug}`);
+    }
+    return res.redirect(301, '/');
+  }
+
+  const storeName = store.name;
+  const storeBanner = store.banner || '';
 
   // Instant pre-cached products lookup for this store (< 1ms)
   let storeProducts = [];
   let catList = ['All'];
   try {
     const odooRes = await odoo.fetchOdooProducts(false);
-    const allProds = odooRes.products || [];
-    storeProducts = store ? stores.filterProductsForStore(allProds, store) : allProds;
+    const allProds = (odooRes && odooRes.products) ? odooRes.products : (Array.isArray(odooRes) ? odooRes : []);
+    storeProducts = stores.filterProductsForStore(allProds, store);
     const catSet = new Set(['All']);
     storeProducts.forEach(p => { if (p.category) catSet.add(p.category); });
     catList = Array.from(catSet);
@@ -1301,19 +1715,8 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   fs.readFile(shopHtmlPath, 'utf8', (err, html) => {
     if (err) return res.sendFile(shopHtmlPath);
 
-    const dynamicMeta = `
-  <title>${escapeMetaAttr(storeName)} — Official Store on Achete</title>
-  <meta name="description" content="${escapeMetaAttr(storeTagline)}">
-  <meta property="og:title" content="${escapeMetaAttr(storeName)} — Online Store">
-  <meta property="og:description" content="${escapeMetaAttr(storeTagline)}">
-  <meta property="og:image" content="${escapeMetaAttr(storeImage)}">
-  <meta property="og:url" content="${escapeMetaAttr(storeUrl)}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Achete">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escapeMetaAttr(storeName)}">
-  <meta name="twitter:description" content="${escapeMetaAttr(storeTagline)}">
-  <meta name="twitter:image" content="${escapeMetaAttr(storeImage)}">
+    const dynamicSeoMeta = buildStorefrontSeoHead(store, storeProducts, req.query);
+    const initialDataScript = `
   <script id="__INITIAL_DATA__">
     window.__INITIAL_STORE__ = ${JSON.stringify(store || {})};
     window.__INITIAL_PRODUCTS__ = ${JSON.stringify(storeProducts)};
@@ -1321,22 +1724,26 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
   </script>
     `.trim();
 
-    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, dynamicMeta);
-    const storeBanner = store ? (store.banner || '') : '';
+    let modifiedHtml = html.replace(/<title>.*?<\/title>/i, `${dynamicSeoMeta}\n${initialDataScript}`);
+    
     if (storeBanner) {
       modifiedHtml = modifiedHtml.replace(
         /<img[^>]*id="storeHeroBannerImg"[^>]*>/i,
         `<img src="${escapeMetaAttr(storeBanner)}" alt="${escapeMetaAttr(storeName)} Signboard" class="store-banner-img" id="storeHeroBannerImg">`
       );
     }
+    
+    res.setHeader('X-Robots-Tag', 'index, follow');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(modifiedHtml);
   });
 });
 
-// Fallback Route
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Fallback 404 Route for all unrecognized URLs
+app.all('*', (req, res) => {
+  res.status(404)
+    .setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+    .sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // Start Express Server

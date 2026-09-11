@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#7433df">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="googlebot" content="noindex, nofollow">
+  <title>404 — Page Not Found | Achete</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/achete-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7433df;
+      --primary-hover: #6225c9;
+      --primary-tint: rgba(116, 51, 223, 0.08);
+      --ink: #0f051f;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #faf7fe;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+    }
+
+    .error-card {
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+      background: #ffffff;
+      padding: 40px 32px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(15, 5, 31, 0.04);
+    }
+
+    .error-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-tint);
+      color: var(--primary);
+      border: 1px solid rgba(116, 51, 223, 0.2);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .error-code {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .error-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .error-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .actions-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+      box-shadow: 0 4px 14px rgba(116, 51, 223, 0.25);
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .btn.secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .verified-stores-box {
+      border-top: 1px dashed var(--border);
+      padding-top: 24px;
+      text-align: left;
+    }
+
+    .stores-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .store-links-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .store-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .store-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid #f1f5f9;
+    }
+
+    @media (min-width: 480px) {
+      .actions-row {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="/" class="brand">
+      <div class="brand-icon">A</div>
+      <span>achete.me</span>
+    </a>
+    <a href="/" class="btn secondary" style="padding: 8px 16px; font-size: 12px;">Home</a>
+  </header>
+
+  <main class="main-container">
+    <div class="error-card">
+      <div class="error-badge">
+        <span>●</span> HTTP 404
+      </div>
+      <div class="error-code">404</div>
+      <h1 class="error-title">Page or Store Not Found</h1>
+      <p class="error-desc">
+        The link you followed doesn't exist, has been moved, or the store handle is not registered on Achete.
+      </p>
+
+      <div class="actions-row">
+        <a href="/" class="btn primary">
+          <span>&larr;</span> Return to Homepage
+        </a>
+      </div>
+
+      <div class="verified-stores-box">
+        <div class="stores-title">Explore Verified Stores on Achete</div>
+        <div class="store-links-grid">
+          <a href="/kodastore" class="store-chip">
+            <span>🟢</span> Koda Store
+          </a>
+          <a href="/benstore" class="store-chip">
+            <span>🟢</span> Ben Store
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2026 Achete Platform (achete.me) &bull; All Rights Reserved.
+  </footer>
+
+</body>
+</html>
