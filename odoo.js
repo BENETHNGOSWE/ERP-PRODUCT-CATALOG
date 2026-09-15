@@ -8,6 +8,7 @@ require('dotenv').config();
 const xmlrpc = require('xmlrpc');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const CONFIG_FILE = path.join(__dirname, 'data', 'odoo_config.json');
 
@@ -386,6 +387,19 @@ function callModel(model, method, args, kwargs = {}, timeoutMs = 12000) {
   });
 }
 
+// Helper: Clean up stale image files when an image is deleted in Odoo ERP
+function removeProductImageFile(id) {
+  try {
+    const productsDir = path.join(__dirname, 'public', 'assets', 'products');
+    ['png', 'jpg', 'jpeg', 'webp', 'svg'].forEach(ext => {
+      const fp = path.join(productsDir, `prod_${id}.${ext}`);
+      if (fs.existsSync(fp)) {
+        try { fs.unlinkSync(fp); } catch (e) {}
+      }
+    });
+  } catch (e) {}
+}
+
 // Map Odoo Product to Catalog Format
 function saveBase64ProductImage(id, base64Data) {
   try {
@@ -404,10 +418,12 @@ function saveBase64ProductImage(id, base64Data) {
       }
     }
     
+    const buffer = Buffer.from(clean, 'base64');
+    const hash = crypto.createHash('md5').update(buffer).digest('hex').substring(0, 8);
     const fileName = `prod_${id}.${ext}`;
     const filePath = path.join(productsDir, fileName);
-    fs.writeFileSync(filePath, Buffer.from(clean, 'base64'));
-    return `/assets/products/${fileName}`;
+    fs.writeFileSync(filePath, buffer);
+    return `/assets/products/${fileName}?v=${hash}`;
   } catch (e) {
     console.warn(`[Image Cache Warning for Product ${id}]:`, e.message);
     return null;
@@ -424,7 +440,8 @@ function saveSvgProductImage(id, svgContent) {
     const fileName = `prod_${id}.svg`;
     const filePath = path.join(productsDir, fileName);
     fs.writeFileSync(filePath, svgContent, 'utf8');
-    return `/assets/products/${fileName}`;
+    const hash = crypto.createHash('md5').update(svgContent).digest('hex').substring(0, 8);
+    return `/assets/products/${fileName}?v=${hash}`;
   } catch (e) {
     console.warn(`[SVG Image Cache Warning for Product ${id}]:`, e.message);
     return `/assets/products/prod_${id}.svg`;
@@ -462,32 +479,29 @@ function mapProduct(p, categMap, tagMap = {}) {
 
   // Exact image from Odoo or custom uploaded data (Optimized to static disk files for sub-10ms initial page load)
   let image = '';
-  if (p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20) {
-    const saved = saveBase64ProductImage(p.id, p.image_128);
-    image = saved || `/assets/products/prod_${p.id}.png`;
-  } else if (p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20) {
-    const saved = saveBase64ProductImage(p.id, p.image_1920);
-    image = saved || `/assets/products/prod_${p.id}.png`;
-  } else if (p.image && typeof p.image === 'string' && p.image.length > 5) {
+  const hasImage128 = p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 20;
+  const hasImage1920 = p.image_1920 && typeof p.image_1920 === 'string' && p.image_1920.length > 20;
+  const hasCustomImg = p.image && typeof p.image === 'string' && p.image.length > 5;
+
+  if (hasImage1920) {
+    image = saveBase64ProductImage(p.id, p.image_1920) || `/assets/products/prod_${p.id}.png`;
+  } else if (hasImage128) {
+    image = saveBase64ProductImage(p.id, p.image_128) || `/assets/products/prod_${p.id}.png`;
+  } else if (hasCustomImg) {
     if (p.image.startsWith('data:image/') && p.image.length > 200) {
-      const saved = saveBase64ProductImage(p.id, p.image);
-      image = saved || `/assets/products/prod_${p.id}.png`;
+      image = saveBase64ProductImage(p.id, p.image) || `/assets/products/prod_${p.id}.png`;
     } else {
       image = p.image;
     }
   } else {
-    // Prefer static PNG product image file
-    const pngPath = path.join(__dirname, 'public', 'assets', 'products', `prod_${p.id}.png`);
-    if (fs.existsSync(pngPath)) {
-      image = `/assets/products/prod_${p.id}.png`;
-    } else {
-      const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
-      const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
-      const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
-      const bgColor = bgColors[colorIndex];
-      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${bgColor}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
-      image = saveSvgProductImage(p.id, svgContent) || `/assets/products/prod_${p.id}.png`;
-    }
+    // If the product has NO image in Odoo (or image was deleted), purge any stale disk cache
+    removeProductImageFile(p.id);
+    const initial = (p.name || 'P').trim().charAt(0).toUpperCase();
+    const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+    const colorIndex = (p.name || 'P').charCodeAt(0) % bgColors.length;
+    const bgColor = bgColors[colorIndex];
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="950" height="800" viewBox="0 0 950 800"><rect width="950" height="800" fill="${bgColor}"/><text x="50%" y="50%" font-family="Arial, sans-serif" font-weight="900" font-size="160" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+    image = saveSvgProductImage(p.id, svgContent);
   }
 
   const inStock = p.qty_available > 0;
