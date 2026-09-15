@@ -774,15 +774,14 @@ app.get('/api/odoo/template.csv', (req, res) => {
 });
 
 // 6. Get Products Filtered Strictly for a Client Store (Product Separation)
-app.get(['/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
+app.get(['/api/store/products', '/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
   try {
-    const slug = req.params.slug || req.query.store;
+    const rawParam = req.params.slug;
+    const isGenericSlug = !rawParam || ['store', 'stores', 'odoo', 'achete', 'shop', 'catalog', 'all'].includes(rawParam.toLowerCase());
+    const targetSlug = (!isGenericSlug ? rawParam : null) || req.query.store || req.query.slug;
     let store = null;
-    if (slug && slug !== 'achete' && slug !== 'shop' && slug !== 'catalog' && slug !== 'all') {
-      store = stores.getStoreBySlug(slug) || stores.getStoreById(slug);
-    }
-    if (!store && req.query.store) {
-      store = stores.getStoreBySlug(req.query.store) || stores.getStoreById(req.query.store);
+    if (targetSlug) {
+      store = stores.getStoreBySlug(targetSlug) || stores.getStoreById(targetSlug);
     }
     if (!store) {
       store = stores.getAllStores()[0];

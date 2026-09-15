@@ -296,7 +296,7 @@ let cachedProducts = [...DEFAULT_SEED_PRODUCTS];
 let cachedCategories = ['All', 'Smartphones', 'Accessories', 'Audio', 'Safety Gear', 'General'];
 let cachedTags = [];
 let lastFetchTime = Date.now();
-const CACHE_TTL = 15 * 60 * 1000; // 15 minutes TTL (Instant Stale-While-Revalidate)
+const CACHE_TTL = 5 * 1000; // 5 seconds TTL (Ultra-fast Stale-While-Revalidate)
 let authUid = null;
 let isSyncing = false;
 
@@ -536,7 +536,7 @@ async function syncOdooProductsInBackground() {
         fields: ['id', 'name']
       }).catch(e => { console.warn('[Odoo] Tags sync note:', e.message); return []; }),
       callModel('product.product', 'search_read', [
-        [['available_in_pos', '=', true]]
+        ['|', ['available_in_pos', '=', true], ['sale_ok', '=', true]]
       ], {
         fields: [
           'id',
@@ -552,7 +552,9 @@ async function syncOdooProductsInBackground() {
           'barcode',
           'default_code',
           'product_tag_ids',
-          'type'
+          'type',
+          'sale_ok',
+          'available_in_pos'
         ],
         limit: 250
       }).catch(e => { console.warn('[Odoo] Products sync note:', e.message); return []; })
