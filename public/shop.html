@@ -16,8 +16,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=2.5">
   <style>
+    /* Full edge-to-edge product hero image in details modal */
+    .prod-detail-hero {
+      position: relative;
+      width: 100% !important;
+      height: 280px !important;
+      min-height: 240px !important;
+      max-height: 340px !important;
+      background: #0f172a !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      border-top-left-radius: 20px !important;
+      border-top-right-radius: 20px !important;
+      border-bottom: 1px solid #f1f5f9 !important;
+    }
+    .prod-detail-hero-img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block !important;
+    }
+
     /* Compact item summary rows inside sticky checkout */
     .summary-item-entry {
       display: flex;
@@ -341,7 +370,7 @@
       <div class="prod-detail-body">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
           <h2 id="detailModalTitle" class="prod-detail-title">Product Title</h2>
-          <span id="detailModalStockTag" class="product-item-stock-tag in-stock" style="margin-top:4px;">In Stock</span>
+          <span id="detailModalStockTag" class="product-item-stock-tag in-stock" style="margin-top:4px;"><span class="stock-dot"></span>In Stock</span>
         </div>
 
         <div class="prod-detail-price-row">
@@ -660,7 +689,7 @@
         const stockTagEl = document.getElementById('detailModalStockTag');
         if (stockTagEl) {
           stockTagEl.className = 'product-item-stock-tag in-stock';
-          stockTagEl.innerHTML = '<span class="stock-dot"></span>In Stock &bull; Bulk Orders Welcome';
+          stockTagEl.innerHTML = '<span class="stock-dot"></span>In Stock';
         }
 
         const priceEl = document.getElementById('detailModalPrice');
