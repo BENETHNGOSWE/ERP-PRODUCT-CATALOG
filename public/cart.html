@@ -100,10 +100,6 @@
               <span class="summary-label">Subtotal</span>
               <span class="summary-val" id="summarySubtotal">TZS 0</span>
             </div>
-            <div class="summary-row discount-row">
-              <span class="summary-label">Discount</span>
-              <span class="summary-val discount-val" id="summaryDiscount">TZS 0</span>
-            </div>
             <div class="summary-row total-row">
               <span class="summary-label">Total</span>
               <span class="summary-val total-val" id="summaryTotal">TZS 0</span>
@@ -177,7 +173,6 @@
       const tbody = document.getElementById('cartTableBody');
       const mobileList = document.getElementById('mobileCartList');
       const subtotalEl = document.getElementById('summarySubtotal');
-      const discountEl = document.getElementById('summaryDiscount');
       const totalEl = document.getElementById('summaryTotal');
       const phoneInput = document.getElementById('customerPhone');
       const btnPlaceOrder = document.getElementById('btnPlaceOrder');
@@ -193,7 +188,6 @@
         NOVA.updateHeaderCartBadge();
 
         if (subtotalEl) subtotalEl.textContent = NOVA.formatTZS(totals.subtotal);
-        if (discountEl) discountEl.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
         if (totalEl) totalEl.textContent = NOVA.formatTZS(totals.total);
 
         const items = Object.entries(cart).filter(([_, qty]) => qty > 0);

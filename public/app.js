@@ -161,19 +161,12 @@
       }
     }
 
-    // Dynamic discount: if subtotal >= 15,000 grant TZS 1,500 discount (as in mockup)
-    let discount = 0;
-    if (subtotal >= 15000) {
-      discount = 1500;
-    } else if (subtotal > 0 && subtotal < 15000) {
-      discount = Math.min(Math.round(subtotal * 0.1), 1000);
-    }
-
-    const total = Math.max(0, subtotal - discount);
+    const discount = 0;
+    const total = subtotal;
 
     return {
       subtotal,
-      discount,
+      discount: 0,
       total,
       itemCount
     };

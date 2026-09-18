@@ -247,15 +247,11 @@
             <!-- Dynamically Populated Items -->
           </div>
 
-          <!-- Dynamic Subtotal, Discount, and Total -->
+          <!-- Dynamic Subtotal and Total -->
           <div class="summary-rows" style="margin-bottom: 18px;">
             <div class="summary-row">
               <span class="summary-label">Subtotal</span>
               <span class="summary-val" id="summarySubtotal">TZS 0</span>
-            </div>
-            <div class="summary-row discount-row">
-              <span class="summary-label">Discount</span>
-              <span class="summary-val discount-val" id="summaryDiscount">TZS 0</span>
             </div>
             <div class="summary-row total-row">
               <span class="summary-label">Total</span>
@@ -328,10 +324,6 @@
           <div class="summary-row">
             <span class="summary-label">Subtotal</span>
             <span class="summary-val" id="drawerSubtotal">TZS 0</span>
-          </div>
-          <div class="summary-row discount-row">
-            <span class="summary-label">Discount</span>
-            <span class="summary-val discount-val" id="drawerDiscount">TZS 0</span>
           </div>
           <div class="summary-row total-row">
             <span class="summary-label">Total</span>
@@ -483,7 +475,6 @@
       const listContainer = document.getElementById('productsListContainer');
       const summaryList = document.getElementById('summaryItemsList');
       const subtotalEl = document.getElementById('summarySubtotal');
-      const discountEl = document.getElementById('summaryDiscount');
       const totalEl = document.getElementById('summaryTotal');
       const mobileTotalEl = document.getElementById('mobileFloatTotal');
       const phoneInput = document.getElementById('customerPhone');
@@ -523,7 +514,6 @@
 
         // 1. Update Order Summary Calculations
         if (subtotalEl) subtotalEl.textContent = NOVA.formatTZS(totals.subtotal);
-        if (discountEl) discountEl.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
         if (totalEl) totalEl.textContent = NOVA.formatTZS(totals.total);
         if (mobileTotalEl) mobileTotalEl.textContent = totals.total > 0 ? `${NOVA.formatTZS(totals.total)} \u2192` : 'Review \u2192';
 
@@ -1040,12 +1030,10 @@
         const totals = NOVA.calculateTotals(cart);
         const drawerBody = document.getElementById('cartDrawerBody');
         const drawerSubtotal = document.getElementById('drawerSubtotal');
-        const drawerDiscount = document.getElementById('drawerDiscount');
         const drawerTotal = document.getElementById('drawerTotal');
         const btnDrawerPlaceOrder = document.getElementById('btnDrawerPlaceOrder');
 
         if (drawerSubtotal) drawerSubtotal.textContent = NOVA.formatTZS(totals.subtotal);
-        if (drawerDiscount) drawerDiscount.textContent = totals.discount > 0 ? `- ${NOVA.formatTZS(totals.discount)}` : 'TZS 0';
         if (drawerTotal) drawerTotal.textContent = NOVA.formatTZS(totals.total);
 
         if (btnDrawerPlaceOrder) {
