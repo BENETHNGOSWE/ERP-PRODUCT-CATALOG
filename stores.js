@@ -627,7 +627,14 @@ class StoreManager {
 
     // 6. Apply Store-Specific Isolated Stock & Pricing Overrides
     const overrides = store.inventoryOverrides || {};
-    return uniqueProducts.map(prod => {
+    return uniqueProducts
+      .filter(p => {
+        if (!p || !p.name) return false;
+        const nl = p.name.toLowerCase();
+        if (nl.includes('iphone 18') || nl.includes('dummy') || nl.includes('final product test')) return false;
+        return true;
+      })
+      .map(prod => {
       const pId = String(prod.id);
       const ovr = overrides[pId];
 

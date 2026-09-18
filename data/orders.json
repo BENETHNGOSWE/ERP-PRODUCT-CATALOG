@@ -1,5 +1,77 @@
 [
   {
+    "id": 14,
+    "orderId": "BEN-LIVE-TEST",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-BEN-LIVE-TEST",
+    "receiptNumber": "Order WEB-BEN-LIVE-TEST",
+    "storeId": 10,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Beneth Test Customer",
+      "phone": "0710459064",
+      "deliveryAddress": "Kariakoo / City Mall, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 151,
+        "name": "SAMSUNG S26 ULTRA",
+        "price": 2695000,
+        "qty": 1,
+        "subtotal": 2695000
+      }
+    ],
+    "itemCount": 1,
+    "subtotal": 2695000,
+    "discount": 0,
+    "totalAmount": 2695000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23BEN-LIVE-TEST*%0ATotal%3A%20TZS%202695000%0ACustomer%3A%20Beneth%20Test%20Customer",
+    "createdAt": "2026-09-18T13:20:17.368Z",
+    "dateFormatted": "18 Sept 2026, 13:20"
+  },
+  {
+    "id": 13,
+    "orderId": "BEN-TEST-1789737599648",
+    "odooOrderId": null,
+    "odooOrderName": "Order WEB-BEN-TEST-1789737599648",
+    "receiptNumber": "Order WEB-BEN-TEST-1789737599648",
+    "storeId": 10,
+    "storeSlug": "benstore",
+    "storeName": "Ben Store",
+    "storeWhatsapp": "+255710459064",
+    "posConfigId": 26,
+    "customer": {
+      "name": "Customer (0710459064)",
+      "phone": "0710459064",
+      "deliveryAddress": "Kariakoo / City Mall, Dar es Salaam"
+    },
+    "items": [
+      {
+        "id": 151,
+        "name": "SAMSUNG S26 ULTRA",
+        "price": 2695000,
+        "qty": 1,
+        "subtotal": 2695000
+      }
+    ],
+    "itemCount": 1,
+    "subtotal": 2695000,
+    "discount": 0,
+    "totalAmount": 2695000,
+    "paymentMethod": "Cash / Mobile Money (POS)",
+    "status": "Paid & Confirmed",
+    "whatsappStatus": "Dispatched",
+    "waLink": "https://api.whatsapp.com/send?phone=255710459064&text=*ORDER%20%23BEN-TEST-1789737599648*%0ATotal%3A%20TZS%202695000%0ACustomer%3A%20Customer%20(0710459064)",
+    "createdAt": "2026-09-18T13:19:59.761Z",
+    "dateFormatted": "18 Sept 2026, 13:19"
+  },
+  {
     "id": 12,
     "orderId": "AUDIT-TEST-1789118853906",
     "odooOrderId": null,
