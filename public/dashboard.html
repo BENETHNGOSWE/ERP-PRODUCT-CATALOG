@@ -1277,7 +1277,7 @@
           </div>
         </a>
 
-        <a href="#" class="dash-nav-item" id="sidebarChangePinLink" onclick="openChangePinModal(); return false;">
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarChangePinLink" onclick="openChangePinModal(); return false;">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -2336,6 +2336,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
     }
 
+    function showNotification(msg, type = 'info') {
+      showDashToast(msg);
+    }
+
     // Helper to detect store slug from URL (e.g. /benstore/dashboard -> benstore)
     function getActiveStoreSlug() {
       const path = window.location.pathname.replace(/^\/|\/$/g, '');
@@ -3280,25 +3284,29 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (confirmPin) confirmPin.value = '';
 
       // Determine active store context
-      if (isStoreClientView && activeClientStore) {
+      if (currentStoreSlug) {
         if (selectGroup) selectGroup.style.display = 'none';
-        if (storeInfo) storeInfo.textContent = `Update password / PIN for ${activeClientStore.name}. (Default is 1234)`;
+        const activeStore = (storesList || []).find(s => s.slug === currentStoreSlug);
+        const storeDisplayName = activeStore ? activeStore.name : currentStoreSlug;
+        if (storeInfo) storeInfo.textContent = `Update password / PIN for "${storeDisplayName}". (Default is 1234)`;
       } else if (targetStoreId) {
-        const target = storesList.find(s => s.id === Number(targetStoreId));
+        const target = (storesList || []).find(s => s.id === Number(targetStoreId));
         if (selectGroup) selectGroup.style.display = 'none';
-        if (storeInfo) storeInfo.textContent = `Update password / PIN for ${target ? target.name : 'Store'}. (Default is 1234)`;
+        if (storeInfo) storeInfo.textContent = `Update password / PIN for "${target ? target.name : 'Store'}". (Default is 1234)`;
       } else {
         // Multi-store admin view: show dropdown of stores
         if (selectGroup) selectGroup.style.display = 'block';
         if (selectEl) {
-          selectEl.innerHTML = storesList.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (/${s.slug})</option>`).join('');
+          selectEl.innerHTML = (storesList || []).map(s => `<option value="${s.slug || s.id}">${escapeHtml(s.name)} (/${s.slug})</option>`).join('');
         }
         if (storeInfo) storeInfo.textContent = 'Select a merchant store and enter its current & new PIN.';
       }
 
       modal.setAttribute('data-target-store', targetStoreId || '');
       modal.style.display = 'flex';
-      if (currentPin) currentPin.focus();
+      setTimeout(() => {
+        if (currentPin) currentPin.focus();
+      }, 50);
     }
 
     function closeChangePinModal() {
@@ -3323,7 +3331,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         return;
       }
       if (!newPin || newPin.length < 4) {
-        if (errBox) { errBox.textContent = 'New PIN must be at least 4 characters/digits.'; errBox.style.display = 'block'; }
+        if (errBox) { errBox.textContent = 'New PIN must be at least 4 characters or digits.'; errBox.style.display = 'block'; }
         return;
       }
       if (newPin !== confirmPin) {
@@ -3333,10 +3341,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       // Determine which store to update
       let targetSlugOrId = '';
-      if (isStoreClientView && activeClientStore) {
-        targetSlugOrId = activeClientStore.slug || activeClientStore.id;
+      if (currentStoreSlug) {
+        targetSlugOrId = currentStoreSlug;
       } else {
-        const modalTarget = modal.getAttribute('data-target-store');
+        const modalTarget = modal ? modal.getAttribute('data-target-store') : null;
         if (modalTarget) {
           targetSlugOrId = modalTarget;
         } else {
@@ -3387,6 +3395,11 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         }
       }
     }
+
+    // Expose globally for inline onclick handlers
+    window.openChangePinModal = openChangePinModal;
+    window.closeChangePinModal = closeChangePinModal;
+    window.submitChangePin = submitChangePin;
 
     function getSafeLogoSrc(logo) {
       if (!logo) return '/assets/products/logo.png';
