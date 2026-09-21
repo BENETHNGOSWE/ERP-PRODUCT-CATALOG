@@ -174,6 +174,28 @@ const DEFAULT_SEED_STORES = [
     inventoryOverrides: {},
     customProducts: [],
     banner: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="250" viewBox="0 0 1500 250"><rect width="1500" height="250" fill="%230f172a"/><defs><linearGradient id="bgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%25" stop-color="%231e1b4b"/><stop offset="50%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23180d2b"/></linearGradient></defs><rect width="1500" height="250" fill="url(%23bgG)"/><rect x="25" y="25" width="1450" height="200" rx="14" fill="%231e293b" stroke="%23334155" stroke-width="2"/><rect x="50" y="45" width="70" height="70" rx="12" fill="%237433df"/><text x="85" y="93" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="42" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">QE</text><text x="140" y="82" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="42" fill="%23ffffff" letter-spacing="1.5">QUALITY ELECTRONICS TZ</text><text x="140" y="116" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="500" font-size="18" fill="%2394a3b8">Official Quality Electronics TZ Store • Quality Products &amp; Fast Delivery</text><line x1="50" y1="160" x2="1450" y2="160" stroke="%23334155" stroke-width="1.5"/><circle cx="70" cy="188" r="5" fill="%2322c55e"/><text x="86" y="193" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="700" font-size="15" fill="%2322c55e">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>'
+  },
+  {
+    id: 12,
+    name: 'Nirushe Chap',
+    slug: 'nirushechap',
+    tagline: 'Official Nirushe Chap Store • Fast Orders & Delivery',
+    logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%237433df"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">NC</text></svg>',
+    whatsapp: '+255710459064',
+    status: 'active',
+    themeColor: '#7433df',
+    currency: 'TZS',
+    address: 'Dar es Salaam, Tanzania',
+    posConfigId: 1,
+    posConfigName: 'Website Orders',
+    categories: ['All', 'Food & Drinks', 'Essentials', 'General'],
+    productKeywords: [],
+    productIds: [],
+    createdDate: '2026-09-18',
+    pin: '1234',
+    inventoryOverrides: {},
+    customProducts: [],
+    banner: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="250" viewBox="0 0 1500 250"><rect width="1500" height="250" fill="%230f172a"/><defs><linearGradient id="bgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%25" stop-color="%231e1b4b"/><stop offset="50%25" stop-color="%230f172a"/><stop offset="100%25" stop-color="%23180d2b"/></linearGradient></defs><rect width="1500" height="250" fill="url(%23bgG)"/><rect x="25" y="25" width="1450" height="200" rx="14" fill="%231e293b" stroke="%23334155" stroke-width="2"/><rect x="50" y="45" width="70" height="70" rx="12" fill="%237433df"/><text x="85" y="93" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="42" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">NC</text><text x="140" y="82" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="900" font-size="42" fill="%23ffffff" letter-spacing="1.5">NIRUSHE CHAP</text><text x="140" y="116" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="500" font-size="18" fill="%2394a3b8">Official Nirushe Chap Store • Fast Orders &amp; Delivery</text><line x1="50" y1="160" x2="1450" y2="160" stroke="%23334155" stroke-width="1.5"/><circle cx="70" cy="188" r="5" fill="%2322c55e"/><text x="86" y="193" font-family="-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif" font-weight="700" font-size="15" fill="%2322c55e">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>'
   }
 ];
 
@@ -253,7 +275,15 @@ class StoreManager {
 
     this.stores = Array.from(storeMap.values());
     const reserved = ['store', 'stores', 'shop', 'shops', 'catalog', 'cart', 'checkout', 'confirmation', 'dashboard', 'api', 'assets', 'admin', 'odoo', 'odoo_preview', 'home', 'general', 'other', 'order', 'orders', 'product', 'products', 'test', 'all'];
-    this.stores = this.stores.filter(s => s && s.slug && !reserved.includes(s.slug.toLowerCase().trim()));
+    const invalidPattern = /\.(zip|rar|tar|gz|war|ru|yaml|yml|php|dist|env|json|xml|txt|html|js|css|ico)$/i;
+
+    this.stores = this.stores.filter(s => {
+      if (!s || !s.slug || !s.name) return false;
+      const cleanSlug = s.slug.toLowerCase().trim();
+      if (cleanSlug.startsWith('.') || invalidPattern.test(cleanSlug)) return false;
+      if (reserved.includes(cleanSlug)) return false;
+      return true;
+    });
 
     // Fallback self-healing: Ensure every store has a valid banner & logo
     this.stores.forEach(store => {
@@ -285,100 +315,11 @@ class StoreManager {
   }
 
   getAllStores() {
-    this.syncStoresFromOdooCache();
     return this.stores;
   }
 
   getActiveStores() {
-    this.syncStoresFromOdooCache();
     return this.stores.filter(s => s.status === 'active');
-  }
-
-  /**
-   * Auto-discover untracked store tags from Odoo cache and register them dynamically
-   */
-  syncStoresFromOdooCache() {
-    try {
-      const reserved = ['store', 'stores', 'shop', 'shops', 'catalog', 'cart', 'checkout', 'confirmation', 'dashboard', 'api', 'assets', 'admin', 'odoo', 'odoo_preview', 'home', 'general', 'other', 'order', 'orders', 'product', 'products', 'test', 'all'];
-      const cachePath = path.join(DATA_DIR, 'odoo_products_cache.json');
-      if (fs.existsSync(cachePath)) {
-        const cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-        const prods = cache.products || [];
-        const foundSlugs = new Set();
-        prods.forEach(p => {
-          const pTags = Array.isArray(p.tags) ? p.tags : (Array.isArray(p.productTags) ? p.productTags : []);
-          pTags.forEach(t => {
-            if (t && typeof t === 'string' && t.length >= 2) {
-              const clean = t.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
-              if (clean && !reserved.includes(clean)) {
-                foundSlugs.add(clean);
-              }
-            }
-          });
-        });
-
-        foundSlugs.forEach(slug => {
-          const exists = this.stores.some(s => s.slug.toLowerCase() === slug);
-          if (!exists) {
-            this.autoDiscoverStore(slug);
-          }
-        });
-      }
-    } catch (e) {}
-  }
-
-  /**
-   * Auto-create store from an Odoo product tag
-   */
-  autoDiscoverStore(slug) {
-    if (!slug) return null;
-    const clean = slug.trim().toLowerCase();
-    const reserved = ['store', 'stores', 'shop', 'shops', 'catalog', 'cart', 'checkout', 'confirmation', 'dashboard', 'api', 'assets', 'admin', 'odoo', 'odoo_preview', 'home', 'general', 'other', 'order', 'orders', 'product', 'products', 'test', 'all'];
-    if (reserved.includes(clean)) {
-      return null;
-    }
-
-    let formattedName = clean
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/tz$/i, ' TZ')
-      .replace(/electronics/i, 'Electronics ')
-      .replace(/store/i, ' Store ')
-      .replace(/[_-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, l => l.toUpperCase())
-      .replace(/ Tz\b/g, ' TZ');
-
-    const nextId = this.stores.reduce((max, s) => Math.max(max, s.id || 0), 0) + 1;
-    const initial = (formattedName || 'S').charAt(0).toUpperCase();
-
-    const newStore = {
-      id: nextId,
-      name: formattedName,
-      slug: clean,
-      pin: '1234',
-      tagline: `Official ${formattedName} Store • Quality Products & Fast Delivery`,
-      logo: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="%237433df"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`,
-      banner: generateDynamicStoreBanner(formattedName, '#7433df', `Official ${formattedName} Store`),
-      whatsapp: '+255710459064',
-      status: 'active',
-      themeColor: '#7433df',
-      currency: 'TZS',
-      address: 'Dar es Salaam, Tanzania',
-      posConfigId: 1,
-      posConfigName: 'Website Orders',
-      categories: ['All', 'Smartphones', 'Electronics', 'Accessories', 'General'],
-      productKeywords: [],
-      productIds: [],
-      inventoryOverrides: {},
-      customProducts: [],
-      createdDate: new Date().toISOString().substring(0, 10)
-    };
-
-    this.stores.push(newStore);
-    this.saveStores();
-    console.log(`[StoreManager] ⚡ Auto-registered new client store "${formattedName}" (/${clean}) from Odoo ERP tag!`);
-    return newStore;
   }
 
   getStoreBySlug(slug) {
@@ -392,10 +333,6 @@ class StoreManager {
     }
     if (!direct && clean === 'achete') {
       direct = this.stores.find(s => s.slug.toLowerCase() === 'novamart') || this.stores[0];
-    }
-
-    if (!direct) {
-      direct = this.autoDiscoverStore(clean);
     }
 
     if (direct && (!direct.banner || direct.banner.trim() === '')) {
