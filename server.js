@@ -1276,6 +1276,42 @@ app.post(['/api/stores/:idOrSlug/verify-pin', '/api/:idOrSlug/verify-pin'], (req
   }
 });
 
+// Change Store PIN / Password Endpoint
+app.post(['/api/stores/:idOrSlug/change-pin', '/api/:idOrSlug/change-pin'], (req, res) => {
+  try {
+    const { idOrSlug } = req.params;
+    const { currentPin, newPin, confirmPin } = req.body;
+    
+    const store = !isNaN(Number(idOrSlug)) ? stores.getStoreById(Number(idOrSlug)) : stores.getStoreBySlug(idOrSlug);
+    if (!store) {
+      return res.status(404).json({ success: false, error: 'Store not found.' });
+    }
+
+    const expectedPin = store.pin || '1234';
+    if (!currentPin || String(currentPin).trim() !== expectedPin) {
+      return res.status(400).json({ success: false, error: 'Current PIN / Password is incorrect.' });
+    }
+
+    if (!newPin || String(newPin).trim().length < 4) {
+      return res.status(400).json({ success: false, error: 'New PIN must be at least 4 characters or digits.' });
+    }
+
+    if (String(newPin).trim() !== String(confirmPin).trim()) {
+      return res.status(400).json({ success: false, error: 'New PIN and Confirmation PIN do not match.' });
+    }
+
+    const updated = stores.updateStore(store.id, { pin: String(newPin).trim() });
+
+    res.json({
+      success: true,
+      message: `Password/PIN for "${updated.name}" updated successfully!`,
+      store: updated
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Helper: Build completely isolated store dashboard payload
 function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
   const now = new Date();
