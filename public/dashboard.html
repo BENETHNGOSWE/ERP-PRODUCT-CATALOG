@@ -1473,7 +1473,12 @@
             <h2 class="card-title">Client Stores & WhatsApp Configuration</h2>
             <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">Multi-client digital storefronts linked to Odoo POS with direct WhatsApp alerts.</p>
           </div>
-          <button class="btn-create-store-action" onclick="openCreateStoreModal()">+ Add New Client Store</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:6px 12px;" onclick="cleanupBotStores()">
+              🧹 Clean Bot Stores
+            </button>
+            <button class="btn-create-store-action" onclick="openCreateStoreModal()">+ Add New Client Store</button>
+          </div>
         </div>
 
         <div style="overflow-x: auto;">
@@ -3169,6 +3174,24 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           </div>
         `;
       }).join('');
+    }
+
+    async function cleanupBotStores() {
+      if (!confirm('This will purge all crawler bot/junk stores and keep only your verified merchant stores. Proceed?')) {
+        return;
+      }
+      try {
+        const res = await fetch('/api/stores/cleanup', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showNotification('All crawler bot stores purged successfully!', 'success');
+          fetchDashboardData();
+        } else {
+          showNotification(data.error || 'Cleanup failed', 'error');
+        }
+      } catch (e) {
+        showNotification('Error during cleanup: ' + e.message, 'error');
+      }
     }
 
     function getSafeLogoSrc(logo) {

@@ -206,6 +206,25 @@ const RESERVED_SLUGS = new Set([
   'other', 'order', 'orders', 'product', 'products', 'test', 'all', 'favicon', 'robots', 'sitemap'
 ]);
 
+const VERIFIED_INITIAL_SLUGS = new Set([
+  'kodastore',
+  'benstore',
+  'qualityelectronicstz',
+  'nirushechap'
+]);
+
+const BOT_KNOWN_KEYWORDS = new Set([
+  'info', 'feed', 'pricing-plans', 'plan', 'plans', 'prices', 'pricing', 'price', 'null',
+  'wp-json', 'dockerfile', 'appconfigs', 'auth', 'authorized_keys', 'autoconfig', 'backup',
+  'composer', 'config', 'configprops', 'configure', 'credentials', 'dump', 'elmah',
+  'environment', 'id_ed25519', 'id_rsa', 'jkmanager-auth', 'jkstatus-auth', 'jolokia',
+  'kubeconfig', 'loggingconfig', 'node_repl_history', 'psql_history', 'settings',
+  'threaddump', 'ws_ftp', 'db', 'database', 'configuration', 'config_ru', 'config_yaml',
+  'config_yml', 'app_war', 'env', 'git', 'svn', 'htaccess', 'htpasswd', 'well-known',
+  'actuator', 'metrics', 'health', 'metrics', 'env_rar', 'env_tar_gz', 'config_zip',
+  'config_rar', 'config_tar_gz', 'configuration_php_dist', 'configuration_yml'
+]);
+
 class StoreManager {
   constructor() {
     this.stores = [];
@@ -258,6 +277,14 @@ class StoreManager {
       if (!cleanSlug || cleanSlug.includes('.')) return false;
       if (!VALID_SLUG_REGEX.test(cleanSlug)) return false;
       if (RESERVED_SLUGS.has(cleanSlug)) return false;
+      if (BOT_KNOWN_KEYWORDS.has(cleanSlug)) return false;
+      
+      // Filter out auto-generated bot stores that matched crawler patterns
+      if (s.tagline && typeof s.tagline === 'string' && s.tagline.includes('• Quality Products & Fast Delivery')) {
+        if (!VERIFIED_INITIAL_SLUGS.has(cleanSlug) && !s.isManualStore) {
+          return false;
+        }
+      }
       return true;
     };
 
@@ -304,6 +331,28 @@ class StoreManager {
 
     // Save synchronized state to all persistence layers (purging any bad stores from disk permanently)
     this.saveStores();
+  }
+
+  /**
+   * Complete Purge of Any Leftover Crawler / Bot Created Stores
+   */
+  purgeBotStores() {
+    this.stores = this.stores.filter(s => {
+      if (!s || typeof s !== 'object') return false;
+      const cleanSlug = String(s.slug || '').toLowerCase().trim();
+      if (!cleanSlug || cleanSlug.includes('.')) return false;
+      if (!VALID_SLUG_REGEX.test(cleanSlug)) return false;
+      if (RESERVED_SLUGS.has(cleanSlug)) return false;
+      if (BOT_KNOWN_KEYWORDS.has(cleanSlug)) return false;
+      if (s.tagline && typeof s.tagline === 'string' && s.tagline.includes('• Quality Products & Fast Delivery')) {
+        if (!VERIFIED_INITIAL_SLUGS.has(cleanSlug) && !s.isManualStore) {
+          return false;
+        }
+      }
+      return true;
+    });
+    this.saveStores();
+    return this.stores;
   }
 
   /**

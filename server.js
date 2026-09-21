@@ -400,6 +400,21 @@ app.post(['/api/stores/:id/banner', '/api/:id/banner'], (req, res) => {
   }
 });
 
+// 4b. Purge Bot & Crawler Leftover Stores
+app.post('/api/stores/cleanup', (req, res) => {
+  try {
+    const cleaned = stores.purgeBotStores();
+    res.json({
+      success: true,
+      message: 'All crawler bot stores have been permanently purged.',
+      count: cleaned.length,
+      stores: cleaned
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // 5. Delete Store
 app.delete('/api/stores/:id', async (req, res) => {
   try {
