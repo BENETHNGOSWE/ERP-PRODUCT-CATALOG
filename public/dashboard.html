@@ -3171,26 +3171,55 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }).join('');
     }
 
+    function getSafeLogoSrc(logo) {
+      if (!logo) return '/assets/products/logo.png';
+      if (logo.startsWith('data:image/svg+xml;utf8,<svg')) {
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(logo.replace('data:image/svg+xml;utf8,', ''));
+      }
+      return logo;
+    }
+
+    async function deleteStorePrompt(storeId, storeName) {
+      if (!confirm(`Are you sure you want to permanently delete store "${storeName}"?\n\nThis will remove it from the dashboard and disable its link.`)) {
+        return;
+      }
+      try {
+        const res = await fetch(`/api/stores/${storeId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showNotification(`Store "${storeName}" deleted successfully!`, 'success');
+          fetchDashboardData();
+        } else {
+          showNotification(data.error || 'Failed to delete store', 'error');
+        }
+      } catch (err) {
+        showNotification('Error deleting store: ' + err.message, 'error');
+      }
+    }
+
     function renderStoresTable() {
       const tbody = document.getElementById('storesTableBody');
       if (!tbody) return;
 
       tbody.innerHTML = storesList.map(s => `
         <tr>
-          <td><img src="${s.logo || '/assets/products/logo.png'}" class="store-table-thumb" alt="${s.name}" onerror="this.src='/assets/products/logo.png'"></td>
+          <td><img src="${getSafeLogoSrc(s.logo)}" class="store-table-thumb" alt="${escapeAttr(s.name)}" onerror="this.onerror=null; this.src='/assets/products/logo.png'"></td>
           <td>
-            <strong style="color:#081735; font-size:0.88rem;">${s.name}</strong>
-            <p style="font-size:0.74rem; color:#64748b; margin:0;">${s.tagline || 'Client Storefront'}</p>
+            <strong style="color:#081735; font-size:0.88rem;">${escapeHtml(s.name)}</strong>
+            <p style="font-size:0.74rem; color:#64748b; margin:0;">${escapeHtml(s.tagline || 'Client Storefront')}</p>
           </td>
           <td>
-            <a href="/${s.slug}" target="_blank" style="color:#0047bb; font-weight:700; text-decoration:none;">
+            <a href="/${s.slug}" target="_blank" style="color:#7433df; font-weight:700; text-decoration:none;">
               achete.me/${s.slug} &nearr;
             </a>
           </td>
-          <td><strong style="color:#081735;">${s.whatsapp}</strong></td>
+          <td><strong style="color:#081735;">${escapeHtml(s.whatsapp)}</strong></td>
           <td>
             <span style="font-size:0.76rem; background:#f1f5f9; padding:2px 6px; border-radius:6px; font-weight:600;">
-              ${s.posConfigName || 'Website Orders'}
+              ${escapeHtml(s.posConfigName || 'Website Orders')}
             </span>
           </td>
           <td>
@@ -3200,11 +3229,14 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           </td>
           <td style="text-align:right;">
             <div style="display:flex; gap:6px; justify-content:flex-end;">
-              <button class="btn-restock" style="background:#0047bb; color:#ffffff; font-weight:700;" onclick="openStoreInventoryModal(${s.id})">
+              <button class="btn-restock" style="background:#7433df; color:#ffffff; font-weight:700;" onclick="openStoreInventoryModal(${s.id})">
                 📦 Load Stock
               </button>
               <button class="btn-restock" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" onclick="openEditStoreModal(${s.id})">
                 ✏️ Edit
+              </button>
+              <button class="btn-restock" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" onclick="deleteStorePrompt(${s.id}, '${escapeAttr(s.name)}')">
+                🗑️ Delete
               </button>
               <a href="/${s.slug}" target="_blank" class="btn-restock" style="text-decoration:none;">
                 Visit &rarr;

@@ -199,6 +199,13 @@ const DEFAULT_SEED_STORES = [
   }
 ];
 
+const VALID_SLUG_REGEX = /^[a-z0-9][a-z0-9_-]{1,40}$/;
+const RESERVED_SLUGS = new Set([
+  'store', 'stores', 'shop', 'shops', 'catalog', 'cart', 'checkout', 'confirmation',
+  'dashboard', 'api', 'assets', 'admin', 'odoo', 'odoo_preview', 'home', 'general',
+  'other', 'order', 'orders', 'product', 'products', 'test', 'all', 'favicon', 'robots', 'sitemap'
+]);
+
 class StoreManager {
   constructor() {
     this.stores = [];
@@ -245,9 +252,18 @@ class StoreManager {
     // Smart Merge: Start with Persistent > Primary > Backup > Seed
     const storeMap = new Map();
 
+    const isLegitStore = (s) => {
+      if (!s || typeof s !== 'object') return false;
+      const cleanSlug = String(s.slug || '').toLowerCase().trim();
+      if (!cleanSlug || cleanSlug.includes('.')) return false;
+      if (!VALID_SLUG_REGEX.test(cleanSlug)) return false;
+      if (RESERVED_SLUGS.has(cleanSlug)) return false;
+      return true;
+    };
+
     const mergeStoreIntoMap = (s) => {
-      if (!s || (!s.id && !s.slug)) return;
-      const key = String(s.slug || s.id).toLowerCase();
+      if (!isLegitStore(s)) return;
+      const key = String(s.slug).toLowerCase().trim();
       const existing = storeMap.get(key);
       if (!existing) {
         storeMap.set(key, { ...s });
@@ -273,17 +289,7 @@ class StoreManager {
     primaryStores.forEach(mergeStoreIntoMap);
     persistentStores.forEach(mergeStoreIntoMap);
 
-    this.stores = Array.from(storeMap.values());
-    const reserved = ['store', 'stores', 'shop', 'shops', 'catalog', 'cart', 'checkout', 'confirmation', 'dashboard', 'api', 'assets', 'admin', 'odoo', 'odoo_preview', 'home', 'general', 'other', 'order', 'orders', 'product', 'products', 'test', 'all'];
-    const invalidPattern = /\.(zip|rar|tar|gz|war|ru|yaml|yml|php|dist|env|json|xml|txt|html|js|css|ico)$/i;
-
-    this.stores = this.stores.filter(s => {
-      if (!s || !s.slug || !s.name) return false;
-      const cleanSlug = s.slug.toLowerCase().trim();
-      if (cleanSlug.startsWith('.') || invalidPattern.test(cleanSlug)) return false;
-      if (reserved.includes(cleanSlug)) return false;
-      return true;
-    });
+    this.stores = Array.from(storeMap.values()).filter(isLegitStore);
 
     // Fallback self-healing: Ensure every store has a valid banner & logo
     this.stores.forEach(store => {
@@ -296,7 +302,7 @@ class StoreManager {
       }
     });
 
-    // Save synchronized state to all persistence layers
+    // Save synchronized state to all persistence layers (purging any bad stores from disk permanently)
     this.saveStores();
   }
 
