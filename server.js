@@ -679,11 +679,11 @@ app.post(['/api/:slug/stock/batch-receive', '/api/stores/:slug/stock/batch-recei
   }
 });
 
-// 5j. Client Store Create Brand New Custom Product (Creates in Odoo ERP + Assigns to Store)
+// 5j. Client Store Create Brand New Custom Product (With Category Auto-Save & Base64 Image)
 app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], async (req, res) => {
   try {
     const slug = req.params.slug;
-    const store = stores.getStoreBySlug(slug);
+    const store = !isNaN(Number(slug)) ? stores.getStoreById(Number(slug)) : stores.getStoreBySlug(slug);
     if (!store) {
       return res.status(404).json({ success: false, error: 'Store not found' });
     }
@@ -693,58 +693,137 @@ app.post(['/api/:slug/products/create', '/api/stores/:slug/products/create'], as
       return res.status(400).json({ success: false, error: 'Product name is required' });
     }
 
-    const initialStock = Number(productData.initialStock) || 0;
+    const initialStock = Number(productData.quantity !== undefined ? productData.quantity : (productData.initialStock || productData.stock || 0));
     
-    // 1. Create in master Odoo ERP (Point of Sale -> Products)
-    let odooProductId = null;
-    let odooProductObj = null;
-    try {
-      const createResult = await odoo.createOdooProduct({
-        ...productData,
-        storeSlug: store.slug,
-        storeName: store.name
-      }, initialStock);
-      odooProductId = createResult.productId;
-      odooProductObj = createResult.product;
-    } catch (odooErr) {
-      console.warn('[Odoo Product Creation Warning]:', odooErr.message);
-    }
-
-    // 2. Assign and record in Store Manager with isolated stock and details
-    if (odooProductId) {
-      productData.id = odooProductId;
-      stores.addProductToStore(store.id, odooProductId);
-      stores.updateStoreProductStock(store.id, odooProductId, {
-        newQty: initialStock,
-        price: Number(productData.price) || 0,
-        name: productData.name,
-        description: productData.description
-      });
-
-      return res.status(201).json({
-        success: true,
-        message: `Product "${productData.name}" created in Odoo ERP and added to your store!`,
-        productId: odooProductId,
-        product: odooProductObj || productData
-      });
-    }
-
-    // 3. Fallback only if Odoo was unreachable
-    const fallbackId = (1000 + Math.floor(Math.random() * 9000));
-    const result = stores.addCustomProductToStore(slug, {
+    // Save locally to store first
+    const result = stores.addCustomProductToStore(store.id, {
       ...productData,
-      id: fallbackId
+      quantity: initialStock
+    });
+
+    // Attempt background sync to master Odoo ERP if possible
+    odoo.createOdooProduct({
+      ...productData,
+      storeSlug: store.slug,
+      storeName: store.name
+    }, initialStock).then(createResult => {
+      if (createResult && createResult.productId) {
+        stores.addProductToStore(store.id, createResult.productId);
+      }
+    }).catch(e => {
+      console.warn('[Odoo Background Sync Note]:', e.message);
     });
 
     res.status(201).json({
       success: true,
-      message: `Product "${productData.name}" added to your store!`,
-      productId: fallbackId,
+      message: `Product "${productData.name}" created and added to your store!`,
+      productId: result.product.id,
       product: result.product
     });
   } catch (err) {
     console.error('[Create Store Product Error]:', err);
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5k. Update Product in Store (Edit details, price, category, stock, image)
+app.put(['/api/:slug/products/:productId', '/api/stores/:slug/products/:productId'], async (req, res) => {
+  try {
+    const { slug, productId } = req.params;
+    const store = !isNaN(Number(slug)) ? stores.getStoreById(Number(slug)) : stores.getStoreBySlug(slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const result = stores.updateProductInStore(store.id, productId, req.body);
+    res.json({
+      success: true,
+      message: 'Product updated successfully!',
+      product: result.product
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post(['/api/:slug/products/:productId/edit', '/api/stores/:slug/products/:productId/edit'], async (req, res) => {
+  try {
+    const { slug, productId } = req.params;
+    const store = !isNaN(Number(slug)) ? stores.getStoreById(Number(slug)) : stores.getStoreBySlug(slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const result = stores.updateProductInStore(store.id, productId, req.body);
+    res.json({
+      success: true,
+      message: 'Product updated successfully!',
+      product: result.product
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5l. Delete Product from Store
+app.delete(['/api/:slug/products/:productId', '/api/stores/:slug/products/:productId'], (req, res) => {
+  try {
+    const { slug, productId } = req.params;
+    const store = !isNaN(Number(slug)) ? stores.getStoreById(Number(slug)) : stores.getStoreBySlug(slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const result = stores.deleteProductFromStore(store.id, productId);
+    res.json({
+      success: true,
+      message: 'Product deleted from store successfully.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5m. Category Management Endpoints
+app.get(['/api/:slug/categories', '/api/stores/:slug/categories'], (req, res) => {
+  try {
+    const store = !isNaN(Number(req.params.slug)) ? stores.getStoreById(Number(req.params.slug)) : stores.getStoreBySlug(req.params.slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    res.json({
+      success: true,
+      categories: stores.getCategoriesForStore(store.id)
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post(['/api/:slug/categories', '/api/stores/:slug/categories'], (req, res) => {
+  try {
+    const store = !isNaN(Number(req.params.slug)) ? stores.getStoreById(Number(req.params.slug)) : stores.getStoreBySlug(req.params.slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const catName = req.body.name || req.body.category;
+    const result = stores.addCategoryToStore(store.id, catName);
+    res.json({
+      success: true,
+      message: `Category "${result.category}" added successfully!`,
+      category: result.category,
+      categories: result.categories
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.delete(['/api/:slug/categories/:name', '/api/stores/:slug/categories/:name'], (req, res) => {
+  try {
+    const store = !isNaN(Number(req.params.slug)) ? stores.getStoreById(Number(req.params.slug)) : stores.getStoreBySlug(req.params.slug);
+    if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
+
+    const result = stores.deleteCategoryFromStore(store.id, req.params.name);
+    res.json({
+      success: true,
+      message: `Category "${req.params.name}" removed.`,
+      categories: result.categories
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 
@@ -1799,6 +1878,9 @@ app.get(['/shop', '/catalog', '/store', '/:slug'], async (req, res, next) => {
     const rawProds = stores.filterProductsForStore(allProds, store);
     storeProducts = rawProds.filter(isPublicProduct);
     const catSet = new Set(['All']);
+    if (store.categories && Array.isArray(store.categories)) {
+      store.categories.forEach(c => { if (c) catSet.add(c); });
+    }
     storeProducts.forEach(p => { if (p.category) catSet.add(p.category); });
     catList = Array.from(catSet);
   } catch (e) {}

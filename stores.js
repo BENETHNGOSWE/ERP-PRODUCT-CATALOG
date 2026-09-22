@@ -64,6 +64,36 @@ function saveBase64ToFile(base64Data, fileNamePrefix) {
   return base64Data;
 }
 
+function saveProductBase64Image(base64Data, prodId) {
+  if (!base64Data || typeof base64Data !== 'string') return base64Data;
+  if (base64Data.startsWith('data:image/svg+xml;utf8') || base64Data.startsWith('data:image/svg+xml;charset=utf-8')) {
+    return base64Data;
+  }
+  if (!base64Data.startsWith('data:image/')) {
+    return base64Data;
+  }
+  try {
+    const parts = base64Data.split(';base64,');
+    if (parts.length === 2) {
+      const mime = parts[0].split(':')[1] || '';
+      const ext = mime.includes('png') ? 'png' : (mime.includes('webp') ? 'webp' : 'jpg');
+      const filename = `custom_prod_${prodId}_${Date.now()}.${ext}`;
+      const buffer = Buffer.from(parts[1], 'base64');
+      const prodAssetsDir = path.join(__dirname, 'public', 'assets', 'products');
+      if (!fs.existsSync(prodAssetsDir)) fs.mkdirSync(prodAssetsDir, { recursive: true });
+      fs.writeFileSync(path.join(prodAssetsDir, filename), buffer);
+      
+      const persistentDir = path.join(UPLOADS_DIR, filename);
+      fs.writeFileSync(persistentDir, buffer);
+      
+      return `/assets/products/${filename}?v=${Date.now()}`;
+    }
+  } catch (e) {
+    console.warn('[Product Image Save Note]:', e.message);
+  }
+  return base64Data;
+}
+
 /**
  * Restore any missing asset files from persistent data/uploads to public/assets/stores
  */
@@ -771,6 +801,7 @@ class StoreManager {
 
     if (!Array.isArray(store.customProducts)) store.customProducts = [];
     if (!Array.isArray(store.productIds)) store.productIds = [];
+    if (!Array.isArray(store.categories)) store.categories = ['All', 'General'];
 
     const nextId = Math.max(
       1000,
@@ -778,16 +809,33 @@ class StoreManager {
       ...store.productIds.map(Number)
     ) + 1;
 
-    const initialStock = Number(data.initialStock || data.qty_available || data.stock || 0);
-    const prodImg = sanitizeImageUrl(data.name, data.image || data.thumb);
+    let prodImg = data.image || data.thumb || '';
+    if (prodImg && prodImg.startsWith('data:image/')) {
+      prodImg = saveProductBase64Image(prodImg, nextId);
+    } else if (!prodImg) {
+      prodImg = sanitizeImageUrl(data.name, '');
+    }
+
+    const cat = (data.category || 'General').trim();
+    if (cat && !store.categories.some(c => c.toLowerCase() === cat.toLowerCase())) {
+      store.categories.push(cat);
+    }
+
+    const initialStock = Number(data.quantity !== undefined ? data.quantity : (data.initialStock || data.qty_available || data.stock || 10));
+    const isTrackQuantity = data.track_quantity !== undefined ? Boolean(data.track_quantity) : true;
+    const status = data.status === 'draft' || data.status === 'Draft' ? 'Draft' : 'Active';
+
     const newProd = {
       id: nextId,
       name: (data.name || 'New Store Product').trim(),
-      category: (data.category || 'General').trim(),
+      category: cat || 'General',
       price: Number(data.price) || 0,
       description: (data.description || '').trim(),
       qty_available: initialStock,
       inStock: initialStock > 0,
+      track_quantity: isTrackQuantity,
+      status: status,
+      isDigital: Boolean(data.isDigital || data.digital_product),
       image: prodImg,
       thumb: prodImg,
       default_code: (data.sku || data.default_code || `SKU-${nextId}`).trim(),
@@ -805,6 +853,158 @@ class StoreManager {
 
     this.saveStores();
     return { store, product: newProd };
+  }
+
+  /**
+   * Update an existing product in store (custom product or ERP product override)
+   */
+  updateProductInStore(idOrSlug, productId, data) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    if (!Array.isArray(store.customProducts)) store.customProducts = [];
+    if (!Array.isArray(store.productIds)) store.productIds = [];
+    if (!Array.isArray(store.categories)) store.categories = ['All', 'General'];
+
+    const pIdNum = Number(productId);
+    let prod = store.customProducts.find(p => Number(p.id) === pIdNum);
+
+    if (prod) {
+      if (data.name) prod.name = data.name.trim();
+      if (data.price !== undefined) prod.price = Number(data.price);
+      if (data.description !== undefined) prod.description = data.description.trim();
+      if (data.category !== undefined) {
+        const cat = data.category.trim();
+        prod.category = cat;
+        if (cat && !store.categories.some(c => c.toLowerCase() === cat.toLowerCase())) {
+          store.categories.push(cat);
+        }
+      }
+      if (data.quantity !== undefined || data.qty_available !== undefined || data.stock !== undefined) {
+        const qty = Number(data.quantity !== undefined ? data.quantity : (data.qty_available !== undefined ? data.qty_available : data.stock));
+        prod.qty_available = qty;
+        prod.inStock = qty > 0;
+      }
+      if (data.track_quantity !== undefined) prod.track_quantity = Boolean(data.track_quantity);
+      if (data.status !== undefined) prod.status = data.status === 'draft' || data.status === 'Draft' ? 'Draft' : 'Active';
+      if (data.isDigital !== undefined) prod.isDigital = Boolean(data.isDigital);
+      if (data.image) {
+        if (data.image.startsWith('data:image/')) {
+          prod.image = saveProductBase64Image(data.image, prod.id);
+          prod.thumb = prod.image;
+        } else {
+          prod.image = data.image;
+          prod.thumb = data.image;
+        }
+      }
+      if (data.sku) prod.default_code = data.sku.trim();
+    } else {
+      if (!store.inventoryOverrides) store.inventoryOverrides = {};
+      const pIdStr = String(pIdNum);
+      const existing = store.inventoryOverrides[pIdStr] || {};
+      
+      let newImage = existing.image;
+      if (data.image) {
+        if (data.image.startsWith('data:image/')) {
+          newImage = saveProductBase64Image(data.image, pIdNum);
+        } else {
+          newImage = data.image;
+        }
+      }
+
+      const cat = data.category ? data.category.trim() : existing.category;
+      if (cat && !store.categories.some(c => c.toLowerCase() === cat.toLowerCase())) {
+        store.categories.push(cat);
+      }
+
+      const qty = data.quantity !== undefined ? Number(data.quantity) : (data.qty_available !== undefined ? Number(data.qty_available) : existing.qty_available);
+
+      store.inventoryOverrides[pIdStr] = {
+        ...existing,
+        name: data.name ? data.name.trim() : existing.name,
+        price: data.price !== undefined ? Number(data.price) : existing.price,
+        description: data.description !== undefined ? data.description.trim() : existing.description,
+        category: cat,
+        qty_available: qty,
+        inStock: qty !== undefined ? qty > 0 : existing.inStock,
+        status: data.status ? (data.status === 'draft' || data.status === 'Draft' ? 'Draft' : 'Active') : (existing.status || 'Active'),
+        image: newImage,
+        thumb: newImage,
+        updatedAt: new Date().toISOString()
+      };
+      prod = store.inventoryOverrides[pIdStr];
+    }
+
+    this.saveStores();
+    return { store, product: prod };
+  }
+
+  /**
+   * Delete a product from store
+   */
+  deleteProductFromStore(idOrSlug, productId) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+
+    const pIdNum = Number(productId);
+    const pIdStr = String(pIdNum);
+
+    if (Array.isArray(store.customProducts)) {
+      store.customProducts = store.customProducts.filter(p => Number(p.id) !== pIdNum);
+    }
+    if (Array.isArray(store.productIds)) {
+      store.productIds = store.productIds.filter(id => Number(id) !== pIdNum);
+    }
+    if (store.inventoryOverrides && store.inventoryOverrides[pIdStr]) {
+      delete store.inventoryOverrides[pIdStr];
+    }
+
+    this.saveStores();
+    return { success: true, message: 'Product removed from store.' };
+  }
+
+  /**
+   * Add a new category to store
+   */
+  addCategoryToStore(idOrSlug, categoryName) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+    if (!Array.isArray(store.categories)) store.categories = ['All', 'General'];
+
+    const clean = String(categoryName || '').trim();
+    if (!clean) throw new Error('Category name cannot be empty.');
+
+    if (!store.categories.some(c => c.toLowerCase() === clean.toLowerCase())) {
+      store.categories.push(clean);
+    }
+
+    this.saveStores();
+    return { success: true, categories: store.categories, category: clean };
+  }
+
+  /**
+   * Delete a category from store
+   */
+  deleteCategoryFromStore(idOrSlug, categoryName) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+    if (!Array.isArray(store.categories)) store.categories = ['All', 'General'];
+
+    const clean = String(categoryName || '').trim().toLowerCase();
+    if (clean === 'all') throw new Error('Cannot delete default "All" category.');
+
+    store.categories = store.categories.filter(c => c.toLowerCase() !== clean);
+    this.saveStores();
+    return { success: true, categories: store.categories };
+  }
+
+  /**
+   * Get store categories
+   */
+  getCategoriesForStore(idOrSlug) {
+    const store = !isNaN(Number(idOrSlug)) ? this.getStoreById(Number(idOrSlug)) : this.getStoreBySlug(String(idOrSlug));
+    if (!store) throw new Error(`Store not found: ${idOrSlug}`);
+    return store.categories || ['All', 'General'];
   }
 
   /**

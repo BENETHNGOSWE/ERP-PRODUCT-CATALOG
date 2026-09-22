@@ -1173,6 +1173,114 @@
       }
     }
 
+    /* Slide-over Right Drawer Styles (Screenshot 2 Match) */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100000;
+      display: none;
+      justify-content: flex-end;
+    }
+    .drawer-overlay.active {
+      display: flex;
+    }
+    .drawer-panel {
+      width: 490px;
+      max-width: 95vw;
+      height: 100vh;
+      background: #ffffff;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      animation: slideDrawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideDrawerIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #ffffff;
+    }
+    .drawer-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      background: #ffffff;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .image-dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .image-dropzone:hover {
+      border-color: #7433df;
+      background: #faf5ff;
+    }
+    .toggle-switch-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .switch-slider {
+      background-color: #16a34a;
+    }
+    input:checked + .switch-slider:before {
+      transform: translateX(22px);
+    }
+
     /* Toast Notification */
     .dash-toast {
       position: fixed;
@@ -1239,18 +1347,25 @@
           </div>
         </a>
 
-        <a href="odoo_preview.html" class="dash-nav-item" id="sidebarOdooLink">
+        <a href="#productsCatalogSection" class="dash-nav-item" id="sidebarProductsLink" onclick="scrollToProductsCatalog(); return false;">
           <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>Odoo ERP View</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span>Products</span>
           </div>
-          <span class="nav-badge-blue">LIVE</span>
+          <span class="nav-badge-blue" id="sidebarProductsBadge" style="background:#ede9fe; color:#7433df; font-weight:700;">0</span>
         </a>
 
-        <a href="index.html" class="dash-nav-item" id="sidebarCatalogLink">
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarCategoriesLink" onclick="openCategoriesModal(); return false;">
           <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            <span id="sidebarCatalogText">Storefront</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            <span>Categories</span>
           </div>
         </a>
 
@@ -1270,16 +1385,39 @@
           <span class="nav-badge-red" id="sidebarStockBadge">0</span>
         </a>
 
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarChangePinLink" onclick="openChangePinModal(); return false;">
+          <div class="dash-nav-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <span>Change Password</span>
+          </div>
+          <span class="nav-badge-blue" style="background:#ede9fe; color:#7433df; font-weight:700;">PIN</span>
+        </a>
+
+        <a href="odoo_preview.html" class="dash-nav-item" id="sidebarOdooLink">
+          <div class="dash-nav-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Odoo ERP View</span>
+          </div>
+          <span class="nav-badge-blue">LIVE</span>
+        </a>
+
+        <a href="index.html" class="dash-nav-item" id="sidebarCatalogLink">
+          <div class="dash-nav-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span id="sidebarCatalogText">Storefront</span>
+          </div>
+        </a>
+
         <a href="#" class="dash-nav-item" onclick="window.print(); return false;">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             <span>Reports</span>
           </div>
         </a>
-
-        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarChangePinLink" onclick="openChangePinModal(); return false;">
-          <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      </nav>
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
@@ -1474,6 +1612,72 @@
           <div class="top-products-list" id="topSellingList">
             <!-- Dynamic Top Selling -->
           </div>
+        </div>
+      </section>
+
+      <!-- Dedicated Product Catalog Section (Screenshot 1 Style) -->
+      <section class="dash-card" id="productsCatalogSection" style="margin-bottom: 24px;">
+        <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+              <span>📦 Product Catalog</span>
+              <span id="productsCatalogCountBadge" style="font-size: 0.75rem; background: #ede9fe; color: #7433df; padding: 2px 10px; border-radius: 12px; font-weight: 700;">0 products</span>
+            </h2>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+              Create, edit, and manage your store's live catalog. Products appear directly in your customer storefront.
+            </p>
+          </div>
+
+          <!-- Top Action Bar (Screenshot 1 Match) -->
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="openCategoriesModal()">
+              🏷️ Manage Categories
+            </button>
+            <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="fetchDashboardData()" title="Refresh Catalog">
+              🔄 Refresh
+            </button>
+            <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; font-size: 0.85rem; padding: 8px 16px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(22,163,74,0.25); cursor: pointer;" onclick="openNewProductDrawer()">
+              + New Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter / Search Toolbar (Screenshot 1) -->
+        <div style="margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <div style="flex: 1; min-width: 240px; position: relative;">
+            <input type="text" id="catalogSearchInput" placeholder="🔍 Search products by name, category or SKU..." oninput="filterCatalogTable()" style="width: 100%; padding: 9px 14px 9px 14px; font-size: 0.84rem; border: 1.5px solid #e2e8f0; border-radius: 8px; outline: none;">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <select id="catalogCategoryFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
+              <option value="All">All Categories</option>
+            </select>
+            <select id="catalogStatusFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
+              <option value="All">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Draft">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Catalog Table (Screenshot 1) -->
+        <div style="overflow-x: auto;">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th style="width: 30px;"><input type="checkbox" id="selectAllCatalogCheckbox" onchange="toggleSelectAllCatalog(this)"></th>
+                <th style="min-width: 220px;">NAME</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th style="text-align: center;">STOCK</th>
+                <th>STATUS</th>
+                <th>CREATED</th>
+                <th style="text-align: right;">ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="catalogProductsTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -2314,6 +2518,173 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     </div>
   </div>
 
+  <!-- New / Edit Product Slide-Over Drawer (Screenshot 2 Style) -->
+  <div class="drawer-overlay" id="productSlideDrawer" onclick="if(event.target===this) closeProductSlideDrawer()">
+    <div class="drawer-panel">
+      <!-- Drawer Header -->
+      <div class="drawer-header">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #081735; margin: 0;" id="drawerTitle">New Product</h3>
+          <p style="font-size: 0.82rem; color: #64748b; margin: 4px 0 0;" id="drawerSubtitle">Add a new product to your catalog</p>
+        </div>
+        <button type="button" onclick="closeProductSlideDrawer()" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #94a3b8; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Drawer Body (Form) -->
+      <div class="drawer-body">
+        <input type="hidden" id="drawerProductId" value="">
+
+        <!-- Image Upload Drag & Drop Area -->
+        <div>
+          <input type="file" id="drawerImageFileInput" accept="image/*" style="display: none;" onchange="handleDrawerImageFile(event)">
+          <div class="image-dropzone" id="drawerImageDropzone" onclick="document.getElementById('drawerImageFileInput').click()">
+            <div id="drawerImageEmptyState">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" style="margin: 0 auto 8px; display: block;">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <strong style="display: block; font-size: 0.9rem; color: #334155; margin-bottom: 2px;">Upload product image</strong>
+              <span style="font-size: 0.75rem; color: #94a3b8;">.PNG, .JPG, .JPEG • Max 5MB</span>
+            </div>
+            <div id="drawerImagePreviewState" style="display: none; position: relative;">
+              <img id="drawerImagePreview" src="" alt="Product Preview" style="max-height: 160px; max-width: 100%; border-radius: 8px; object-fit: contain; margin: 0 auto; display: block;">
+              <button type="button" onclick="event.stopPropagation(); removeDrawerImage();" style="position: absolute; top: 0; right: 0; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; cursor: pointer;">
+                ✕ Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Name Input -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Name *</label>
+          <input type="text" id="drawerInputName" class="modal-input" placeholder="Product name">
+        </div>
+
+        <!-- Description Input -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Description</label>
+          <textarea id="drawerInputDesc" class="modal-input" rows="3" placeholder="Optional description" style="resize: vertical;"></textarea>
+        </div>
+
+        <!-- Price Input (with Currency Selector) -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Price (TZS) *</label>
+          <div style="display: flex; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 0 12px; font-weight: 700; font-size: 0.82rem; color: #475569;">
+              TZS ▾
+            </div>
+            <input type="number" id="drawerInputPrice" class="modal-input" placeholder="0" min="0" step="500" style="flex: 1;">
+          </div>
+        </div>
+
+        <!-- Category Dropdown with [+] On-The-Spot Create Button -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Category</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="drawerSelectCategory" class="modal-input" style="flex: 1; background: #ffffff;">
+              <!-- Populated dynamically -->
+            </select>
+            <button type="button" class="btn-restock" style="width: 42px; height: 42px; padding: 0; font-size: 1.3rem; font-weight: 700; background: #f8fafc; border-color: #cbd5e1; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleDrawerInlineCategory()" title="Create New Category">
+              +
+            </button>
+          </div>
+
+          <!-- Inline Quick Category Input Box -->
+          <div id="drawerInlineCategoryBox" style="display: none; margin-top: 8px; padding: 10px; background: #f8fafc; border: 1.5px dashed #7433df; border-radius: 8px; gap: 6px; align-items: center;">
+            <input type="text" id="drawerNewCategoryInput" placeholder="Enter new category name..." style="flex: 1; padding: 7px 10px; font-size: 0.82rem; border: 1px solid #cbd5e1; border-radius: 6px;" onkeydown="if(event.key==='Enter') saveDrawerNewCategory()">
+            <button type="button" onclick="saveDrawerNewCategory()" style="background: #7433df; color: white; border: none; padding: 7px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">Save</button>
+            <button type="button" onclick="toggleDrawerInlineCategory(false)" style="background: none; border: none; color: #64748b; font-size: 0.8rem; cursor: pointer;">✕</button>
+          </div>
+        </div>
+
+        <!-- Track Quantity Switch -->
+        <div class="toggle-switch-wrapper">
+          <div>
+            <strong style="display: block; font-size: 0.84rem; color: #1e293b;">Track quantity</strong>
+            <span style="font-size: 0.75rem; color: #64748b;">Decrement stock on each purchase</span>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="drawerInputTrackQty" checked onchange="document.getElementById('drawerQtyContainer').style.display = this.checked ? 'block' : 'none'">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <!-- Quantity Input -->
+        <div id="drawerQtyContainer">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Quantity</label>
+          <input type="number" id="drawerInputQty" class="modal-input" placeholder="10" value="10" min="0">
+        </div>
+
+        <!-- Digital Product Switch -->
+        <div class="toggle-switch-wrapper">
+          <div>
+            <strong style="display: block; font-size: 0.84rem; color: #1e293b;">Digital product</strong>
+            <span style="font-size: 0.75rem; color: #64748b;">For downloadable files or digital services</span>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="drawerInputDigital">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <!-- Product Status -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Status</label>
+          <select id="drawerInputStatus" class="modal-input" style="background: #ffffff;">
+            <option value="Active">Active (Visible in Store)</option>
+            <option value="Draft">Draft (Hidden)</option>
+          </select>
+        </div>
+
+        <div id="drawerErrorMsg" style="display: none; padding: 10px; background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; border-radius: 8px; font-size: 0.82rem; font-weight: 600;"></div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="drawer-footer">
+        <button type="button" class="btn-modal-cancel" onclick="closeProductSlideDrawer()" style="padding: 10px 18px; font-weight: 600;">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btnSaveDrawerProduct" style="background: #16a34a; color: #ffffff; padding: 10px 24px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(22,163,74,0.3);" onclick="submitDrawerProduct()">
+          Save Product
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Management Modal -->
+  <div class="restock-modal-overlay" id="categoriesManagementModal" style="display:none; z-index: 99999;">
+    <div class="restock-modal" style="max-width: 480px; width: 92%; padding: 24px; border-radius: 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🏷️</span>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #081735; margin:0;">Store Categories</h3>
+        </div>
+        <button type="button" onclick="closeCategoriesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
+      </div>
+
+      <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 14px;">
+        Add and organize categories for your store. Categories appear in your storefront filter tabs and product dropdown.
+      </p>
+
+      <!-- Add Category Input Row -->
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <input type="text" id="modalNewCategoryInput" class="modal-input" placeholder="e.g. Smartphones, Accessories, Shoes..." onkeydown="if(event.key==='Enter') saveModalCategory()">
+        <button type="button" onclick="saveModalCategory()" style="background: #7433df; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; flex-shrink: 0;">
+          + Add
+        </button>
+      </div>
+
+      <!-- Categories List -->
+      <div id="modalCategoriesList" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div style="margin-top: 18px; text-align: right;">
+        <button type="button" class="btn-modal-cancel" onclick="closeCategoriesModal()" style="padding: 9px 18px; font-weight: 600;">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="dash-toast" id="dashToast">Odoo POS Orders synchronized.</div>
 
@@ -2523,6 +2894,17 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
           renderCurrentPeriod();
           renderStoresTable();
+
+          // Also load and render products catalog for first store if in admin mode
+          if (storesList.length > 0) {
+            const firstStoreSlug = storesList[0].slug;
+            fetch(`/api/${firstStoreSlug}/dashboard-data`).then(r => r.json()).then(d => {
+              if (d.success && d.products) {
+                if (d.store && Array.isArray(d.store.categories)) activeStoreCategories = d.store.categories;
+                renderCatalogProductsTable(d.products);
+              }
+            }).catch(() => {});
+          }
         }
 
         if (isManual) {
@@ -2542,6 +2924,9 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const kpi = data.kpi || {};
       currentClientProducts = data.products || [];
       rawDashboardPayload = data;
+      if (store.categories && Array.isArray(store.categories)) {
+        activeStoreCategories = store.categories;
+      }
 
       // 1. Page Header & Branding (Remove all Odoo references for Client)
       document.title = `${store.name} — Store Management Portal`;
@@ -2627,6 +3012,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       // 5. Render Isolated Period Charts & Tables
       renderCurrentPeriod();
       renderClientInventoryTable(currentClientProducts);
+      renderCatalogProductsTable(currentClientProducts);
     }
 
     function handleClientProductImgSelect(event) {
@@ -3400,6 +3786,547 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     window.openChangePinModal = openChangePinModal;
     window.closeChangePinModal = closeChangePinModal;
     window.submitChangePin = submitChangePin;
+
+    // =========================================================================
+    // DEDICATED PRODUCT CATALOG & RIGHT SLIDE-OVER DRAWER (Screenshots 1 & 2)
+    // =========================================================================
+    let catalogProductsList = [];
+    let activeStoreCategories = ['All', 'General', 'Smartphones', 'Electronics', 'Accessories', 'Food', 'Drinks'];
+    let currentEditingProductId = null;
+    let currentDrawerImageData = '';
+
+    function getStoreSlugOrIdForApi() {
+      if (currentStoreSlug) return currentStoreSlug;
+      if (storesList && storesList.length > 0) return storesList[0].slug || storesList[0].id;
+      return 'benstore';
+    }
+
+    function scrollToProductsCatalog() {
+      const section = document.getElementById('productsCatalogSection');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        section.style.transition = 'box-shadow 0.3s ease';
+        section.style.boxShadow = '0 0 0 3px rgba(116, 51, 223, 0.35)';
+        setTimeout(() => { section.style.boxShadow = ''; }, 1500);
+      }
+    }
+
+    function renderCatalogProductsTable(products = null) {
+      if (products) {
+        catalogProductsList = products;
+      }
+      const tbody = document.getElementById('catalogProductsTableBody');
+      const badge = document.getElementById('productsCatalogCountBadge');
+      const sidebarBadge = document.getElementById('sidebarProductsBadge');
+      if (!tbody) return;
+
+      const q = (document.getElementById('catalogSearchInput')?.value || '').toLowerCase().trim();
+      const catFilter = document.getElementById('catalogCategoryFilter')?.value || 'All';
+      const statusFilter = document.getElementById('catalogStatusFilter')?.value || 'All';
+
+      let filtered = (catalogProductsList || []).filter(p => {
+        const name = (p.name || '').toLowerCase();
+        const cat = (p.category || 'General').toLowerCase();
+        const sku = (p.default_code || p.sku || '').toLowerCase();
+        
+        if (q && !name.includes(q) && !cat.includes(q) && !sku.includes(q)) return false;
+        if (catFilter !== 'All' && (p.category || 'General') !== catFilter) return false;
+        
+        const pStatus = p.status || (p.qty_available > 0 || p.inStock ? 'Active' : 'Active');
+        if (statusFilter !== 'All' && pStatus !== statusFilter) return false;
+
+        return true;
+      });
+
+      if (badge) badge.textContent = `${catalogProductsList.length} products`;
+      if (sidebarBadge) sidebarBadge.textContent = `${catalogProductsList.length}`;
+
+      updateCatalogCategoryFilterOptions();
+
+      if (!filtered || filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 48px 16px; color: #64748b;">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">📦</div>
+              <strong style="color: #081735; font-size: 1.05rem; display: block; margin-bottom: 4px;">No products found</strong>
+              <p style="font-size: 0.84rem; margin-bottom: 14px;">Add your first product to start selling immediately!</p>
+              <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; padding: 8px 18px; border: none; border-radius: 8px;" onclick="openNewProductDrawer()">
+                + New Product
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(prod => {
+        const qty = Number(prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 0));
+        const price = Number(prod.price || 0);
+        const status = prod.status || (qty > 0 || prod.inStock ? 'Active' : 'Active');
+        const isActive = status === 'Active';
+        const img = prod.image || prod.thumb || '/assets/products/logo.png';
+        const createdDateStr = prod.createdAt ? formatCatalogDate(prod.createdAt) : '22 Sept 2026, 16:48';
+
+        return `
+          <tr style="transition: background 0.15s ease;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+            <td><input type="checkbox" class="catalog-row-cb" value="${prod.id}"></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="${escapeAttr(img)}" alt="" style="width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #ffffff; border: 1.5px solid #e2e8f0; padding: 2px; flex-shrink: 0;" onerror="this.onerror=null; this.src='/assets/products/logo.png'">
+                <div>
+                  <strong style="color: #081735; font-size: 0.88rem; display: block;">${escapeHtml(prod.name)}</strong>
+                  <span style="font-size: 0.74rem; color: #64748b;">${escapeHtml(prod.default_code || prod.sku || `ID: ${prod.id}`)}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span style="font-size: 0.78rem; background: #f1f5f9; color: #475569; padding: 3px 8px; border-radius: 6px; font-weight: 600;">
+                ${escapeHtml(prod.category || 'General')}
+              </span>
+            </td>
+            <td>
+              <strong style="color: #081735; font-size: 0.88rem;">${formatTZS(price)}</strong>
+            </td>
+            <td style="text-align: center;">
+              <span style="font-weight: 700; color: ${qty > 0 ? '#0f172a' : '#ef4444'}; font-size: 0.88rem;">
+                ${qty}
+              </span>
+            </td>
+            <td>
+              <span style="background: ${isActive ? '#dcfce7' : '#f1f5f9'}; color: ${isActive ? '#15803d' : '#64748b'}; font-weight: 700; font-size: 0.74rem; padding: 3px 10px; border-radius: 12px; display: inline-block;">
+                ${escapeHtml(status)}
+              </span>
+            </td>
+            <td style="color: #64748b; font-size: 0.78rem; white-space: nowrap;">
+              ${createdDateStr}
+            </td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                <button type="button" class="btn-restock" style="background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; padding: 5px 10px; font-size: 0.78rem; font-weight: 700;" onclick="openEditProductDrawer(${prod.id})" title="Edit Product">
+                  ✏️ Edit
+                </button>
+                <button type="button" class="btn-restock" style="background: #fee2e2; color: #b91c1c; border-color: #fca5a5; padding: 5px 10px; font-size: 0.78rem;" onclick="deleteCatalogProduct(${prod.id}, '${escapeAttr(prod.name)}')" title="Delete Product">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function formatCatalogDate(dateStr) {
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '22 Sept 2026, 16:48';
+        const day = d.getDate();
+        const month = d.toLocaleString('en-US', { month: 'short' });
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const mins = String(d.getMinutes()).padStart(2, '0');
+        return `${day} ${month} ${year}, ${hours}:${mins}`;
+      } catch (e) {
+        return '22 Sept 2026, 16:48';
+      }
+    }
+
+    function filterCatalogTable() {
+      renderCatalogProductsTable();
+    }
+
+    function toggleSelectAllCatalog(masterCb) {
+      const cbs = document.querySelectorAll('.catalog-row-cb');
+      cbs.forEach(cb => cb.checked = masterCb.checked);
+    }
+
+    function updateCatalogCategoryFilterOptions() {
+      const select = document.getElementById('catalogCategoryFilter');
+      if (!select) return;
+      const currentVal = select.value;
+      const catSet = new Set(['All']);
+      (catalogProductsList || []).forEach(p => {
+        if (p.category) catSet.add(p.category);
+      });
+      (activeStoreCategories || []).forEach(c => {
+        if (c && c !== 'All') catSet.add(c);
+      });
+
+      select.innerHTML = Array.from(catSet).map(c => `
+        <option value="${escapeAttr(c)}" ${c === currentVal ? 'selected' : ''}>${c === 'All' ? 'All Categories' : escapeHtml(c)}</option>
+      `).join('');
+    }
+
+    // SLIDE-OVER DRAWER LOGIC (Screenshot 2 Match)
+    function openNewProductDrawer() {
+      currentEditingProductId = null;
+      currentDrawerImageData = '';
+
+      document.getElementById('drawerTitle').textContent = 'New Product';
+      document.getElementById('drawerSubtitle').textContent = 'Add a new product to your catalog';
+      document.getElementById('drawerProductId').value = '';
+      document.getElementById('drawerInputName').value = '';
+      document.getElementById('drawerInputDesc').value = '';
+      document.getElementById('drawerInputPrice').value = '';
+      document.getElementById('drawerInputQty').value = '10';
+      document.getElementById('drawerInputTrackQty').checked = true;
+      document.getElementById('drawerQtyContainer').style.display = 'block';
+      document.getElementById('drawerInputDigital').checked = false;
+      document.getElementById('drawerInputStatus').value = 'Active';
+      document.getElementById('btnSaveDrawerProduct').textContent = 'Save Product';
+
+      removeDrawerImage();
+      populateDrawerCategories();
+      toggleDrawerInlineCategory(false);
+
+      const errBox = document.getElementById('drawerErrorMsg');
+      if (errBox) errBox.style.display = 'none';
+
+      document.getElementById('productSlideDrawer').classList.add('active');
+      setTimeout(() => document.getElementById('drawerInputName')?.focus(), 100);
+    }
+
+    function openEditProductDrawer(productId) {
+      const prod = (catalogProductsList || []).find(p => Number(p.id) === Number(productId));
+      if (!prod) {
+        showNotification('Product not found.', 'error');
+        return;
+      }
+
+      currentEditingProductId = prod.id;
+      currentDrawerImageData = prod.image || prod.thumb || '';
+
+      document.getElementById('drawerTitle').textContent = 'Edit Product';
+      document.getElementById('drawerSubtitle').textContent = 'Update product details in your catalog';
+      document.getElementById('drawerProductId').value = prod.id;
+      document.getElementById('drawerInputName').value = prod.name || '';
+      document.getElementById('drawerInputDesc').value = prod.description || '';
+      document.getElementById('drawerInputPrice').value = prod.price || 0;
+      
+      const qty = prod.qty_available !== undefined ? prod.qty_available : (prod.stock || 10);
+      document.getElementById('drawerInputQty').value = qty;
+      const isTrack = prod.track_quantity !== false;
+      document.getElementById('drawerInputTrackQty').checked = isTrack;
+      document.getElementById('drawerQtyContainer').style.display = isTrack ? 'block' : 'none';
+      document.getElementById('drawerInputDigital').checked = Boolean(prod.isDigital);
+      document.getElementById('drawerInputStatus').value = prod.status || 'Active';
+      document.getElementById('btnSaveDrawerProduct').textContent = 'Update Product';
+
+      populateDrawerCategories(prod.category || 'General');
+      toggleDrawerInlineCategory(false);
+
+      if (currentDrawerImageData && !currentDrawerImageData.includes('default-banner')) {
+        document.getElementById('drawerImagePreview').src = currentDrawerImageData;
+        document.getElementById('drawerImageEmptyState').style.display = 'none';
+        document.getElementById('drawerImagePreviewState').style.display = 'block';
+      } else {
+        removeDrawerImage();
+      }
+
+      const errBox = document.getElementById('drawerErrorMsg');
+      if (errBox) errBox.style.display = 'none';
+
+      document.getElementById('productSlideDrawer').classList.add('active');
+    }
+
+    function closeProductSlideDrawer() {
+      const drawer = document.getElementById('productSlideDrawer');
+      if (drawer) drawer.classList.remove('active');
+      currentEditingProductId = null;
+    }
+
+    function populateDrawerCategories(selectedCategory = null) {
+      const select = document.getElementById('drawerSelectCategory');
+      if (!select) return;
+
+      const catSet = new Set(activeStoreCategories || ['General']);
+      if (selectedCategory) catSet.add(selectedCategory);
+
+      select.innerHTML = Array.from(catSet).map(c => `
+        <option value="${escapeAttr(c)}" ${c === selectedCategory ? 'selected' : ''}>${escapeHtml(c)}</option>
+      `).join('');
+    }
+
+    function toggleDrawerInlineCategory(forceState) {
+      const box = document.getElementById('drawerInlineCategoryBox');
+      const input = document.getElementById('drawerNewCategoryInput');
+      if (!box) return;
+      const shouldShow = forceState !== undefined ? forceState : (box.style.display === 'none');
+      box.style.display = shouldShow ? 'flex' : 'none';
+      if (shouldShow && input) {
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    async function saveDrawerNewCategory() {
+      const input = document.getElementById('drawerNewCategoryInput');
+      const catName = input ? input.value.trim() : '';
+      if (!catName) return;
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: catName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          activeStoreCategories = data.categories || activeStoreCategories;
+          if (!activeStoreCategories.includes(catName)) activeStoreCategories.push(catName);
+          populateDrawerCategories(catName);
+          toggleDrawerInlineCategory(false);
+          showDashToast(`✅ Category "${catName}" added!`);
+        } else {
+          alert(data.error || 'Failed to add category');
+        }
+      } catch (err) {
+        alert('Error adding category: ' + err.message);
+      }
+    }
+
+    function handleDrawerImageFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please choose a valid image file (.png, .jpg, .jpeg, .webp).');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size exceeds 5MB. Please choose a smaller image.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentDrawerImageData = e.target.result;
+        document.getElementById('drawerImagePreview').src = currentDrawerImageData;
+        document.getElementById('drawerImageEmptyState').style.display = 'none';
+        document.getElementById('drawerImagePreviewState').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeDrawerImage() {
+      currentDrawerImageData = '';
+      const fileInput = document.getElementById('drawerImageFileInput');
+      if (fileInput) fileInput.value = '';
+      document.getElementById('drawerImagePreview').src = '';
+      document.getElementById('drawerImageEmptyState').style.display = 'block';
+      document.getElementById('drawerImagePreviewState').style.display = 'none';
+    }
+
+    async function submitDrawerProduct() {
+      const name = document.getElementById('drawerInputName')?.value.trim();
+      const desc = document.getElementById('drawerInputDesc')?.value.trim();
+      const price = parseFloat(document.getElementById('drawerInputPrice')?.value) || 0;
+      const category = document.getElementById('drawerSelectCategory')?.value || 'General';
+      const qty = parseInt(document.getElementById('drawerInputQty')?.value, 10) || 0;
+      const trackQty = document.getElementById('drawerInputTrackQty')?.checked !== false;
+      const isDigital = document.getElementById('drawerInputDigital')?.checked || false;
+      const status = document.getElementById('drawerInputStatus')?.value || 'Active';
+      const btn = document.getElementById('btnSaveDrawerProduct');
+      const errBox = document.getElementById('drawerErrorMsg');
+
+      if (!name) {
+        if (errBox) { errBox.textContent = 'Please enter product name.'; errBox.style.display = 'block'; }
+        return;
+      }
+
+      if (price < 0) {
+        if (errBox) { errBox.textContent = 'Price cannot be negative.'; errBox.style.display = 'block'; }
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+      }
+
+      const payload = {
+        name,
+        description: desc,
+        price,
+        category,
+        quantity: qty,
+        qty_available: qty,
+        track_quantity: trackQty,
+        isDigital,
+        status,
+        image: currentDrawerImageData
+      };
+
+      const targetStore = getStoreSlugOrIdForApi();
+
+      try {
+        let res;
+        if (currentEditingProductId) {
+          res = await fetch(`/api/stores/${targetStore}/products/${currentEditingProductId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch(`/api/stores/${targetStore}/products/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to save product');
+        }
+
+        closeProductSlideDrawer();
+        showNotification(currentEditingProductId ? `✅ Product "${name}" updated successfully!` : `🎉 Product "${name}" added to catalog!`, 'success');
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        if (errBox) {
+          errBox.textContent = err.message || 'Error saving product';
+          errBox.style.display = 'block';
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = currentEditingProductId ? 'Update Product' : 'Save Product';
+        }
+      }
+    }
+
+    async function deleteCatalogProduct(productId, prodName) {
+      if (!confirm(`Are you sure you want to delete "${prodName}" from your store catalog?\n\nThis will remove it from customer view immediately.`)) {
+        return;
+      }
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/products/${productId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to delete product');
+        }
+
+        showNotification(`Product "${prodName}" deleted successfully.`, 'success');
+        fetchLiveDashboardData(false);
+      } catch (err) {
+        showNotification('Error deleting product: ' + err.message, 'error');
+      }
+    }
+
+    // CATEGORIES MANAGEMENT MODAL
+    async function openCategoriesModal() {
+      const modal = document.getElementById('categoriesManagementModal');
+      const listEl = document.getElementById('modalCategoriesList');
+      if (!modal) return;
+
+      modal.style.display = 'flex';
+      renderModalCategoriesList();
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/categories`);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.categories)) {
+          activeStoreCategories = data.categories;
+          renderModalCategoriesList();
+        }
+      } catch (e) {}
+    }
+
+    function closeCategoriesModal() {
+      const modal = document.getElementById('categoriesManagementModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function renderModalCategoriesList() {
+      const listEl = document.getElementById('modalCategoriesList');
+      if (!listEl) return;
+
+      const cats = activeStoreCategories || ['All', 'General'];
+      listEl.innerHTML = cats.map(cat => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <span style="font-size: 0.86rem; font-weight: 600; color: #1e293b;">${escapeHtml(cat)}</span>
+          ${cat.toLowerCase() !== 'all' ? `
+            <button type="button" onclick="deleteModalCategory('${escapeAttr(cat)}')" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 700;" title="Remove Category">
+              🗑️
+            </button>
+          ` : '<span style="font-size: 0.72rem; color: #94a3b8;">Default</span>'}
+        </div>
+      `).join('');
+    }
+
+    async function saveModalCategory() {
+      const input = document.getElementById('modalNewCategoryInput');
+      const catName = input ? input.value.trim() : '';
+      if (!catName) return;
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: catName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          activeStoreCategories = data.categories;
+          renderModalCategoriesList();
+          input.value = '';
+          showDashToast(`✅ Category "${catName}" added!`);
+          updateCatalogCategoryFilterOptions();
+        } else {
+          alert(data.error || 'Failed to add category');
+        }
+      } catch (err) {
+        alert('Error adding category: ' + err.message);
+      }
+    }
+
+    async function deleteModalCategory(catName) {
+      if (!confirm(`Are you sure you want to delete category "${catName}"?`)) return;
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/categories/${encodeURIComponent(catName)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+          activeStoreCategories = data.categories;
+          renderModalCategoriesList();
+          showDashToast(`Category "${catName}" removed.`);
+          updateCatalogCategoryFilterOptions();
+        } else {
+          alert(data.error || 'Failed to delete category');
+        }
+      } catch (err) {
+        alert('Error deleting category: ' + err.message);
+      }
+    }
+
+    // Expose all catalog functions globally
+    window.scrollToProductsCatalog = scrollToProductsCatalog;
+    window.openNewProductDrawer = openNewProductDrawer;
+    window.openEditProductDrawer = openEditProductDrawer;
+    window.closeProductSlideDrawer = closeProductSlideDrawer;
+    window.handleDrawerImageFile = handleDrawerImageFile;
+    window.removeDrawerImage = removeDrawerImage;
+    window.toggleDrawerInlineCategory = toggleDrawerInlineCategory;
+    window.saveDrawerNewCategory = saveDrawerNewCategory;
+    window.submitDrawerProduct = submitDrawerProduct;
+    window.deleteCatalogProduct = deleteCatalogProduct;
+    window.openCategoriesModal = openCategoriesModal;
+    window.closeCategoriesModal = closeCategoriesModal;
+    window.saveModalCategory = saveModalCategory;
+    window.deleteModalCategory = deleteModalCategory;
+    window.filterCatalogTable = filterCatalogTable;
+    window.toggleSelectAllCatalog = toggleSelectAllCatalog;
 
     function getSafeLogoSrc(logo) {
       if (!logo) return '/assets/products/logo.png';
