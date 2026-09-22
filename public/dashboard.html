@@ -199,7 +199,7 @@
     }
 
     .nav-badge-blue {
-      background: #0047bb;
+      background: #6d2fe3;
       color: #ffffff;
       font-size: 0.68rem;
       font-weight: 700;
@@ -232,8 +232,8 @@
     }
 
     .btn-sidebar-shop:hover {
-      background: #eff6ff;
-      border-color: #bfdbfe;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
     }
 
     .admin-profile-card {
@@ -249,7 +249,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: #0047bb;
+      background: #6d2fe3;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -357,21 +357,21 @@
       background: transparent;
       font-size: 0.82rem;
       font-weight: 600;
-      color: #64748b;
+      color: #71717a;
       cursor: pointer;
       transition: all 0.18s ease;
       font-family: inherit;
     }
 
     .period-tab-btn:hover {
-      color: var(--navy-dark);
-      background: #f1f5f9;
+      color: #09090b;
+      background: #f4f4f5;
     }
 
     .period-tab-btn.active {
-      background: #0047bb;
+      background: #09090b;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 71, 187, 0.28);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
     .btn-sync-odoo {
@@ -391,9 +391,9 @@
     }
 
     .btn-sync-odoo:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #0047bb;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #6d2fe3;
     }
 
     .btn-sync-odoo.rotating svg {
@@ -422,7 +422,7 @@
       align-items: center;
       gap: 6px;
       padding: 8px 16px;
-      background: #0047bb;
+      background: #6d2fe3;
       color: #ffffff;
       border: none;
       border-radius: var(--radius-sm);
@@ -436,88 +436,145 @@
 
     .btn-export-report:hover { background: #00368f; }
 
-    /* 4 KPI Cards Grid */
+    /* 4 KPI Cards Grid (Matching Reference Image) */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
+      gap: 16px;
       width: 100%;
     }
 
     @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 680px) { .kpi-grid { grid-template-columns: 1fr; } }
 
-    .kpi-card {
+    .kpi-card-clean {
       background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 18px;
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.06);
-    }
-
-    .kpi-top {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .kpi-icon-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .kpi-icon-box.green { background: #dcfce7; color: #16a34a; }
-    .kpi-icon-box.blue { background: #dbeafe; color: #2563eb; }
-    .kpi-icon-box.purple { background: #f3e8ff; color: #9333ea; }
-    .kpi-icon-box.red { background: #fee2e2; color: #ef4444; }
-
-    .kpi-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .kpi-middle {
-      display: flex;
-      align-items: flex-end;
       justify-content: space-between;
-      gap: 10px;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      transition: all 0.15s ease;
+      min-height: 110px;
     }
 
-    .kpi-value {
-      font-size: 1.65rem;
+    .kpi-card-clean:hover {
+      border-color: #d4d4d8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .kpi-clean-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-clean-label {
+      font-size: 0.82rem;
+      color: #71717a;
+      font-weight: 500;
+    }
+
+    .kpi-clean-value {
+      font-size: 1.55rem;
       font-weight: 800;
-      color: var(--navy-dark);
+      color: #09090b;
       letter-spacing: -0.5px;
-      line-height: 1;
+      margin-top: 4px;
     }
 
-    .kpi-sparkline {
-      width: 80px;
-      height: 32px;
-      flex-shrink: 0;
+    .kpi-clean-sub {
+      font-size: 0.74rem;
+      color: #71717a;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .kpi-bottom {
+    /* Action Feature Cards (Matching SELL / DELIVER in Reference Image) */
+    .dash-action-card {
+      background: #ffffff;
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      padding: 18px 20px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      transition: all 0.18s ease;
+    }
+
+    .dash-action-card:hover {
+      border-color: #6d2fe3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(109, 47, 227, 0.08);
+    }
+
+    .action-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #71717a;
+      border: 1px solid #e4e4e7;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .dash-card-clean {
+      background: #ffffff;
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .btn-clean-viewall {
+      background: #09090b;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.76rem;
-      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+
+    .btn-clean-viewall:hover {
+      background: #27272a;
+    }
+
+    .dash-table-clean {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .dash-table-clean th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #71717a;
+      letter-spacing: 0.5px;
+      padding: 12px 14px;
+      border-bottom: 1px solid #e4e4e7;
+      background: #fafafa;
+    }
+
+    .dash-table-clean td {
+      padding: 14px;
+      border-bottom: 1px solid #f4f4f5;
+      color: #09090b;
+    }
+
+    .dash-table-clean tr:hover td {
+      background: #fafafa;
+    }
       color: #64748b;
     }
 
@@ -766,9 +823,9 @@
     }
 
     .btn-restock:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #0047bb;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #6d2fe3;
     }
 
     /* Recent Orders */
@@ -844,7 +901,7 @@
 
     .btn-create-store-action {
       padding: 7px 14px;
-      background: #0047bb;
+      background: #6d2fe3;
       color: #ffffff;
       border: none;
       border-radius: 6px;
@@ -857,7 +914,7 @@
     .restock-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.55);
+      background: rgba(9, 9, 11, 0.65);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -920,7 +977,7 @@
 
     .btn-modal-confirm {
       padding: 8px 18px;
-      background: #0047bb;
+      background: #6d2fe3;
       color: #ffffff;
       border: none;
       border-radius: 8px;
@@ -1314,7 +1371,7 @@
         <span style="font-weight:800; font-size:0.95rem; color:#081735;" id="mobileHeaderTitle">ACHETE.ME</span>
       </div>
       <button class="mobile-refresh-btn" onclick="fetchLiveDashboardData(true)" title="Refresh Data">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
       </button>
     </header>
 
@@ -1452,16 +1509,12 @@
     <main class="dash-main">
       
       <!-- Top Bar (Shared Header) -->
-      <div class="dash-topbar">
+      <div class="dash-topbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div class="dash-header-left">
-          <h1 class="dash-page-title" id="dashPageMainTitle">Executive Dashboard</h1>
-          <div class="odoo-sync-pill" id="headerStatusPill">
-            <span class="status-dot-green"></span>
-            <span id="headerStatusText">Live Connected: Odoo 18 (KODADEMOS)</span>
-          </div>
+          <h1 class="dash-page-title" id="dashPageMainTitle" style="font-size: 1.25rem; font-weight: 800; color: #09090b; letter-spacing: -0.2px;">Overview</h1>
         </div>
         
-        <div class="dash-topbar-actions">
+        <div class="dash-topbar-actions" style="display: flex; align-items: center; gap: 10px;">
           <!-- Period Tabs (Visible in Dashboard overview) -->
           <div class="period-tabs" id="dashPeriodTabsWrap">
             <button class="period-tab-btn active" id="tabToday" onclick="setPeriod('today')">Today</button>
@@ -1470,110 +1523,119 @@
             <button class="period-tab-btn" id="tabAll" onclick="setPeriod('all')">All Time</button>
           </div>
 
-          <!-- Date Range Display -->
-          <div class="date-range-btn" id="dashDateRangeWrap">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span id="dateRangeText">Today: Sep 01, 2026</span>
-          </div>
-
-          <!-- WhatsApp Gateway Settings Button (Super-Admin Only) -->
-          <button class="btn-sync-odoo" id="btnWaGatewayHeader" style="background:#25D366; border-color:#22c55e; color:#ffffff; display:none;" onclick="openWhatsAppConfigModal()" title="WhatsApp Gateway & Dispatch Config">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.177.182-.076.355.101.173.448.74 1.025 1.254.746.665 1.374.871 1.569.968.195.097.311.082.427-.051.116-.133.491-.571.621-.767.13-.196.26-.163.433-.099.173.064 1.097.517 1.285.611.188.094.314.14.36.218.046.078.046.452-.098.857z"/></svg>
-            <span>WhatsApp Gateway</span>
+          <!-- Web Refresh Icon Button (Sleek monochrome circle matching mobile) -->
+          <button class="dash-icon-btn" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Refresh Live Data" style="width: 38px; height: 38px; border-radius: 8px; background: #ffffff; border: 1px solid #e4e4e7; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #09090b; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.15s ease;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           </button>
         </div>
       </div>
 
       <!-- =====================================================================
-           VIEW 1: EXECUTIVE DASHBOARD OVERVIEW (Default View)
+           VIEW 1: EXECUTIVE DASHBOARD OVERVIEW (Matching Reference Image)
            ===================================================================== -->
       <div id="viewDashboard" class="dash-tab-view" style="display: flex; flex-direction: column; gap: 20px;">
-        <!-- 4 KPI Cards -->
+        <!-- 4 KPI Cards (Clean Monochrome Format) -->
         <section class="kpi-grid">
-          <!-- 1. Order Completed -->
-          <div class="kpi-card">
-            <div class="kpi-top">
-              <div class="kpi-icon-box green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              </div>
-              <span class="kpi-label">Order Completed</span>
+          <!-- 1. Available Balance -->
+          <div class="kpi-card-clean">
+            <div class="kpi-clean-top">
+              <span class="kpi-clean-label">Available Balance</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="16" cy="12" r="1.5"/></svg>
             </div>
-            <div class="kpi-middle">
-              <span class="kpi-value" id="kpiCompleted">14</span>
-              <svg class="kpi-sparkline" viewBox="0 0 80 32">
-                <path d="M 0 24 Q 20 18, 40 20 T 80 6" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="kpi-bottom">
-              <span style="color:#16a34a; font-weight:700;">+100% Odoo Paid / Done</span>
-            </div>
+            <div class="kpi-clean-value" id="kpiSales">TSh 0</div>
           </div>
 
-          <!-- 2. Order On Progress -->
-          <div class="kpi-card">
-            <div class="kpi-top">
-              <div class="kpi-icon-box blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <span class="kpi-label">Order On Progress</span>
+          <!-- 2. Total Balance -->
+          <div class="kpi-card-clean">
+            <div class="kpi-clean-top">
+              <span class="kpi-clean-label">Total Balance</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="16" cy="12" r="1.5"/></svg>
             </div>
-            <div class="kpi-middle">
-              <span class="kpi-value" id="kpiProgress">0</span>
-              <svg class="kpi-sparkline" viewBox="0 0 80 32">
-                <path d="M 0 22 Q 25 24, 45 14 T 80 8" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="kpi-bottom">
-              <span style="color:#2563eb; font-weight:700;">Active Odoo Draft / Open</span>
-            </div>
+            <div class="kpi-clean-value" id="kpiTotalBalance">TSh 0</div>
           </div>
 
-          <!-- 3. Total Sales -->
-          <div class="kpi-card">
-            <div class="kpi-top">
-              <div class="kpi-icon-box purple">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="14" y2="16"/></svg>
-              </div>
-              <span class="kpi-label">Total Sales (TZS)</span>
+          <!-- 3. Payments This Week -->
+          <div class="kpi-card-clean">
+            <div class="kpi-clean-top">
+              <span class="kpi-clean-label">Payments This Week</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
-            <div class="kpi-middle">
-              <span class="kpi-value" id="kpiSales" style="font-size:1.4rem;">TZS 2,423,850</span>
-              <svg class="kpi-sparkline" viewBox="0 0 80 32">
-                <path d="M 0 26 Q 30 26, 50 12 T 80 4" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="kpi-bottom">
-              <span style="color:#16a34a; font-weight:700;">Live Sync Odoo POS Revenue</span>
-            </div>
+            <div class="kpi-clean-value" id="kpiWeeklyPayments">TSh 0</div>
+            <span class="kpi-clean-sub">↘ 0.0% vs last week</span>
           </div>
 
-          <!-- 4. Products Out of Stock -->
-          <div class="kpi-card">
-            <div class="kpi-top">
-              <div class="kpi-icon-box red">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              </div>
-              <span class="kpi-label">Products Out of Stock</span>
+          <!-- 4. Transactions -->
+          <div class="kpi-card-clean">
+            <div class="kpi-clean-top">
+              <span class="kpi-clean-label">Transactions</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             </div>
-            <div class="kpi-middle">
-              <span class="kpi-value" id="kpiOutStock">15</span>
-              <svg class="kpi-sparkline" viewBox="0 0 80 32">
-                <path d="M 0 26 Q 30 20, 55 12 T 80 14" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="kpi-bottom">
-              <span style="color:#ef4444; font-weight:700;">Needs Restock (0 qty in Odoo)</span>
-            </div>
+            <div class="kpi-clean-value" id="kpiCompleted">0</div>
+            <span class="kpi-clean-sub">this week</span>
           </div>
         </section>
 
-        <!-- Middle Grid: Sales Area Chart + Orders Summary Donut + Top Selling Products -->
-        <section class="middle-grid">
+        <!-- Quick Action Feature Cards (SELL Payment Pages & DELIVER Content Delivery) -->
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <!-- Card 1: Payment Pages -->
+          <div class="dash-action-card" onclick="switchDashboardTab('products')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <span class="action-tag">SELL</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
+            <h3 style="font-size: 1rem; font-weight: 700; color: #09090b; margin: 0 0 4px;">Payment Pages</h3>
+            <p style="font-size: 0.8rem; color: #71717a; margin: 0;">Create pages to sell products & services</p>
+          </div>
+
+          <!-- Card 2: Content Delivery -->
+          <div class="dash-action-card" onclick="switchDashboardTab('inventory')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <span class="action-tag">DELIVER</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <h3 style="font-size: 1rem; font-weight: 700; color: #09090b; margin: 0 0 4px;">Content Delivery</h3>
+            <p style="font-size: 0.8rem; color: #71717a; margin: 0;">Track digital product fulfillment</p>
+          </div>
+        </section>
+
+        <!-- Recent Payments Table (Matching Screenshot) -->
+        <section class="dash-card-clean">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #09090b; margin: 0;">Recent Payments</h3>
+            <button type="button" onclick="fetchLiveDashboardData(true)" class="btn-clean-viewall">
+              <span>View all</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="dash-table-clean">
+              <thead>
+                <tr>
+                  <th style="width: 28px;"><input type="checkbox" style="border-radius: 4px; accent-color: #6d2fe3;"></th>
+                  <th>REFERENCE</th>
+                  <th>TYPE</th>
+                  <th>CUSTOMER</th>
+                  <th>PHONE</th>
+                  <th>AMOUNT</th>
+                  <th>STATUS</th>
+                  <th style="text-align: right;">DATE</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersList">
+                <!-- Dynamically populated rows or 'No recent payments' empty state -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Sales Analytics Breakdown Grid -->
+        <section class="middle-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
           <!-- Sales Overview Chart -->
-          <div class="dash-card">
-            <div class="card-header-row">
-              <h2 class="card-title" id="salesChartTitle">Sales Overview</h2>
-              <select class="period-select" id="periodSelect" onchange="renderSalesChart()">
+          <div class="dash-card-clean">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #09090b; margin: 0;" id="salesChartTitle">Sales Overview</h4>
+              <select class="period-select" id="periodSelect" onchange="renderSalesChart()" style="padding: 6px 10px; font-size: 0.78rem; font-weight: 600; border: 1px solid #e4e4e7; border-radius: 6px; background: #ffffff;">
                 <option value="hourly">Hourly View</option>
                 <option value="daily">Daily Breakdown</option>
                 <option value="weekly">Weekly Summary</option>
@@ -1581,70 +1643,19 @@
               </select>
             </div>
 
-            <div style="position: relative; width: 100%; height: 230px; margin-top: 6px;" id="chartContainer">
-              <!-- Dynamic SVG Area Chart -->
-            </div>
-          </div>
-
-          <!-- Orders Summary Donut -->
-          <div class="dash-card">
-            <div class="card-header-row">
-              <h2 class="card-title">Orders Summary</h2>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;" id="donutContainer">
-              <!-- Dynamic Donut -->
+            <div style="position: relative; width: 100%; height: 210px;" id="chartContainer">
+              <!-- Dynamic Area Chart -->
             </div>
           </div>
 
           <!-- Top Selling Products -->
-          <div class="dash-card">
-            <div class="card-header-row">
-              <h2 class="card-title">Top Selling Products</h2>
+          <div class="dash-card-clean">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #09090b; margin: 0;">Top Selling Products</h4>
             </div>
 
             <div class="top-products-list" id="topSellingList">
               <!-- Dynamic Top Selling -->
-            </div>
-          </div>
-        </section>
-
-        <!-- Bottom Grid: Out of Stock Table + Recent Orders -->
-        <section class="bottom-grid" id="outOfStockSection">
-          <!-- Out of Stock Products Table -->
-          <div class="dash-card">
-            <div class="card-header-row">
-              <h2 class="card-title">Out of Stock Products (<span id="tableOutStockCount">15</span>)</h2>
-            </div>
-
-            <div style="overflow-x: auto;">
-              <table class="dash-table">
-                <thead>
-                  <tr>
-                    <th style="width: 25px;">#</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th style="text-align: center;">Stock Status</th>
-                    <th>Last Updated</th>
-                    <th style="text-align: right;">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="outOfStockTableBody">
-                  <!-- Dynamic rows -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Recent Orders -->
-          <div class="dash-card">
-            <div class="card-header-row">
-              <h2 class="card-title">Recent Orders</h2>
-              <a href="javascript:void(0)" style="font-size: 0.8rem; font-weight: 700; color: #0047bb; text-decoration: none;" onclick="fetchLiveDashboardData(true); return false;">Sync Now</a>
-            </div>
-
-            <div class="recent-orders-list" id="recentOrdersList">
-              <!-- Dynamic recent orders -->
             </div>
           </div>
         </section>
@@ -1761,7 +1772,7 @@
               </p>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" onclick="openClientStockReceiveModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,71,187,0.25);">
+              <button type="button" onclick="openClientStockReceiveModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
                 <span>📦 Load / Receive Stock</span>
               </button>
               <button type="button" onclick="openNewProductDrawer()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
@@ -1862,7 +1873,7 @@
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div>
             <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Stock Received (+Qty):</label>
-            <input type="number" id="clientReceiveQtyInput" class="modal-input" value="10" min="1" max="10000" style="font-size:0.95rem; font-weight:700; color:#0047bb;">
+            <input type="number" id="clientReceiveQtyInput" class="modal-input" value="10" min="1" max="10000" style="font-size:0.95rem; font-weight:700; color:#6d2fe3;">
           </div>
           <div>
             <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:4px;">Current Stock Level:</label>
@@ -1938,7 +1949,7 @@
             <div style="flex:1;">
               <input type="file" id="clientProductImageFileInput" accept="image/*" style="display:none;" onchange="handleClientProductImgSelect(event)">
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                <button type="button" onclick="document.getElementById('clientProductImageFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                <button type="button" onclick="document.getElementById('clientProductImageFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
                   📁 Upload Photo
                 </button>
                 <select id="clientNewProdImagePresets" class="modal-input" style="width:auto; font-size:0.78rem; padding:5px 8px;" onchange="setClientProductPresetImage(this.value)">
@@ -2028,7 +2039,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
       <!-- Order Summary -->
       <div style="background:#f1f5f9; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
         <span style="font-weight:700; color:#1e293b; font-size:0.9rem;">Total Amount:</span>
-        <strong id="orderModalTotal" style="font-size:1.15rem; color:#0047bb;">TZS 0</strong>
+        <strong id="orderModalTotal" style="font-size:1.15rem; color:#6d2fe3;">TZS 0</strong>
       </div>
 
       <div class="modal-actions" style="margin-top:16px;">
@@ -2082,7 +2093,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
             </div>
             <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
               <input type="file" id="storeModalLogoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
-              <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#0047bb; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
+              <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
                 📁 Upload Logo
               </button>
               <input type="text" id="storeModalLogoUrl" class="modal-input" placeholder="Or paste logo URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleLogoUrlInput()">
@@ -2095,7 +2106,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">📸 Shop Banner (Physical Signboard)</label>
-              <span style="font-size:0.7rem; color:#7433df; font-weight:700;">📐 Optimal: 1500 × 250 px (6:1 Signboard Ratio)</span>
+              <span style="font-size:0.7rem; color:#6d2fe3; font-weight:700;">📐 Optimal: 1500 × 250 px (6:1 Signboard Ratio)</span>
             </div>
             <select id="storeModalBannerPreset" onchange="applyStoreBannerPreset(this.value)" style="font-size:0.72rem; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; background:#ffffff; color:#0f172a;">
               <option value="">Choose preset...</option>
@@ -2109,7 +2120,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
             </div>
             <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
               <input type="file" id="storeModalBannerFileInput" accept="image/*" style="display:none;" onchange="handleBannerFileSelect(event)">
-              <button type="button" onclick="document.getElementById('storeModalBannerFileInput').click()" style="background:#7433df; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
+              <button type="button" onclick="document.getElementById('storeModalBannerFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
                 📷 Upload Shop Photo
               </button>
               <input type="text" id="storeModalBannerUrl" class="modal-input" placeholder="Or paste banner image URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleBannerUrlInput()">
@@ -2130,7 +2141,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
         </div>
       </div>
 
-      <span style="font-size:0.76rem; color:#0047bb; font-weight:700; margin: 4px 0 12px; display:block;" id="storeUrlPreview">URL: achete.me/shopname</span>
+      <span style="font-size:0.76rem; color:#6d2fe3; font-weight:700; margin: 4px 0 12px; display:block;" id="storeUrlPreview">URL: achete.me/shopname</span>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
@@ -2231,7 +2242,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
       <div id="invViewCurrent">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <span style="font-size:0.86rem; font-weight:700; color:#334155;">Products Loaded in this Store:</span>
-          <button onclick="switchInvTab('add')" style="background:#0047bb; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
+          <button onclick="switchInvTab('add')" style="background:#6d2fe3; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
             + Add Another Product
           </button>
         </div>
@@ -2445,10 +2456,26 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button type="button" class="btn-modal-cancel" onclick="closeChangePinModal()" style="padding: 10px 18px; font-weight: 600; cursor: pointer;">Cancel</button>
-        <button type="button" class="btn-modal-confirm" id="btnSubmitChangePin" style="padding: 10px 20px; font-weight: 700; background: #7433df; color: white; border: none; border-radius: 8px; cursor: pointer;" onclick="submitChangePin()">
-          💾 Save New Password
+        <button type="button" class="btn-modal-confirm" id="btnSubmitChangePin" style="padding: 10px 20px; font-weight: 700; background: #6d2fe3; color: white; border: none; border-radius: 8px; cursor: pointer;" onclick="submitChangePin()">
+          Save New Password
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modern Reports Configuration Modal -->
+  <div class="restock-modal-overlay" id="reportsConfigModal" style="display:none; background: rgba(9, 9, 11, 0.65); backdrop-filter: blur(6px); z-index: 99999;">
+    <div class="restock-modal" style="max-width: 420px; width: 92%; text-align: center; padding: 32px 24px; border-radius: 16px; border: 1px solid #e4e4e7; background: #ffffff; box-shadow: 0 20px 45px rgba(0,0,0,0.2);">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: #f5f3ff; color: #6d2fe3; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 1px solid #ddd6fe;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6d2fe3" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: #09090b; margin-bottom: 6px;">Reports & Analytics</h3>
+      <p style="font-size: 0.84rem; color: #71717a; line-height: 1.5; margin-bottom: 22px;">
+        The sales reports and financial export module is currently under configuration. Advanced reporting will be active in the next release.
+      </p>
+      <button type="button" onclick="closeReportsModal()" style="width: 100%; padding: 11px 20px; font-weight: 700; background: #6d2fe3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.88rem; box-shadow: 0 2px 8px rgba(109,47,227,0.3);">
+        Got it
+      </button>
     </div>
   </div>
 
@@ -3105,7 +3132,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
                 <button type="button" onclick="openClientAddProductModal()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
                   ➕ Add First Product
                 </button>
-                <button type="button" onclick="openClientSheetImportModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
+                <button type="button" onclick="openClientSheetImportModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
                   📄 Import from Excel / CSV
                 </button>
               </div>
@@ -3136,7 +3163,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
             <td><span class="cat-badge furniture">${prod.category || 'General'}</span></td>
             <td>
               <div style="display:flex; align-items:center; gap:6px;">
-                <input type="number" id="client-price-${prod.id}" value="${price}" min="0" step="100" style="width:105px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; color:#0047bb;" title="Change selling price">
+                <input type="number" id="client-price-${prod.id}" value="${price}" min="0" step="100" style="width:105px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; color:#09090b;" title="Change selling price">
                 <button type="button" onclick="quickUpdatePriceInline(${prod.id})" title="Save Price" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:0.76rem; font-weight:700;">
                   💾
                 </button>
@@ -3149,15 +3176,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
             </td>
             <td>
               <div style="display:flex; align-items:center; gap:6px;">
-                <input type="number" id="client-receive-input-${prod.id}" value="10" min="1" max="5000" style="width:65px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1.5px solid #93c5fd; border-radius:6px; color:#081735; text-align:center;" title="Number of units received">
-                <button type="button" onclick="quickAddStockInline(${prod.id})" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.78rem; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px rgba(0,71,187,0.2);">
+                <input type="number" id="client-receive-input-${prod.id}" value="10" min="1" max="5000" style="width:65px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1.5px solid #ddd6fe; border-radius:6px; color:#081735; text-align:center;" title="Number of units received">
+                <button type="button" onclick="quickAddStockInline(${prod.id})" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.78rem; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px rgba(109,47,227,0.2);">
                   + Receive
                 </button>
               </div>
             </td>
             <td style="text-align: right;">
               <div style="display:flex; gap:6px; justify-content:flex-end;">
-                <button type="button" onclick="openClientStockReceiveModal(${prod.id})" title="Full Restock" style="background:#f8fafc; color:#0047bb; border:1px solid #cbd5e1; font-weight:700; font-size:0.78rem; padding:5px 9px; border-radius:6px; cursor:pointer;">
+                <button type="button" onclick="openClientStockReceiveModal(${prod.id})" title="Full Restock" style="background:#f8fafc; color:#6d2fe3; border:1px solid #cbd5e1; font-weight:700; font-size:0.78rem; padding:5px 9px; border-radius:6px; cursor:pointer;">
                   📦 Load
                 </button>
                 <button type="button" onclick="removeClientProduct(${prod.id})" title="Remove Product" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:5px 8px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.8rem;">
@@ -3318,7 +3345,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
     function generateProductPlaceholder(name) {
       const initial = (name || 'P').trim().charAt(0).toUpperCase();
-      const bgColors = ['#0047bb', '#081735', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
+      const bgColors = ['#6d2fe3', '#09090b', '#059669', '#7c3aed', '#d97706', '#dc2626', '#0284c7'];
       const colorIndex = (name || 'P').charCodeAt(0) % bgColors.length;
       const bgColor = bgColors[colorIndex];
       return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" rx="24" fill="${encodeURIComponent(bgColor)}"/><text x="50%" y="54%" font-family="Arial, sans-serif" font-weight="900" font-size="96" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
@@ -3443,12 +3470,27 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (!rawDashboardPayload) return;
       const periodData = (rawDashboardPayload.periods && rawDashboardPayload.periods[currentPeriod]) || rawDashboardPayload;
 
-      // 1. KPI Cards
+      // 1. KPI Cards (Monochrome Minimalist Overview)
       const kpi = periodData.kpi || {};
-      document.getElementById('kpiCompleted').textContent = kpi.orderCompleted || 0;
-      document.getElementById('kpiProgress').textContent = kpi.orderInProgress || 0;
-      document.getElementById('kpiSales').textContent = formatTZS(kpi.totalSales);
-      document.getElementById('kpiOutStock').textContent = (rawDashboardPayload.outOfStock || []).length;
+      const salesFormatted = formatTZS(kpi.totalSales);
+      
+      const kpiSalesEl = document.getElementById('kpiSales');
+      if (kpiSalesEl) kpiSalesEl.textContent = salesFormatted;
+
+      const kpiTotalEl = document.getElementById('kpiTotalBalance');
+      if (kpiTotalEl) kpiTotalEl.textContent = salesFormatted;
+
+      const kpiWeeklyEl = document.getElementById('kpiWeeklyPayments');
+      if (kpiWeeklyEl) kpiWeeklyEl.textContent = salesFormatted;
+
+      const kpiCompletedEl = document.getElementById('kpiCompleted');
+      if (kpiCompletedEl) kpiCompletedEl.textContent = kpi.orderCompleted || 0;
+
+      const kpiProgressEl = document.getElementById('kpiProgress');
+      if (kpiProgressEl) kpiProgressEl.textContent = kpi.orderInProgress || 0;
+
+      const kpiOutStockEl = document.getElementById('kpiOutStock');
+      if (kpiOutStockEl) kpiOutStockEl.textContent = (rawDashboardPayload.outOfStock || []).length;
       
       const sbStock = document.getElementById('sidebarStockBadge');
       if (sbStock) sbStock.textContent = (rawDashboardPayload.outOfStock || []).length;
@@ -3459,7 +3501,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const tableOutCount = document.getElementById('tableOutStockCount');
       if (tableOutCount) tableOutCount.textContent = (rawDashboardPayload.outOfStock || []).length;
 
-      // 2. Charts
+      // 2. Charts & Tables
       renderSalesChart();
       renderOrdersDonut(periodData.ordersSummary);
       renderTopSelling(periodData.topSelling);
@@ -3545,8 +3587,8 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
           <defs>
             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#0047bb" stop-opacity="0.32" />
-              <stop offset="100%" stop-color="#0047bb" stop-opacity="0.0" />
+              <stop offset="0%" stop-color="#6d2fe3" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#6d2fe3" stop-opacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -3559,17 +3601,17 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           <text x="${padLeft - 8}" y="${padTop + plotHeight + 3}" font-size="10" fill="#94a3b8" text-anchor="end" font-family="inherit">TZS 0</text>
 
           <path d="${areaD}" fill="url(#chartGradient)" />
-          <path d="${pathD}" fill="none" stroke="#0047bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="${pathD}" fill="none" stroke="#6d2fe3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
 
           ${plotPoints.map(p => `
-            <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#ffffff" stroke="#0047bb" stroke-width="2.5" />
+            <circle cx="${p.x}" cy="${p.y}" r="4" fill="#ffffff" stroke="#6d2fe3" stroke-width="2.5" />
             <text x="${p.x}" y="${padTop + plotHeight + 18}" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle" font-family="inherit">${p.label}</text>
           `).join('')}
 
           ${highestPoint.amount > 0 ? `
             <g transform="translate(${highestPoint.x}, ${Math.max(16, highestPoint.y - 18)})">
-              <rect x="-56" y="-24" width="112" height="22" rx="6" fill="#081735" />
-              <polygon points="-4,-2 4,-2 0,3" fill="#081735" />
+              <rect x="-56" y="-24" width="112" height="22" rx="6" fill="#09090b" />
+              <polygon points="-4,-2 4,-2 0,3" fill="#09090b" />
               <text x="0" y="-9" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="inherit">${formatTZS(highestPoint.amount)}</text>
             </g>
           ` : ''}
@@ -3825,10 +3867,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     window.submitChangePin = submitChangePin;
 
     function openReportsNotice() {
-      showDashToast('⚙️ Reports & Sales Analytics module is currently in configuration. Keep waiting.');
-      alert('Reports & Analytics module is currently in configuration. Keep waiting.');
+      const modal = document.getElementById('reportsConfigModal');
+      if (modal) modal.style.display = 'flex';
+    }
+    function closeReportsModal() {
+      const modal = document.getElementById('reportsConfigModal');
+      if (modal) modal.style.display = 'none';
     }
     window.openReportsNotice = openReportsNotice;
+    window.closeReportsModal = closeReportsModal;
 
     // =========================================================================
     // DEDICATED VIEW TAB ROUTING (Dashboard, Products, Categories, Inventory, Stores)
@@ -4666,21 +4713,41 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (!container) return;
 
       if (!recentOrders || recentOrders.length === 0) {
-        container.innerHTML = '<p style="font-size:0.84rem; color:#64748b; padding:12px 0; text-align:center;">No orders recorded yet.<br><span style="font-size:0.75rem;">Orders placed will appear here live!</span></p>';
+        container.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 36px 16px; color: #71717a; font-size: 0.86rem;">
+              No recent payments recorded
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      container.innerHTML = recentOrders.slice(0, 8).map((o, idx) => `
-        <div class="recent-order-item" onclick="openOrderDetailModal(${idx})" style="cursor:pointer; transition:background 0.15s ease; border-radius:6px; padding:8px 6px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'" title="Click to view full order details">
-          <div class="order-item-left">
-            <span class="order-item-id" style="color:#0047bb;" title="${o.fullRef || o.ref}">${o.ref || ('#' + (o.orderId || o.id))} &nearr;</span>
-            <span class="order-item-date">${o.customer || o.customerName || 'Store Customer'} &bull; ${o.date || ''}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="status-pill ${o.statusClass || 'completed'}">${o.status || 'Paid'}</span>
-            <span style="font-size:0.84rem; font-weight:700; color:#081735;">${formatTZS(o.amount || o.total)}</span>
-          </div>
-        </div>
+      container.innerHTML = recentOrders.slice(0, 10).map((o, idx) => `
+        <tr onclick="openOrderDetailModal(${idx})" style="cursor: pointer; transition: background 0.15s ease;" title="Click to view order details">
+          <td style="width: 28px;"><input type="checkbox" style="border-radius: 4px; accent-color: #6d2fe3;" onclick="event.stopPropagation()"></td>
+          <td>
+            <strong style="color: #6d2fe3; font-weight: 700;">${escapeHtml(o.ref || ('#' + (o.orderId || o.id)))}</strong>
+          </td>
+          <td>
+            <span style="font-size: 0.72rem; background: #f4f4f5; color: #52525b; padding: 2px 7px; border-radius: 4px; font-weight: 600;">Storefront</span>
+          </td>
+          <td>
+            <strong style="color: #09090b;">${escapeHtml(o.customer || o.customerName || 'Customer')}</strong>
+          </td>
+          <td style="color: #71717a; font-size: 0.82rem;">
+            ${escapeHtml(o.phone || '+255 7XX XXX XXX')}
+          </td>
+          <td>
+            <strong style="color: #09090b; font-size: 0.88rem;">${formatTZS(o.amount || o.total)}</strong>
+          </td>
+          <td>
+            <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #dcfce7; color: #15803d;">${escapeHtml(o.status || 'Paid')}</span>
+          </td>
+          <td style="text-align: right; color: #71717a; font-size: 0.8rem; white-space: nowrap;">
+            ${escapeHtml(o.date || 'Today')}
+          </td>
+        </tr>
       `).join('');
     }
 
@@ -5140,7 +5207,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
               <strong style="color:#081735; font-size:1rem; display:block; margin-bottom:4px;">No stock loaded yet for this store</strong>
               <p style="font-size:0.84rem; margin-bottom:12px;">Add brand new items or assign products from your Odoo ERP inventory.</p>
               <div style="display:flex; justify-content:center; gap:8px;">
-                <button onclick="switchInvTab('add')" style="background:#0047bb; color:#ffffff; padding:7px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer;">
+                <button onclick="switchInvTab('add')" style="background:#6d2fe3; color:#ffffff; padding:7px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer;">
                   ➕ Quick Add Product
                 </button>
                 <button onclick="switchInvTab('assign')" style="background:#f1f5f9; color:#0f172a; padding:7px 14px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; cursor:pointer;">
