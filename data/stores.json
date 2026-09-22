@@ -90,7 +90,28 @@
         "updatedAt": "2026-09-11T09:27:33.975Z"
       }
     },
-    "customProducts": [],
+    "customProducts": [
+      {
+        "id": 1001,
+        "name": "Apple Watch Ultra 2 Titanium (Updated)",
+        "category": "Smart Watches",
+        "price": 2100000,
+        "description": "Updated description",
+        "qty_available": 20,
+        "inStock": true,
+        "track_quantity": true,
+        "status": "Active",
+        "isDigital": false,
+        "image": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23059669\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">A</text></svg>",
+        "thumb": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\" viewBox=\"0 0 300 300\"><rect width=\"300\" height=\"300\" rx=\"24\" fill=\"%23059669\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"96\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">A</text></svg>",
+        "default_code": "SKU-1001",
+        "barcode": "",
+        "type": "consu",
+        "rating": 5,
+        "reviews": 1,
+        "createdAt": "2026-09-22T14:33:53.513Z"
+      }
+    ],
     "banner": "/assets/stores/simukitaa-banner.jpg"
   },
   {
