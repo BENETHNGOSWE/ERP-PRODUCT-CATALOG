@@ -531,22 +531,24 @@
     }
 
     .btn-clean-viewall {
-      background: #09090b;
+      background: #6d2fe3;
       color: #ffffff;
       border: none;
       border-radius: 8px;
-      padding: 6px 12px;
+      padding: 6px 14px;
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(109, 47, 227, 0.25);
     }
 
     .btn-clean-viewall:hover {
-      background: #27272a;
+      background: #5b21b6;
+      box-shadow: 0 4px 12px rgba(109, 47, 227, 0.35);
     }
 
     .dash-table-clean {
@@ -1135,12 +1137,16 @@
       }
 
       .date-range-btn,
-      .btn-sync-odoo,
       .btn-export-report,
       #btnWaGatewayHeader {
         width: 100% !important;
         justify-content: center !important;
         box-sizing: border-box !important;
+      }
+
+      #btnSyncOdoo,
+      .desktop-only-refresh-btn {
+        display: none !important;
       }
 
       .kpi-grid {
@@ -1523,8 +1529,8 @@
             <button class="period-tab-btn" id="tabAll" onclick="setPeriod('all')">All Time</button>
           </div>
 
-          <!-- Web Refresh Icon Button (Sleek monochrome circle matching mobile) -->
-          <button class="dash-icon-btn" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Refresh Live Data" style="width: 38px; height: 38px; border-radius: 8px; background: #ffffff; border: 1px solid #e4e4e7; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #09090b; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.15s ease;">
+          <!-- Web Refresh Icon Button (Sleek monochrome circle - Desktop only) -->
+          <button class="dash-icon-btn desktop-only-refresh-btn" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Refresh Live Data" style="width: 38px; height: 38px; border-radius: 8px; background: #ffffff; border: 1px solid #e4e4e7; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #09090b; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.15s ease;">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           </button>
         </div>
@@ -1577,26 +1583,28 @@
           </div>
         </section>
 
-        <!-- Quick Action Feature Cards (SELL Payment Pages & DELIVER Content Delivery) -->
+        <!-- Quick Action Feature Cards (Total Stock Valuation & Total Items in Stock) -->
         <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <!-- Card 1: Payment Pages -->
-          <div class="dash-action-card" onclick="switchDashboardTab('products')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-              <span class="action-tag">SELL</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <!-- Card 1: Total Stock Valuation -->
+          <div class="dash-action-card" onclick="switchDashboardTab('inventory')" title="Click to view inventory details">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <span class="action-tag">VALUATION</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
             </div>
-            <h3 style="font-size: 1rem; font-weight: 700; color: #09090b; margin: 0 0 4px;">Payment Pages</h3>
-            <p style="font-size: 0.8rem; color: #71717a; margin: 0;">Create pages to sell products & services</p>
+            <div style="font-size: 0.82rem; color: #71717a; font-weight: 600; margin-bottom: 4px;">Total Stock Valuation</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: #09090b; letter-spacing: -0.5px;" id="kpiStockValuation">TZS 0</div>
+            <p style="font-size: 0.74rem; color: #71717a; margin: 4px 0 0;" id="kpiStockValuationSub">Total inventory capital value</p>
           </div>
 
-          <!-- Card 2: Content Delivery -->
-          <div class="dash-action-card" onclick="switchDashboardTab('inventory')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-              <span class="action-tag">DELIVER</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <!-- Card 2: Total Items in Stock -->
+          <div class="dash-action-card" onclick="switchDashboardTab('inventory')" title="Click to view inventory details">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <span class="action-tag">INVENTORY</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             </div>
-            <h3 style="font-size: 1rem; font-weight: 700; color: #09090b; margin: 0 0 4px;">Content Delivery</h3>
-            <p style="font-size: 0.8rem; color: #71717a; margin: 0;">Track digital product fulfillment</p>
+            <div style="font-size: 0.82rem; color: #71717a; font-weight: 600; margin-bottom: 4px;">Total Items in Stock</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: #09090b; letter-spacing: -0.5px;" id="kpiTotalStockUnits">0 units</div>
+            <p style="font-size: 0.74rem; color: #71717a; margin: 4px 0 0;" id="kpiTotalStockUnitsSub">Active units across inventory</p>
           </div>
         </section>
 
@@ -1678,7 +1686,7 @@
 
             <!-- Top Action Bar -->
             <div style="display: flex; gap: 8px; align-items: center;">
-              <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; font-size: 0.85rem; padding: 8px 18px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(22,163,74,0.25); cursor: pointer;" onclick="openNewProductDrawer()">
+              <button type="button" class="btn-restock" style="background: #6d2fe3; color: #ffffff; font-weight: 700; font-size: 0.85rem; padding: 8px 18px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(109,47,227,0.25); cursor: pointer;" onclick="openNewProductDrawer()">
                 + New Product
               </button>
             </div>
@@ -1687,7 +1695,7 @@
           <!-- Filter / Search Toolbar (Screenshot 1 Match) -->
           <div style="margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             <div style="flex: 1; min-width: 240px; position: relative;">
-              <input type="text" id="catalogSearchInput" placeholder="🔍 Search products by name, category or SKU..." oninput="filterCatalogTable()" style="width: 100%; padding: 9px 14px; font-size: 0.84rem; border: 1.5px solid #e2e8f0; border-radius: 8px; outline: none; box-sizing: border-box;">
+              <input type="text" id="catalogSearchInput" placeholder="Search products by name, category or SKU..." oninput="filterCatalogTable()" style="width: 100%; padding: 9px 14px; font-size: 0.84rem; border: 1.5px solid #e2e8f0; border-radius: 8px; outline: none; box-sizing: border-box;">
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
               <select id="catalogCategoryFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
@@ -1766,7 +1774,7 @@
           <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <h2 class="card-title" style="display:flex; align-items:center; gap:8px;">
-                <span>🏪 Store Inventory & Stock Management</span>
+                <span>Store Inventory & Stock Management</span>
                 <span id="clientProdCountBadge" style="font-size:0.75rem; background:#ede9fe; color:#6d28d9; padding:2px 8px; border-radius:12px; font-weight:700;">0 products</span>
               </h2>
               <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
@@ -1775,20 +1783,20 @@
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button type="button" onclick="openClientStockReceiveModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
-                <span>📦 Load / Receive Stock</span>
+                <span>Load / Receive Stock</span>
               </button>
-              <button type="button" onclick="openNewProductDrawer()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                <span>➕ Add Product</span>
+              <button type="button" onclick="openNewProductDrawer()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
+                <span>Add Product</span>
               </button>
               <button type="button" onclick="openClientSheetImportModal()" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:0.82rem; padding:8px 14px; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                <span>📄 Import Sheet</span>
+                <span>Import Sheet</span>
               </button>
             </div>
           </div>
 
           <!-- Search / Filter Bar -->
           <div style="margin: 14px 0 16px; display:flex; gap:10px;">
-            <input type="text" id="clientInvSearchInput" placeholder="🔍 Search your products by name, category or SKU..." oninput="filterClientInventoryTable()" style="flex:1; padding:9px 14px; font-size:0.84rem; border:1.5px solid #e2e8f0; border-radius:8px; outline:none; box-sizing:border-box;">
+            <input type="text" id="clientInvSearchInput" placeholder="Search your products by name, category or SKU..." oninput="filterClientInventoryTable()" style="flex:1; padding:9px 14px; font-size:0.84rem; border:1.5px solid #e2e8f0; border-radius:8px; outline:none; box-sizing:border-box;">
           </div>
 
           <div style="overflow-x: auto;">
@@ -1823,7 +1831,7 @@
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
               <button class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:6px 12px;" onclick="cleanupBotStores()">
-                🧹 Clean Bot Stores
+                Clean Bot Stores
               </button>
               <button class="btn-create-store-action" onclick="openCreateStoreModal()">+ Add New Client Store</button>
             </div>
@@ -1857,7 +1865,7 @@
   <div class="restock-modal-overlay" id="clientStockReceiveModal" style="display:none;">
     <div class="restock-modal" style="max-width: 480px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-        <h3 class="modal-title" style="margin:0;">📦 Receive Stock Delivery</h3>
+        <h3 class="modal-title" style="margin:0;">Receive Stock Delivery</h3>
         <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientStockReceiveModal()">&times;</button>
       </div>
       <p style="font-size:0.84rem; color:#64748b; margin-bottom:14px;">
@@ -1892,7 +1900,7 @@
       <div class="modal-actions" style="margin-top:18px;">
         <button type="button" class="btn-modal-cancel" onclick="closeClientStockReceiveModal()">Cancel</button>
         <button type="button" class="btn-modal-confirm" id="btnConfirmClientReceive" onclick="submitClientStockReceive()">
-          ✅ Save Received Stock
+          Save Received Stock
         </button>
       </div>
     </div>
@@ -1902,7 +1910,7 @@
   <div class="restock-modal-overlay" id="clientAddProductModal" style="display:none;">
     <div class="restock-modal" style="max-width: 500px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-        <h3 class="modal-title" style="margin:0;">➕ Add Product to My Store</h3>
+        <h3 class="modal-title" style="margin:0;">Add Product to My Store</h3>
         <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientAddProductModal()">&times;</button>
       </div>
       <p style="font-size:0.84rem; color:#64748b; margin-bottom:14px;">
@@ -1952,15 +1960,15 @@
               <input type="file" id="clientProductImageFileInput" accept="image/*" style="display:none;" onchange="handleClientProductImgSelect(event)">
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 <button type="button" onclick="document.getElementById('clientProductImageFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.78rem; font-weight:700; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-                  📁 Upload Photo
+                  Upload Photo
                 </button>
                 <select id="clientNewProdImagePresets" class="modal-input" style="width:auto; font-size:0.78rem; padding:5px 8px;" onchange="setClientProductPresetImage(this.value)">
                   <option value="">Or choose preset...</option>
-                  <option value="/assets/products/samsung_charger.png">📱 Smartphone & Tech</option>
-                  <option value="/assets/products/coca_cola.png">🥤 Drinks & Beverages</option>
-                  <option value="/assets/products/nivea_lotion.png">🧴 Cosmetics & Care</option>
-                  <option value="/assets/products/redbull.png">⚡ Energy & Food</option>
-                  <option value="/assets/products/logo.png">🛍️ General Goods</option>
+                  <option value="/assets/products/samsung_charger.png">Smartphones & Tech</option>
+                  <option value="/assets/products/coca_cola.png">Drinks & Beverages</option>
+                  <option value="/assets/products/nivea_lotion.png">Cosmetics & Personal Care</option>
+                  <option value="/assets/products/redbull.png">Food & Beverages</option>
+                  <option value="/assets/products/logo.png">General Goods</option>
                 </select>
               </div>
               <input type="hidden" id="clientNewProdImageData" value="/assets/products/samsung_charger.png">
@@ -1971,7 +1979,7 @@
         <div class="modal-actions" style="margin-top:14px;">
           <button type="button" class="btn-modal-cancel" onclick="closeClientAddProductModal()">Cancel</button>
           <button type="submit" class="btn-modal-confirm" id="btnSubmitClientNewProd">
-            ➕ Add to Store Catalog
+            Add to Store Catalog
           </button>
         </div>
       </form>
@@ -1982,7 +1990,7 @@
   <div class="restock-modal-overlay" id="clientSheetImportModal" style="display:none;">
     <div class="restock-modal" style="max-width: 540px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-        <h3 class="modal-title" style="margin:0;">📄 Import Stock from Sheet / CSV</h3>
+        <h3 class="modal-title" style="margin:0;">Import Stock from Sheet / CSV</h3>
         <button type="button" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#64748b;" onclick="closeClientSheetImportModal()">&times;</button>
       </div>
       <p style="font-size:0.84rem; color:#64748b; margin-bottom:10px;">
@@ -1996,7 +2004,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
       <div class="modal-actions" style="margin-top:16px;">
         <button type="button" class="btn-modal-cancel" onclick="closeClientSheetImportModal()">Cancel</button>
         <button type="button" class="btn-modal-confirm" id="btnSubmitClientSheetImport" onclick="submitClientSheetImport()">
-          📥 Import All Stock to Store
+          Import All Stock to Store
         </button>
       </div>
     </div>
@@ -2007,7 +2015,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
     <div class="restock-modal" style="max-width: 520px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.4rem;">🧾</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6d2fe3" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <div>
             <h3 class="modal-title" id="orderModalRef" style="margin:0; font-size:1.08rem; color:#081735;">Order Details</h3>
             <span id="orderModalDate" style="font-size:0.75rem; color:#64748b;">Today</span>
@@ -2055,7 +2063,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
   <!-- Restock Modal -->
   <div class="restock-modal-overlay" id="restockModal">
     <div class="restock-modal">
-      <h3 class="modal-title">⚡ 1-Click Odoo Restock</h3>
+      <h3 class="modal-title">Restock Product</h3>
       <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; font-size:0.84rem; display:flex; flex-direction:column; gap:4px;">
         <strong id="modalProdName">Product Name</strong>
         <span style="color:#64748b;" id="modalProdSku">SKU: ---</span>
@@ -2088,7 +2096,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
         <!-- Logo -->
         <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">🏪 Store Logo</label>
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">Store Logo</label>
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 50px; height: 50px; border-radius: 50%; background: #ffffff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
               <img id="storeModalLogoPreview" src="/assets/achete-icon.svg" alt="Logo Preview" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
@@ -2096,7 +2104,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
             <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
               <input type="file" id="storeModalLogoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
               <button type="button" onclick="document.getElementById('storeModalLogoFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
-                📁 Upload Logo
+                Upload Logo
               </button>
               <input type="text" id="storeModalLogoUrl" class="modal-input" placeholder="Or paste logo URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleLogoUrlInput()">
             </div>
@@ -2107,13 +2115,13 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
         <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">📸 Shop Banner (Physical Signboard)</label>
-              <span style="font-size:0.7rem; color:#6d2fe3; font-weight:700;">📐 Optimal: 1500 × 250 px (6:1 Signboard Ratio)</span>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#334155;">Shop Banner (Signboard)</label>
+              <span style="font-size:0.7rem; color:#6d2fe3; font-weight:700;">Optimal: 1500 × 250 px (6:1 Ratio)</span>
             </div>
             <select id="storeModalBannerPreset" onchange="applyStoreBannerPreset(this.value)" style="font-size:0.72rem; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; background:#ffffff; color:#0f172a;">
               <option value="">Choose preset...</option>
-              <option value="/assets/stores/simukitaa-banner.jpg">🏪 Simukitaa Signboard</option>
-              <option value="/assets/stores/koda-store-banner.jpg">⚡ Koda Tech Glass Store</option>
+              <option value="/assets/stores/simukitaa-banner.jpg">Simukitaa Signboard</option>
+              <option value="/assets/stores/koda-store-banner.jpg">Koda Tech Signboard</option>
             </select>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
@@ -2123,7 +2131,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
             <div style="display:flex; flex-direction:column; gap: 4px; flex:1;">
               <input type="file" id="storeModalBannerFileInput" accept="image/*" style="display:none;" onchange="handleBannerFileSelect(event)">
               <button type="button" onclick="document.getElementById('storeModalBannerFileInput').click()" style="background:#6d2fe3; color:#ffffff; font-size:0.75rem; font-weight:700; padding:5px 10px; border:none; border-radius:6px; cursor:pointer;">
-                📷 Upload Shop Photo
+                Upload Shop Photo
               </button>
               <input type="text" id="storeModalBannerUrl" class="modal-input" placeholder="Or paste banner image URL..." style="font-size: 0.74rem; padding: 4px 8px; margin:0;" oninput="handleBannerUrlInput()">
             </div>
@@ -2197,7 +2205,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
 
       <div class="modal-actions" style="margin-top: 20px; display:flex; justify-content:space-between; align-items:center;">
         <button type="button" id="btnDeleteStore" onclick="deleteCurrentStore()" style="display:none; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:8px 14px; border-radius:6px; font-weight:700; font-size:0.82rem; cursor:pointer;">
-          🗑️ Delete Store
+          Delete Store
         </button>
         <div style="display:flex; gap:10px; margin-left:auto;">
           <button class="btn-modal-cancel" onclick="closeStoreModal()">Cancel</button>
@@ -2226,7 +2234,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           <button onclick="openEditStoreModal(activeInvStoreId)" style="background:#f3ebfc; color:#7433df; border:1px solid #c4b5fd; font-size:0.78rem; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer;">
-            ⚙️ Edit Store & Banner
+            Edit Store & Banner
           </button>
           <button style="border:none; background:transparent; font-size:1.6rem; cursor:pointer; color:#64748b;" onclick="closeStoreInventoryModal()">&times;</button>
         </div>
@@ -2234,10 +2242,10 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
 
       <!-- Inventory Tabs -->
       <div style="display:flex; gap:8px; border-bottom:1.5px solid #e2e8f0; margin-bottom:18px; overflow-x:auto;">
-        <button class="period-tab-btn active" id="tabInvCurrent" onclick="switchInvTab('current')">📋 Store Products (<span id="tabCountBadge">0</span>)</button>
-        <button class="period-tab-btn" id="tabInvAdd" onclick="switchInvTab('add')">➕ Quick Add Product</button>
-        <button class="period-tab-btn" id="tabInvAssign" onclick="switchInvTab('assign')">🔍 Pick from Odoo ERP</button>
-        <button class="period-tab-btn" id="tabInvImport" onclick="switchInvTab('import')">📥 Bulk CSV Import</button>
+        <button class="period-tab-btn active" id="tabInvCurrent" onclick="switchInvTab('current')">Store Products (<span id="tabCountBadge">0</span>)</button>
+        <button class="period-tab-btn" id="tabInvAdd" onclick="switchInvTab('add')">Quick Add Product</button>
+        <button class="period-tab-btn" id="tabInvAssign" onclick="switchInvTab('assign')">Pick from Odoo ERP</button>
+        <button class="period-tab-btn" id="tabInvImport" onclick="switchInvTab('import')">Bulk CSV Import</button>
       </div>
 
       <!-- TAB 1: CURRENT STORE INVENTORY -->
@@ -2311,7 +2319,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
             <div style="display:flex; gap:8px; align-items:center;">
               <input type="file" id="newProdImageFile" accept="image/*" style="display:none;" onchange="handleNewProdImageFile(event)">
               <button type="button" onclick="document.getElementById('newProdImageFile').click()" style="background:#ffffff; color:#0f172a; font-size:0.8rem; font-weight:700; padding:8px 14px; border:1.5px solid #cbd5e1; border-radius:6px; cursor:pointer;">
-                📁 Upload Photo
+                Upload Photo
               </button>
               <input type="text" id="newProdImageUrl" class="modal-input" placeholder="Or paste image URL (https://...)" style="flex:1;">
             </div>
@@ -2322,7 +2330,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
 
           <div style="margin-top:18px; text-align:right;">
             <button class="btn-modal-confirm" id="btnSubmitAddProd" onclick="submitQuickAddProduct()" style="padding:10px 20px;">
-              ➕ Save &amp; Add to Store Stock
+              Save &amp; Add to Store Stock
             </button>
           </div>
         </div>
@@ -2331,7 +2339,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
       <!-- TAB 3: PICK & ASSIGN FROM ODOO ERP -->
       <div id="invViewAssign" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <input type="text" id="searchErpProds" class="modal-input" placeholder="🔍 Filter Odoo ERP products by name, category, SKU..." oninput="filterErpProdsList()" style="max-width:380px;">
+          <input type="text" id="searchErpProds" class="modal-input" placeholder="Filter Odoo ERP products by name, category, SKU..." oninput="filterErpProdsList()" style="max-width:380px;">
           <div style="display:flex; gap:8px;">
             <button type="button" onclick="toggleSelectAllErpProds(true)" style="background:#f1f5f9; color:#334155; font-size:0.78rem; font-weight:600; padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
               Select All
@@ -2362,7 +2370,7 @@ USB-C Fast Cable 65W, Accessories, 25000, 50, CBL-65W"></textarea>
         <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.82rem; color:#64748b;" id="erpSelectionSummary">0 products selected</span>
           <button class="btn-modal-confirm" id="btnSubmitAssignProds" onclick="submitAssignErpProducts()" style="padding:10px 22px;">
-            💾 Save Assigned Products to Store
+            Save Assigned Products to Store
           </button>
         </div>
       </div>
@@ -2381,7 +2389,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
           <div style="margin-top:14px; text-align:right;">
             <button class="btn-modal-confirm" id="btnSubmitBulkImport" onclick="submitBulkImport()" style="padding:10px 22px;">
-              🚀 Import Inventory into Store
+              Import Inventory into Store
             </button>
           </div>
         </div>
@@ -2421,7 +2429,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     <div class="restock-modal" style="max-width: 440px; width: 92%; padding: 26px; border-radius: 18px; box-shadow: 0 20px 45px rgba(0,0,0,0.3);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.4rem;">🔐</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6d2fe3" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <h3 style="font-size: 1.15rem; font-weight: 800; color: #081735; margin:0;">Change Store Password / PIN</h3>
         </div>
         <button type="button" onclick="closeChangePinModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
@@ -2486,7 +2494,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     <div class="restock-modal" style="max-width: 580px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.4rem;">📲</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6d2fe3" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <h3 style="font-size: 1.15rem; font-weight: 800; color: #081735; margin:0;">WhatsApp Gateway Integration</h3>
         </div>
         <button style="border:none; background:transparent; font-size:1.6rem; cursor:pointer; color:#64748b;" onclick="closeWhatsAppConfigModal()">&times;</button>
@@ -2560,11 +2568,11 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       <!-- Live Test Dispatch Box -->
       <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:14px; margin-top:18px;">
-        <strong style="color:#166534; font-size:0.88rem; display:block; margin-bottom:6px;">⚡ Live WhatsApp Message Tester</strong>
+        <strong style="color:#166534; font-size:0.88rem; display:block; margin-bottom:6px;">Live WhatsApp Message Tester</strong>
         <p style="font-size:0.78rem; color:#15803d; margin-bottom:8px;">Enter your phone number to test direct delivery to your WhatsApp right now:</p>
         <div style="display:flex; gap:8px;">
           <input type="tel" id="waTestTargetPhone" class="modal-input" placeholder="+255 710 459 064" style="background:#ffffff;">
-          <button type="button" id="btnRunWaTest" onclick="runLiveWhatsAppTest()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+          <button type="button" id="btnRunWaTest" onclick="runLiveWhatsAppTest()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
             Send Test
           </button>
         </div>
@@ -2704,7 +2712,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       <!-- Drawer Footer -->
       <div class="drawer-footer">
         <button type="button" class="btn-modal-cancel" onclick="closeProductSlideDrawer()" style="padding: 10px 18px; font-weight: 600;">Cancel</button>
-        <button type="button" class="btn-modal-confirm" id="btnSaveDrawerProduct" style="background: #16a34a; color: #ffffff; padding: 10px 24px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(22,163,74,0.3);" onclick="submitDrawerProduct()">
+        <button type="button" class="btn-modal-confirm" id="btnSaveDrawerProduct" style="background: #6d2fe3; color: #ffffff; padding: 10px 24px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(109,47,227,0.3);" onclick="submitDrawerProduct()">
           Save Product
         </button>
       </div>
@@ -2716,7 +2724,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     <div class="restock-modal" style="max-width: 480px; width: 92%; padding: 24px; border-radius: 16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.4rem;">🏷️</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6d2fe3" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           <h3 style="font-size: 1.15rem; font-weight: 800; color: #081735; margin:0;">Store Categories</h3>
         </div>
         <button type="button" onclick="closeCategoriesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
@@ -2889,7 +2897,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
         sessionStorage.setItem('store_auth_' + currentStoreSlug, 'true');
         document.getElementById('storeLoginModal').style.display = 'none';
-        showDashToast(`👋 Welcome to ${data.store ? data.store.name : currentStoreSlug} Admin Dashboard!`);
+        showDashToast(`Welcome to ${data.store ? data.store.name : currentStoreSlug} Admin Dashboard!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         if (errBox) {
@@ -2906,24 +2914,32 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       currentPeriod = period;
       document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
 
+      const dateTextEl = document.getElementById('dateRangeText');
+      const periodSelectEl = document.getElementById('periodSelect');
+
       if (period === 'today') {
-        document.getElementById('tabToday').classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'Today: Sep 01, 2026';
-        document.getElementById('periodSelect').value = 'hourly';
+        const t = document.getElementById('tabToday');
+        if (t) t.classList.add('active');
+        if (dateTextEl) dateTextEl.textContent = 'Today: Sep 22, 2026';
+        if (periodSelectEl) periodSelectEl.value = 'hourly';
       } else if (period === 'week') {
-        document.getElementById('tabWeek').classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'This Week: Aug 26 – Sep 01';
-        document.getElementById('periodSelect').value = 'daily';
+        const t = document.getElementById('tabWeek');
+        if (t) t.classList.add('active');
+        if (dateTextEl) dateTextEl.textContent = 'This Week: Sep 16 – Sep 22';
+        if (periodSelectEl) periodSelectEl.value = 'daily';
       } else if (period === 'month') {
-        document.getElementById('tabMonth').classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'This Month: Sep 2026';
-        document.getElementById('periodSelect').value = 'weekly';
+        const t = document.getElementById('tabMonth');
+        if (t) t.classList.add('active');
+        if (dateTextEl) dateTextEl.textContent = 'This Month: Sep 2026';
+        if (periodSelectEl) periodSelectEl.value = 'weekly';
       } else if (period === 'all') {
-        document.getElementById('tabAll').classList.add('active');
-        document.getElementById('dateRangeText').textContent = 'All Time History';
-        document.getElementById('periodSelect').value = 'monthly';
+        const t = document.getElementById('tabAll');
+        if (t) t.classList.add('active');
+        if (dateTextEl) dateTextEl.textContent = 'All Time History';
+        if (periodSelectEl) periodSelectEl.value = 'monthly';
       }
 
+      // Immediately recompute and render KPI values, valuation, total stock, and charts without needing manual refresh
       renderCurrentPeriod();
     }
 
@@ -2968,7 +2984,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         }
 
         if (isManual) {
-          showDashToast(`✅ Live data synced successfully!`);
+          showDashToast(`Live data synced successfully!`);
         }
       } catch (err) {
         console.error('Error loading dashboard data:', err);
@@ -3000,7 +3016,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (titleEl) titleEl.textContent = `${store.name} Dashboard`;
       
       const headerStatusText = document.getElementById('headerStatusText');
-      if (headerStatusText) headerStatusText.textContent = `🟢 Store Online • ${store.name} (${store.whatsapp || ''})`;
+      if (headerStatusText) headerStatusText.textContent = `Store Online • ${store.name} (${store.whatsapp || ''})`;
 
       const btnSyncText = document.getElementById('btnSyncOdooText');
       if (btnSyncText) btnSyncText.textContent = 'Refresh';
@@ -3127,15 +3143,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         tbody.innerHTML = `
           <tr>
             <td colspan="6" style="text-align:center; padding:36px 16px; color:#64748b;">
-              <div style="font-size:2.2rem; margin-bottom:8px;">📦</div>
+              <div style="display:flex; justify-content:center; margin-bottom:8px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
               <strong style="color:#081735; font-size:1.05rem; display:block; margin-bottom:4px;">No products in your catalog yet</strong>
               <p style="font-size:0.84rem; margin-bottom:14px;">Start by adding your first product or receiving a shipment delivery!</p>
               <div style="display:flex; justify-content:center; gap:8px;">
-                <button type="button" onclick="openClientAddProductModal()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
-                  ➕ Add First Product
+                <button type="button" onclick="openClientAddProductModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
+                  Add First Product
                 </button>
                 <button type="button" onclick="openClientSheetImportModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.84rem; padding:8px 16px; border:none; border-radius:8px; cursor:pointer;">
-                  📄 Import from Excel / CSV
+                  Import from Excel / CSV
                 </button>
               </div>
             </td>
@@ -3167,7 +3183,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
               <div style="display:flex; align-items:center; gap:6px;">
                 <input type="number" id="client-price-${prod.id}" value="${price}" min="0" step="100" style="width:105px; padding:6px 8px; font-size:0.84rem; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; color:#09090b;" title="Change selling price">
                 <button type="button" onclick="quickUpdatePriceInline(${prod.id})" title="Save Price" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:0.76rem; font-weight:700;">
-                  💾
+                  Save
                 </button>
               </div>
             </td>
@@ -3187,7 +3203,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
             <td style="text-align: right;">
               <div style="display:flex; gap:6px; justify-content:flex-end;">
                 <button type="button" onclick="openClientStockReceiveModal(${prod.id})" title="Full Restock" style="background:#f8fafc; color:#6d2fe3; border:1px solid #cbd5e1; font-weight:700; font-size:0.78rem; padding:5px 9px; border-radius:6px; cursor:pointer;">
-                  📦 Load
+                  Load
                 </button>
                 <button type="button" onclick="removeClientProduct(${prod.id})" title="Remove Product" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:5px 8px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.8rem;">
                   ✕
@@ -3228,7 +3244,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast(`📦 Added +${addQty} stock units!`);
+        showDashToast(`Added +${addQty} stock units!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Stock update error: ' + err.message);
@@ -3248,7 +3264,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast(`💾 Price updated to ${formatTZS(newPrice)}!`);
+        showDashToast(`Price updated to ${formatTZS(newPrice)}!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Price update error: ' + err.message);
@@ -3321,13 +3337,13 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         if (!data.success) throw new Error(data.error || 'Failed');
 
         closeClientStockReceiveModal();
-        showDashToast(`✅ Successfully received +${addQty} stock units!`);
+        showDashToast(`Successfully received +${addQty} stock units!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Error saving stock: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '✅ Save Received Stock';
+        btn.textContent = 'Save Received Stock';
       }
     }
 
@@ -3384,13 +3400,13 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         if (!data.success) throw new Error(data.error || 'Failed to create product');
 
         closeClientAddProductModal();
-        showDashToast(`🎉 Product "${payload.name}" added with ${payload.initialStock} units!`);
+        showDashToast(`Product "${payload.name}" added with ${payload.initialStock} units!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Error creating product: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '➕ Add to Store Catalog';
+        btn.textContent = 'Add to Store Catalog';
       }
     }
 
@@ -3441,13 +3457,13 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         if (!data.success) throw new Error(data.error || 'Failed to import stock');
 
         closeClientSheetImportModal();
-        showDashToast(`📥 Imported ${data.importedCount || items.length} products to your store!`);
+        showDashToast(`Imported ${data.importedCount || items.length} products to your store!`);
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Import error: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '📥 Import All Stock to Store';
+        btn.textContent = 'Import All Stock to Store';
       }
     }
 
@@ -3468,36 +3484,69 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
     }
 
+    function calculateStockStats(products) {
+      let totalValuation = 0;
+      let totalStockUnits = 0;
+      (products || []).forEach(p => {
+        const stock = Number(p.qty_available !== undefined ? p.qty_available : (p.storeStock || 0)) || 0;
+        const price = Number(p.price !== undefined ? p.price : (p.storePrice || 0)) || 0;
+        if (stock > 0) {
+          totalStockUnits += stock;
+          totalValuation += (stock * price);
+        }
+      });
+      return { totalValuation, totalStockUnits };
+    }
+
     function renderCurrentPeriod() {
       if (!rawDashboardPayload) return;
       const periodData = (rawDashboardPayload.periods && rawDashboardPayload.periods[currentPeriod]) || rawDashboardPayload;
 
       // 1. KPI Cards (Clean Monochrome Overview: Total Sales, Order Completed, Order On Progress, Products Out of Stock)
       const kpi = periodData.kpi || {};
-      const salesFormatted = formatTZS(kpi.totalSales);
+      const totalSales = (kpi.totalSales !== undefined) ? kpi.totalSales : (rawDashboardPayload.kpi ? rawDashboardPayload.kpi.totalSales : 0);
+      const orderCompleted = (kpi.orderCompleted !== undefined) ? kpi.orderCompleted : (rawDashboardPayload.kpi ? rawDashboardPayload.kpi.orderCompleted : 0);
+      const orderInProgress = (kpi.orderInProgress !== undefined) ? kpi.orderInProgress : (rawDashboardPayload.kpi ? rawDashboardPayload.kpi.orderInProgress : 0);
+      const outOfStockCount = (rawDashboardPayload.outOfStock || []).length;
       
       const kpiSalesEl = document.getElementById('kpiSales');
-      if (kpiSalesEl) kpiSalesEl.textContent = salesFormatted;
+      if (kpiSalesEl) kpiSalesEl.textContent = formatTZS(totalSales);
 
       const kpiCompletedEl = document.getElementById('kpiCompleted');
-      if (kpiCompletedEl) kpiCompletedEl.textContent = kpi.orderCompleted || 0;
+      if (kpiCompletedEl) kpiCompletedEl.textContent = orderCompleted;
 
       const kpiProgressEl = document.getElementById('kpiProgress');
-      if (kpiProgressEl) kpiProgressEl.textContent = kpi.orderInProgress || 0;
+      if (kpiProgressEl) kpiProgressEl.textContent = orderInProgress;
 
       const kpiOutStockEl = document.getElementById('kpiOutStock');
-      if (kpiOutStockEl) kpiOutStockEl.textContent = (rawDashboardPayload.outOfStock || []).length;
+      if (kpiOutStockEl) kpiOutStockEl.textContent = outOfStockCount;
+
+      // 2. Action Cards: Total Stock Valuation & Total Items in Stock
+      const prods = (currentClientProducts && currentClientProducts.length > 0) ? currentClientProducts : (rawDashboardPayload.products || []);
+      const { totalValuation, totalStockUnits } = calculateStockStats(prods);
+
+      const valEl = document.getElementById('kpiStockValuation');
+      if (valEl) valEl.textContent = formatTZS(totalValuation);
+
+      const valSub = document.getElementById('kpiStockValuationSub');
+      if (valSub) valSub.textContent = `Capital across ${prods.length} products`;
+
+      const unitsEl = document.getElementById('kpiTotalStockUnits');
+      if (unitsEl) unitsEl.textContent = `${totalStockUnits.toLocaleString('en-US')} units`;
+
+      const unitsSub = document.getElementById('kpiTotalStockUnitsSub');
+      if (unitsSub) unitsSub.textContent = `Active units on hand`;
       
       const sbStock = document.getElementById('sidebarStockBadge');
-      if (sbStock) sbStock.textContent = (rawDashboardPayload.outOfStock || []).length;
+      if (sbStock) sbStock.textContent = outOfStockCount;
 
       const sbStores = document.getElementById('sidebarStoresBadge');
       if (sbStores) sbStores.textContent = storesList.length || 4;
 
       const tableOutCount = document.getElementById('tableOutStockCount');
-      if (tableOutCount) tableOutCount.textContent = (rawDashboardPayload.outOfStock || []).length;
+      if (tableOutCount) tableOutCount.textContent = outOfStockCount;
 
-      // 2. Charts & Tables
+      // 3. Charts & Tables
       renderSalesChart();
       renderOrdersDonut(periodData.ordersSummary);
       renderTopSelling(periodData.topSelling);
@@ -3836,7 +3885,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         }
 
         if (succBox) {
-          succBox.textContent = '✅ ' + (data.message || 'Password/PIN updated successfully!');
+          succBox.textContent = '' + (data.message || 'Password/PIN updated successfully!');
           succBox.style.display = 'block';
         }
         showNotification('Store Password/PIN updated successfully!', 'success');
@@ -3852,7 +3901,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = '💾 Save New Password';
+          btn.textContent = 'Save New Password';
         }
       }
     }
@@ -3916,6 +3965,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const titleEl = document.getElementById('dashPageMainTitle');
       const periodTabsWrap = document.getElementById('dashPeriodTabsWrap');
       const dateRangeWrap = document.getElementById('dashDateRangeWrap');
+      const refreshBtn = document.getElementById('btnSyncOdoo');
 
       const storeName = rawDashboardPayload?.store?.name || (currentStoreSlug ? currentStoreSlug.toUpperCase() : 'Executive');
 
@@ -3923,26 +3973,25 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         if (titleEl) titleEl.textContent = `${storeName} Dashboard`;
         if (periodTabsWrap) periodTabsWrap.style.display = 'flex';
         if (dateRangeWrap) dateRangeWrap.style.display = 'flex';
-      } else if (tab === 'products') {
-        if (titleEl) titleEl.textContent = `Product Catalog`;
+        if (refreshBtn) refreshBtn.style.display = (window.innerWidth > 992) ? 'flex' : 'none';
+      } else {
         if (periodTabsWrap) periodTabsWrap.style.display = 'none';
         if (dateRangeWrap) dateRangeWrap.style.display = 'none';
-        renderCatalogProductsTable();
-      } else if (tab === 'categories') {
-        if (titleEl) titleEl.textContent = `Store Categories`;
-        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
-        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
-        renderDedicatedCategoriesPage();
-      } else if (tab === 'inventory') {
-        if (titleEl) titleEl.textContent = `Inventory & Stock Reception`;
-        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
-        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
-        renderClientInventoryTable(currentClientProducts);
-      } else if (tab === 'stores') {
-        if (titleEl) titleEl.textContent = `Client Stores Management`;
-        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
-        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
-        renderStoresTable();
+        if (refreshBtn) refreshBtn.style.display = 'none';
+
+        if (tab === 'products') {
+          if (titleEl) titleEl.textContent = `Product Catalog`;
+          renderCatalogProductsTable();
+        } else if (tab === 'categories') {
+          if (titleEl) titleEl.textContent = `Store Categories`;
+          renderDedicatedCategoriesPage();
+        } else if (tab === 'inventory') {
+          if (titleEl) titleEl.textContent = `Inventory & Stock Reception`;
+          renderClientInventoryTable(currentClientProducts);
+        } else if (tab === 'stores') {
+          if (titleEl) titleEl.textContent = `Client Stores Management`;
+          renderStoresTable();
+        }
       }
 
       // 4. Update URL without page jump or reload
@@ -4023,7 +4072,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           if (!activeStoreCategories.includes(catName)) activeStoreCategories.push(catName);
           renderDedicatedCategoriesPage();
           input.value = '';
-          showDashToast(`✅ Category "${catName}" added!`);
+          showDashToast(`Category "${catName}" added!`);
           updateCatalogCategoryFilterOptions();
         } else {
           alert(data.error || 'Failed to add category');
@@ -4110,10 +4159,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         tbody.innerHTML = `
           <tr>
             <td colspan="8" style="text-align: center; padding: 48px 16px; color: #64748b;">
-              <div style="font-size: 2.2rem; margin-bottom: 8px;">📦</div>
+              <div style="display:flex; justify-content:center; margin-bottom:8px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
               <strong style="color: #081735; font-size: 1.05rem; display: block; margin-bottom: 4px;">No products found</strong>
               <p style="font-size: 0.84rem; margin-bottom: 14px;">Add your first product to start selling immediately!</p>
-              <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; padding: 8px 18px; border: none; border-radius: 8px;" onclick="openNewProductDrawer()">
+              <button type="button" class="btn-restock" style="background: #6d2fe3; color: #ffffff; font-weight: 700; padding: 8px 18px; border: none; border-radius: 8px; box-shadow:0 2px 8px rgba(109,47,227,0.25); cursor:pointer;" onclick="openNewProductDrawer()">
                 + New Product
               </button>
             </td>
@@ -4166,10 +4215,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
             <td style="text-align: right;">
               <div style="display: flex; gap: 6px; justify-content: flex-end;">
                 <button type="button" class="btn-restock" style="background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; padding: 5px 10px; font-size: 0.78rem; font-weight: 700;" onclick="openEditProductDrawer(${prod.id})" title="Edit Product">
-                  ✏️ Edit
+                  Edit
                 </button>
                 <button type="button" class="btn-restock" style="background: #fee2e2; color: #b91c1c; border-color: #fca5a5; padding: 5px 10px; font-size: 0.78rem;" onclick="deleteCatalogProduct(${prod.id}, '${escapeAttr(prod.name)}')" title="Delete Product">
-                  🗑️
+                  ✕
                 </button>
               </div>
             </td>
@@ -4339,7 +4388,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           if (!activeStoreCategories.includes(catName)) activeStoreCategories.push(catName);
           populateDrawerCategories(catName);
           toggleDrawerInlineCategory(false);
-          showDashToast(`✅ Category "${catName}" added!`);
+          showDashToast(`Category "${catName}" added!`);
         } else {
           alert(data.error || 'Failed to add category');
         }
@@ -4445,7 +4494,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         }
 
         closeProductSlideDrawer();
-        showNotification(currentEditingProductId ? `✅ Product "${name}" updated successfully!` : `🎉 Product "${name}" added to catalog!`, 'success');
+        showNotification(currentEditingProductId ? `Product "${name}" updated successfully!` : `Product "${name}" added to catalog!`, 'success');
         fetchLiveDashboardData(false);
       } catch (err) {
         if (errBox) {
@@ -4517,7 +4566,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           <span style="font-size: 0.86rem; font-weight: 600; color: #1e293b;">${escapeHtml(cat)}</span>
           ${cat.toLowerCase() !== 'all' ? `
             <button type="button" onclick="deleteModalCategory('${escapeAttr(cat)}')" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; font-weight: 700;" title="Remove Category">
-              🗑️
+              ✕
             </button>
           ` : '<span style="font-size: 0.72rem; color: #94a3b8;">Default</span>'}
         </div>
@@ -4541,7 +4590,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           activeStoreCategories = data.categories;
           renderModalCategoriesList();
           input.value = '';
-          showDashToast(`✅ Category "${catName}" added!`);
+          showDashToast(`Category "${catName}" added!`);
           updateCatalogCategoryFilterOptions();
         } else {
           alert(data.error || 'Failed to add category');
@@ -4644,19 +4693,19 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           </td>
           <td>
             <span class="wa-badge-pill" style="${s.status === 'inactive' ? 'background:#fef2f2; color:#ef4444; border-color:#fca5a5;' : ''}">
-              ${s.status === 'inactive' ? '🔴 Inactive' : '🟢 Active & Connected'}
+              ${s.status === 'inactive' ? 'Inactive' : 'Active & Connected'}
             </span>
           </td>
           <td style="text-align:right;">
             <div style="display:flex; gap:6px; justify-content:flex-end;">
               <button class="btn-restock" style="background:#7433df; color:#ffffff; font-weight:700;" onclick="openStoreInventoryModal(${s.id})">
-                📦 Load Stock
+                Load Stock
               </button>
               <button class="btn-restock" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" onclick="openEditStoreModal(${s.id})">
-                ✏️ Edit
+                Edit
               </button>
               <button class="btn-restock" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" onclick="deleteStorePrompt(${s.id}, '${escapeAttr(s.name)}')">
-                🗑️ Delete
+                Delete
               </button>
               <a href="/${s.slug}" target="_blank" class="btn-restock" style="text-decoration:none;">
                 Visit &rarr;
@@ -4672,7 +4721,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (!tbody) return;
 
       if (!outOfStock || outOfStock.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:18px; color:#16a34a; font-weight:600;">✅ All products in Odoo POS are in stock!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:18px; color:#16a34a; font-weight:600;">All products in Odoo POS are in stock!</td></tr>';
         return;
       }
 
@@ -4757,8 +4806,8 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       document.getElementById('orderModalCustomer').textContent = order.customer || order.customerName || 'Store Customer';
       
       const phone = order.phone || '+255 7XX XXX XXX';
-      document.getElementById('orderModalPhone').textContent = `📞 ${phone}`;
-      document.getElementById('orderModalAddress').textContent = `📍 ${order.deliveryAddress || 'Dar es Salaam'}`;
+      document.getElementById('orderModalPhone').textContent = `${phone}`;
+      document.getElementById('orderModalAddress').textContent = `${order.deliveryAddress || 'Dar es Salaam'}`;
 
       let cleanWa = String(phone).replace(/[^0-9]/g, '');
       if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
@@ -4829,7 +4878,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           });
           const data = await res.json();
           if (!data.success) throw new Error(data.error || 'Failed');
-          showDashToast(`✅ Loaded +${qty} units into store inventory!`);
+          showDashToast(`Loaded +${qty} units into store inventory!`);
           await loadStoreInventoryData();
         } else {
           // Restock in master Odoo ERP
@@ -4840,7 +4889,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           });
           const data = await res.json();
           if (!data.success) throw new Error(data.error || 'Failed');
-          showDashToast(`✅ Restocked ${qty} units in Odoo ERP!`);
+          showDashToast(`Restocked ${qty} units in Odoo ERP!`);
           fetchLiveDashboardData(false);
         }
         closeRestockModal();
@@ -4941,7 +4990,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         currentStoreLogoData = e.target.result;
         document.getElementById('storeModalLogoPreview').src = currentStoreLogoData;
         document.getElementById('storeModalLogoUrl').value = '';
-        showDashToast('✅ Logo attached successfully!');
+        showDashToast('Logo attached successfully!');
       };
       reader.readAsDataURL(file);
     }
@@ -4985,12 +5034,12 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           currentStoreBannerData = canvas.toDataURL('image/jpeg', 0.90);
           document.getElementById('storeModalBannerPreview').src = currentStoreBannerData;
           document.getElementById('storeModalBannerUrl').value = '';
-          showDashToast('✅ Shop signboard photo attached and optimized!');
+          showDashToast('Shop signboard photo attached and optimized!');
         };
         img.onerror = function() {
           currentStoreBannerData = e.target.result;
           document.getElementById('storeModalBannerPreview').src = currentStoreBannerData;
-          showDashToast('✅ Shop signboard photo attached!');
+          showDashToast('Shop signboard photo attached!');
         };
         img.src = e.target.result;
       };
@@ -5104,7 +5153,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Operation failed');
 
-        showDashToast(`✅ Store "${name}" saved successfully!`);
+        showDashToast(`Store "${name}" saved successfully!`);
         closeStoreModal();
         fetchLiveDashboardData(false);
       } catch (err) {
@@ -5125,7 +5174,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to delete store');
 
-        showDashToast(`🗑️ Store removed successfully.`);
+        showDashToast(`Store removed successfully.`);
         closeStoreModal();
         fetchLiveDashboardData(false);
       } catch (err) {
@@ -5200,15 +5249,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         tbody.innerHTML = `
           <tr>
             <td colspan="5" style="text-align:center; padding:36px 16px; color:#64748b;">
-              <div style="font-size:2rem; margin-bottom:8px;">📦</div>
+              <div style="display:flex; justify-content:center; margin-bottom:8px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
               <strong style="color:#081735; font-size:1rem; display:block; margin-bottom:4px;">No stock loaded yet for this store</strong>
               <p style="font-size:0.84rem; margin-bottom:12px;">Add brand new items or assign products from your Odoo ERP inventory.</p>
               <div style="display:flex; justify-content:center; gap:8px;">
                 <button onclick="switchInvTab('add')" style="background:#6d2fe3; color:#ffffff; padding:7px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer;">
-                  ➕ Quick Add Product
+                  Quick Add Product
                 </button>
                 <button onclick="switchInvTab('assign')" style="background:#f1f5f9; color:#0f172a; padding:7px 14px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; cursor:pointer;">
-                  🔍 Pick from Odoo ERP
+                  Pick from Odoo ERP
                 </button>
               </div>
             </td>
@@ -5243,7 +5292,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
             <td style="text-align:right;">
               <div style="display:flex; gap:6px; justify-content:flex-end;">
                 <button class="btn-restock" onclick="openRestockModal(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${p.sku || ''}')">
-                  ⚡ Restock
+                  Restock
                 </button>
                 <button onclick="removeProductFromStore(${p.id})" title="Remove from store" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:700;">
                   ✕
@@ -5353,7 +5402,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast(`✅ Added "${name}" with ${stock} units to store!`);
+        showDashToast(`Added "${name}" with ${stock} units to store!`);
         
         // Reset form
         document.getElementById('newProdName').value = '';
@@ -5373,7 +5422,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       } catch (err) {
         alert('Error adding product: ' + err.message);
       } finally {
-        btn.textContent = '➕ Save & Add to Store Stock';
+        btn.textContent = 'Save & Add to Store Stock';
         btn.disabled = false;
       }
     }
@@ -5398,14 +5447,14 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast(`✅ Assigned ${checkedIds.length} products to store!`);
+        showDashToast(`Assigned ${checkedIds.length} products to store!`);
         switchInvTab('current');
         await loadStoreInventoryData();
         fetchLiveDashboardData(false);
       } catch (err) {
         alert('Error assigning products: ' + err.message);
       } finally {
-        btn.textContent = '💾 Save Assigned Products to Store';
+        btn.textContent = 'Save Assigned Products to Store';
         btn.disabled = false;
       }
     }
@@ -5470,7 +5519,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast(`🚀 Successfully imported ${data.importedCount} products!`);
+        showDashToast(`Successfully imported ${data.importedCount} products!`);
         document.getElementById('bulkImportTextarea').value = '';
         switchInvTab('current');
         await loadStoreInventoryData();
@@ -5478,7 +5527,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       } catch (err) {
         alert('Error importing stock: ' + err.message);
       } finally {
-        btn.textContent = '🚀 Import Inventory into Store';
+        btn.textContent = 'Import Inventory into Store';
         btn.disabled = false;
       }
     }
@@ -5566,7 +5615,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed');
 
-        showDashToast('✅ WhatsApp Gateway settings saved successfully!');
+        showDashToast('WhatsApp Gateway settings saved successfully!');
         closeWhatsAppConfigModal();
       } catch (err) {
         alert('Error saving WhatsApp settings: ' + err.message);
@@ -5588,7 +5637,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       btn.textContent = 'Sending...';
       btn.disabled = true;
       resBox.style.display = 'block';
-      resBox.innerHTML = '<span style="color:#2563eb;">📡 Contacting WhatsApp Gateway...</span>';
+      resBox.innerHTML = '<span style="color:#2563eb;">Contacting WhatsApp Gateway...</span>';
 
       try {
         const res = await fetch('/api/whatsapp/test-send', {
@@ -5596,19 +5645,19 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             phone: phone,
-            message: `🔔 *WhatsApp Gateway Test Connection*\n✅ Your store gateway is connected! Automated order alerts will be delivered directly here.`
+            message: `*WhatsApp Gateway Test Connection*\nYour store gateway is connected! Automated order alerts will be delivered directly here.`
           })
         });
 
         const data = await res.json();
         if (data.success) {
-          resBox.innerHTML = `<span style="color:#16a34a; font-weight:700;">✅ Success! Test message dispatched via ${data.gateway || 'Gateway'} to ${data.recipient}! Check your WhatsApp.</span>`;
-          showDashToast(`✅ Message dispatched to ${phone}!`);
+          resBox.innerHTML = `<span style="color:#16a34a; font-weight:700;">Success! Test message dispatched via ${data.gateway || 'Gateway'} to ${data.recipient}! Check your WhatsApp.</span>`;
+          showDashToast(`Message dispatched to ${phone}!`);
         } else {
-          resBox.innerHTML = `<span style="color:#ef4444; font-weight:700;">⚠️ Delivery note: ${data.error || 'Gateway returned error. Please check your Instance ID / Token.'}</span>`;
+          resBox.innerHTML = `<span style="color:#ef4444; font-weight:700;">Delivery note: ${data.error || 'Gateway returned error. Please check your Instance ID / Token.'}</span>`;
         }
       } catch (err) {
-        resBox.innerHTML = `<span style="color:#ef4444;">❌ Error: ${err.message}</span>`;
+        resBox.innerHTML = `<span style="color:#ef4444;">Error: ${err.message}</span>`;
       } finally {
         btn.textContent = 'Send Test';
         btn.disabled = false;
