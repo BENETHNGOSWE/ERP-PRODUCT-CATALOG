@@ -1340,14 +1340,16 @@
       </div>
 
       <nav class="dash-nav">
-        <a href="dashboard.html" class="dash-nav-item active" id="sidebarDashLink">
+        <!-- 1. Dashboard Overview -->
+        <a href="javascript:void(0)" class="dash-nav-item active" id="sidebarDashLink" onclick="switchDashboardTab('dashboard')">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             <span>Dashboard</span>
           </div>
         </a>
 
-        <a href="#productsCatalogSection" class="dash-nav-item" id="sidebarProductsLink" onclick="scrollToProductsCatalog(); return false;">
+        <!-- 2. Dedicated Products Catalog Page -->
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarProductsLink" onclick="switchDashboardTab('products')">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -1359,7 +1361,8 @@
           <span class="nav-badge-blue" id="sidebarProductsBadge" style="background:#ede9fe; color:#7433df; font-weight:700;">0</span>
         </a>
 
-        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarCategoriesLink" onclick="openCategoriesModal(); return false;">
+        <!-- 3. Dedicated Categories Page -->
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarCategoriesLink" onclick="switchDashboardTab('categories')">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
@@ -1369,15 +1372,8 @@
           </div>
         </a>
 
-        <a href="#storesTableSection" class="dash-nav-item" id="sidebarStoresLink">
-          <div class="dash-nav-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Client Stores</span>
-          </div>
-          <span class="nav-badge-blue" id="sidebarStoresBadge">4</span>
-        </a>
-
-        <a href="#clientInventorySection" class="dash-nav-item" id="sidebarStockLink">
+        <!-- 4. Dedicated Inventory Page -->
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarStockLink" onclick="switchDashboardTab('inventory')">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             <span>Inventory</span>
@@ -1385,6 +1381,16 @@
           <span class="nav-badge-red" id="sidebarStockBadge">0</span>
         </a>
 
+        <!-- 5. Client Stores (Super-Admin only) -->
+        <a href="javascript:void(0)" class="dash-nav-item" id="sidebarStoresLink" onclick="switchDashboardTab('stores')">
+          <div class="dash-nav-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Client Stores</span>
+          </div>
+          <span class="nav-badge-blue" id="sidebarStoresBadge">4</span>
+        </a>
+
+        <!-- 6. Change Password -->
         <a href="javascript:void(0)" class="dash-nav-item" id="sidebarChangePinLink" onclick="openChangePinModal(); return false;">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1396,6 +1402,7 @@
           <span class="nav-badge-blue" style="background:#ede9fe; color:#7433df; font-weight:700;">PIN</span>
         </a>
 
+        <!-- 7. Odoo ERP View -->
         <a href="odoo_preview.html" class="dash-nav-item" id="sidebarOdooLink">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -1404,31 +1411,26 @@
           <span class="nav-badge-blue">LIVE</span>
         </a>
 
-        <a href="index.html" class="dash-nav-item" id="sidebarCatalogLink">
+        <!-- 8. Customer Storefront -->
+        <a href="index.html" class="dash-nav-item" id="sidebarCatalogLink" target="_blank">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             <span id="sidebarCatalogText">Storefront</span>
           </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
 
-        <a href="#" class="dash-nav-item" onclick="window.print(); return false;">
+        <!-- 9. Reports -->
+        <a href="javascript:void(0)" class="dash-nav-item" onclick="window.print(); return false;">
           <div class="dash-nav-left">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             <span>Reports</span>
           </div>
         </a>
       </nav>
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <span>Change Password</span>
-          </div>
-          <span class="nav-badge-blue" style="background:#ede9fe; color:#7433df; font-weight:700;">PIN</span>
-        </a>
-      </nav>
 
       <div class="sidebar-bottom">
-        <a href="index.html" class="btn-sidebar-shop" id="sidebarStorefrontBtn">
+        <a href="index.html" class="btn-sidebar-shop" id="sidebarStorefrontBtn" target="_blank">
           <div style="display:flex; flex-direction:column;">
             <span style="font-weight:700; font-size:0.84rem;" id="sidebarStorefrontBtnTitle">Open Storefront</span>
             <span style="font-size:0.72rem; color:#64748b;" id="sidebarStorefrontBtnSub">Live Catalog</span>
@@ -1446,13 +1448,13 @@
       </div>
     </aside>
 
-    <!-- MAIN DASHBOARD CONTENT -->
+    <!-- MAIN DASHBOARD CONTENT AREA WITH DEDICATED VIEWS -->
     <main class="dash-main">
       
-      <!-- Top Bar -->
+      <!-- Top Bar (Shared Header) -->
       <div class="dash-topbar">
         <div class="dash-header-left">
-          <h1 class="dash-page-title">Executive Dashboard</h1>
+          <h1 class="dash-page-title" id="dashPageMainTitle">Executive Dashboard</h1>
           <div class="odoo-sync-pill" id="headerStatusPill">
             <span class="status-dot-green"></span>
             <span id="headerStatusText">Live Connected: Odoo 18 (KODADEMOS)</span>
@@ -1460,8 +1462,8 @@
         </div>
         
         <div class="dash-topbar-actions">
-          <!-- Period Tabs -->
-          <div class="period-tabs">
+          <!-- Period Tabs (Visible in Dashboard overview) -->
+          <div class="period-tabs" id="dashPeriodTabsWrap">
             <button class="period-tab-btn active" id="tabToday" onclick="setPeriod('today')">Today</button>
             <button class="period-tab-btn" id="tabWeek" onclick="setPeriod('week')">This Week</button>
             <button class="period-tab-btn" id="tabMonth" onclick="setPeriod('month')">This Month</button>
@@ -1469,15 +1471,15 @@
           </div>
 
           <!-- Date Range Display -->
-          <div class="date-range-btn">
+          <div class="date-range-btn" id="dashDateRangeWrap">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0047bb" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span id="dateRangeText">Today: Sep 01, 2026</span>
           </div>
 
-          <!-- Sync Odoo Button -->
+          <!-- Sync / Refresh Button -->
           <button class="btn-sync-odoo" id="btnSyncOdoo" onclick="fetchLiveDashboardData(true)" title="Force Sync Data">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-            <span id="btnSyncOdooText">Sync Odoo</span>
+            <span id="btnSyncOdooText">Refresh</span>
           </button>
 
           <!-- WhatsApp Gateway Settings Button (Super-Admin Only) -->
@@ -1494,319 +1496,372 @@
         </div>
       </div>
 
-      <!-- 4 KPI Cards -->
-      <section class="kpi-grid">
-        <!-- 1. Order Completed -->
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-icon-box green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <!-- =====================================================================
+           VIEW 1: EXECUTIVE DASHBOARD OVERVIEW (Default View)
+           ===================================================================== -->
+      <div id="viewDashboard" class="dash-tab-view" style="display: flex; flex-direction: column; gap: 20px;">
+        <!-- 4 KPI Cards -->
+        <section class="kpi-grid">
+          <!-- 1. Order Completed -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon-box green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <span class="kpi-label">Order Completed</span>
             </div>
-            <span class="kpi-label">Order Completed</span>
-          </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiCompleted">14</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 24 Q 20 18, 40 20 T 80 6" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span style="color:#16a34a; font-weight:700;">+100% Odoo Paid / Done</span>
-          </div>
-        </div>
-
-        <!-- 2. Order On Progress -->
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-icon-box blue">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div class="kpi-middle">
+              <span class="kpi-value" id="kpiCompleted">14</span>
+              <svg class="kpi-sparkline" viewBox="0 0 80 32">
+                <path d="M 0 24 Q 20 18, 40 20 T 80 6" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
             </div>
-            <span class="kpi-label">Order On Progress</span>
-          </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiProgress">0</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 22 Q 25 24, 45 14 T 80 8" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span style="color:#2563eb; font-weight:700;">Active Odoo Draft / Open</span>
-          </div>
-        </div>
-
-        <!-- 3. Total Sales -->
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-icon-box purple">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="14" y2="16"/></svg>
+            <div class="kpi-bottom">
+              <span style="color:#16a34a; font-weight:700;">+100% Odoo Paid / Done</span>
             </div>
-            <span class="kpi-label">Total Sales (TZS)</span>
           </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiSales" style="font-size:1.4rem;">TZS 2,423,850</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 26 Q 30 26, 50 12 T 80 4" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span style="color:#16a34a; font-weight:700;">Live Sync Odoo POS Revenue</span>
-          </div>
-        </div>
 
-        <!-- 4. Products Out of Stock -->
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <div class="kpi-icon-box red">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <!-- 2. Order On Progress -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon-box blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span class="kpi-label">Order On Progress</span>
             </div>
-            <span class="kpi-label">Products Out of Stock</span>
-          </div>
-          <div class="kpi-middle">
-            <span class="kpi-value" id="kpiOutStock">15</span>
-            <svg class="kpi-sparkline" viewBox="0 0 80 32">
-              <path d="M 0 26 Q 30 20, 55 12 T 80 14" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="kpi-bottom">
-            <span style="color:#ef4444; font-weight:700;">Needs Restock (0 qty in Odoo)</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Middle Grid: Sales Area Chart + Orders Summary Donut + Top Selling Products -->
-      <section class="middle-grid">
-        <!-- Sales Overview Chart -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title" id="salesChartTitle">Sales Overview</h2>
-            <select class="period-select" id="periodSelect" onchange="renderSalesChart()">
-              <option value="hourly">Hourly View</option>
-              <option value="daily">Daily Breakdown</option>
-              <option value="weekly">Weekly Summary</option>
-              <option value="monthly">Monthly View</option>
-            </select>
+            <div class="kpi-middle">
+              <span class="kpi-value" id="kpiProgress">0</span>
+              <svg class="kpi-sparkline" viewBox="0 0 80 32">
+                <path d="M 0 22 Q 25 24, 45 14 T 80 8" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="kpi-bottom">
+              <span style="color:#2563eb; font-weight:700;">Active Odoo Draft / Open</span>
+            </div>
           </div>
 
-          <div style="position: relative; width: 100%; height: 230px; margin-top: 6px;" id="chartContainer">
-            <!-- Dynamic SVG Area Chart -->
-          </div>
-        </div>
-
-        <!-- Orders Summary Donut -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title">Orders Summary</h2>
-          </div>
-
-          <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;" id="donutContainer">
-            <!-- Dynamic Donut -->
-          </div>
-        </div>
-
-        <!-- Top Selling Products -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title">Top Selling Products</h2>
+          <!-- 3. Total Sales -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon-box purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="14" y2="16"/></svg>
+              </div>
+              <span class="kpi-label">Total Sales (TZS)</span>
+            </div>
+            <div class="kpi-middle">
+              <span class="kpi-value" id="kpiSales" style="font-size:1.4rem;">TZS 2,423,850</span>
+              <svg class="kpi-sparkline" viewBox="0 0 80 32">
+                <path d="M 0 26 Q 30 26, 50 12 T 80 4" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="kpi-bottom">
+              <span style="color:#16a34a; font-weight:700;">Live Sync Odoo POS Revenue</span>
+            </div>
           </div>
 
-          <div class="top-products-list" id="topSellingList">
-            <!-- Dynamic Top Selling -->
+          <!-- 4. Products Out of Stock -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon-box red">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              <span class="kpi-label">Products Out of Stock</span>
+            </div>
+            <div class="kpi-middle">
+              <span class="kpi-value" id="kpiOutStock">15</span>
+              <svg class="kpi-sparkline" viewBox="0 0 80 32">
+                <path d="M 0 26 Q 30 20, 55 12 T 80 14" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="kpi-bottom">
+              <span style="color:#ef4444; font-weight:700;">Needs Restock (0 qty in Odoo)</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Dedicated Product Catalog Section (Screenshot 1 Style) -->
-      <section class="dash-card" id="productsCatalogSection" style="margin-bottom: 24px;">
-        <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h2 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-              <span>📦 Product Catalog</span>
-              <span id="productsCatalogCountBadge" style="font-size: 0.75rem; background: #ede9fe; color: #7433df; padding: 2px 10px; border-radius: 12px; font-weight: 700;">0 products</span>
-            </h2>
-            <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
-              Create, edit, and manage your store's live catalog. Products appear directly in your customer storefront.
-            </p>
+        <!-- Middle Grid: Sales Area Chart + Orders Summary Donut + Top Selling Products -->
+        <section class="middle-grid">
+          <!-- Sales Overview Chart -->
+          <div class="dash-card">
+            <div class="card-header-row">
+              <h2 class="card-title" id="salesChartTitle">Sales Overview</h2>
+              <select class="period-select" id="periodSelect" onchange="renderSalesChart()">
+                <option value="hourly">Hourly View</option>
+                <option value="daily">Daily Breakdown</option>
+                <option value="weekly">Weekly Summary</option>
+                <option value="monthly">Monthly View</option>
+              </select>
+            </div>
+
+            <div style="position: relative; width: 100%; height: 230px; margin-top: 6px;" id="chartContainer">
+              <!-- Dynamic SVG Area Chart -->
+            </div>
           </div>
 
-          <!-- Top Action Bar (Screenshot 1 Match) -->
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="openCategoriesModal()">
-              🏷️ Manage Categories
+          <!-- Orders Summary Donut -->
+          <div class="dash-card">
+            <div class="card-header-row">
+              <h2 class="card-title">Orders Summary</h2>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-around; flex: 1; padding: 10px 0;" id="donutContainer">
+              <!-- Dynamic Donut -->
+            </div>
+          </div>
+
+          <!-- Top Selling Products -->
+          <div class="dash-card">
+            <div class="card-header-row">
+              <h2 class="card-title">Top Selling Products</h2>
+            </div>
+
+            <div class="top-products-list" id="topSellingList">
+              <!-- Dynamic Top Selling -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Bottom Grid: Out of Stock Table + Recent Orders -->
+        <section class="bottom-grid" id="outOfStockSection">
+          <!-- Out of Stock Products Table -->
+          <div class="dash-card">
+            <div class="card-header-row">
+              <h2 class="card-title">Out of Stock Products (<span id="tableOutStockCount">15</span>)</h2>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25px;">#</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th style="text-align: center;">Stock Status</th>
+                    <th>Last Updated</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="outOfStockTableBody">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="dash-card">
+            <div class="card-header-row">
+              <h2 class="card-title">Recent Orders</h2>
+              <a href="javascript:void(0)" style="font-size: 0.8rem; font-weight: 700; color: #0047bb; text-decoration: none;" onclick="fetchLiveDashboardData(true); return false;">Sync Now</a>
+            </div>
+
+            <div class="recent-orders-list" id="recentOrdersList">
+              <!-- Dynamic recent orders -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 2: DEDICATED PRODUCTS CATALOG PAGE
+           ===================================================================== -->
+      <div id="viewProducts" class="dash-tab-view" style="display: none; flex-direction: column; gap: 20px;">
+        <section class="dash-card" id="productsCatalogSection">
+          <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <span>📦 Product Catalog</span>
+                <span id="productsCatalogCountBadge" style="font-size: 0.75rem; background: #ede9fe; color: #7433df; padding: 2px 10px; border-radius: 12px; font-weight: 700;">0 products</span>
+              </h2>
+              <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                Create, edit, and manage your store's live catalog. Products appear directly in your customer storefront.
+              </p>
+            </div>
+
+            <!-- Top Action Bar (Screenshot 1 Match) -->
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="switchDashboardTab('categories')">
+                🏷️ Manage Categories
+              </button>
+              <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="fetchLiveDashboardData(true)" title="Refresh Catalog">
+                🔄 Refresh
+              </button>
+              <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; font-size: 0.85rem; padding: 8px 16px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(22,163,74,0.25); cursor: pointer;" onclick="openNewProductDrawer()">
+                + New Product
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter / Search Toolbar (Screenshot 1) -->
+          <div style="margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 240px; position: relative;">
+              <input type="text" id="catalogSearchInput" placeholder="🔍 Search products by name, category or SKU..." oninput="filterCatalogTable()" style="width: 100%; padding: 9px 14px; font-size: 0.84rem; border: 1.5px solid #e2e8f0; border-radius: 8px; outline: none; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <select id="catalogCategoryFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
+                <option value="All">All Categories</option>
+              </select>
+              <select id="catalogStatusFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
+                <option value="All">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Catalog Table (Screenshot 1 Match) -->
+          <div style="overflow-x: auto;">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;"><input type="checkbox" id="selectAllCatalogCheckbox" onchange="toggleSelectAllCatalog(this)"></th>
+                  <th style="min-width: 220px;">NAME</th>
+                  <th>CATEGORY</th>
+                  <th>PRICE</th>
+                  <th style="text-align: center;">STOCK</th>
+                  <th>STATUS</th>
+                  <th>CREATED</th>
+                  <th style="text-align: right;">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="catalogProductsTableBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 3: DEDICATED STORE CATEGORIES PAGE
+           ===================================================================== -->
+      <div id="viewCategories" class="dash-tab-view" style="display: none; flex-direction: column; gap: 20px;">
+        <section class="dash-card">
+          <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <span>🏷️ Store Categories</span>
+              </h2>
+              <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                Organize your catalog by adding and managing categories. Categories power your customer storefront filter tabs.
+              </p>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" class="btn-restock" style="background:#7433df; color:#ffffff; font-weight:700; border:none; padding:8px 16px; border-radius:8px;" onclick="openCategoriesModal()">
+                + Manage Categories
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Quick Category Bar -->
+          <div style="margin: 16px 0 20px; display: flex; gap: 10px; max-width: 500px;">
+            <input type="text" id="viewNewCategoryInput" placeholder="Enter new category (e.g. Smart Watches, Audio)..." style="flex: 1; padding: 9px 14px; font-size: 0.85rem; border: 1.5px solid #e2e8f0; border-radius: 8px;" onkeydown="if(event.key==='Enter') savePageNewCategory()">
+            <button type="button" onclick="savePageNewCategory()" style="background: #7433df; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 0.84rem; cursor: pointer; white-space: nowrap;">
+              + Add Category
             </button>
-            <button type="button" class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:7px 12px;" onclick="fetchDashboardData()" title="Refresh Catalog">
-              🔄 Refresh
-            </button>
-            <button type="button" class="btn-restock" style="background: #16a34a; color: #ffffff; font-weight: 700; font-size: 0.85rem; padding: 8px 16px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(22,163,74,0.25); cursor: pointer;" onclick="openNewProductDrawer()">
-              + New Product
-            </button>
           </div>
-        </div>
 
-        <!-- Filter / Search Toolbar (Screenshot 1) -->
-        <div style="margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <div style="flex: 1; min-width: 240px; position: relative;">
-            <input type="text" id="catalogSearchInput" placeholder="🔍 Search products by name, category or SKU..." oninput="filterCatalogTable()" style="width: 100%; padding: 9px 14px 9px 14px; font-size: 0.84rem; border: 1.5px solid #e2e8f0; border-radius: 8px; outline: none;">
+          <!-- Categories Cards Grid -->
+          <div id="categoriesCardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+            <!-- Rendered dynamically -->
           </div>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <select id="catalogCategoryFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
-              <option value="All">All Categories</option>
-            </select>
-            <select id="catalogStatusFilter" onchange="filterCatalogTable()" style="padding: 8px 12px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; outline: none;">
-              <option value="All">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Draft">Draft</option>
-            </select>
+        </section>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 4: DEDICATED INVENTORY & STOCK RECEPTION PAGE
+           ===================================================================== -->
+      <div id="viewInventory" class="dash-tab-view" style="display: none; flex-direction: column; gap: 20px;">
+        <section class="dash-card" id="clientInventorySection">
+          <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 class="card-title" style="display:flex; align-items:center; gap:8px;">
+                <span>🏪 Store Inventory & Stock Management</span>
+                <span id="clientProdCountBadge" style="font-size:0.75rem; background:#ede9fe; color:#6d28d9; padding:2px 8px; border-radius:12px; font-weight:700;">0 products</span>
+              </h2>
+              <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
+                Manage your store's stock received, set custom selling prices, and restock delivery inventory.
+              </p>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" onclick="openClientStockReceiveModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,71,187,0.25);">
+                <span>📦 Load / Receive Stock</span>
+              </button>
+              <button type="button" onclick="openNewProductDrawer()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                <span>➕ Add Product</span>
+              </button>
+              <button type="button" onclick="openClientSheetImportModal()" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:0.82rem; padding:8px 14px; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                <span>📄 Import Sheet</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Catalog Table (Screenshot 1) -->
-        <div style="overflow-x: auto;">
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th style="width: 30px;"><input type="checkbox" id="selectAllCatalogCheckbox" onchange="toggleSelectAllCatalog(this)"></th>
-                <th style="min-width: 220px;">NAME</th>
-                <th>CATEGORY</th>
-                <th>PRICE</th>
-                <th style="text-align: center;">STOCK</th>
-                <th>STATUS</th>
-                <th>CREATED</th>
-                <th style="text-align: right;">ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="catalogProductsTableBody">
-              <!-- Dynamically populated rows -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Client Stores Section -->
-      <section class="dash-card" id="storesTableSection">
-        <div class="card-header-row">
-          <div>
-            <h2 class="card-title">Client Stores & WhatsApp Configuration</h2>
-            <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">Multi-client digital storefronts linked to Odoo POS with direct WhatsApp alerts.</p>
-          </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:6px 12px;" onclick="cleanupBotStores()">
-              🧹 Clean Bot Stores
-            </button>
-            <button class="btn-create-store-action" onclick="openCreateStoreModal()">+ Add New Client Store</button>
-          </div>
-        </div>
-
-        <div style="overflow-x: auto;">
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th style="width: 35px;">Logo</th>
-                <th>Client / Shop Name</th>
-                <th>Storefront Slug</th>
-                <th>Registered WhatsApp</th>
-                <th>Odoo POS Link</th>
-                <th>WhatsApp Status</th>
-                <th style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="storesTableBody">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Store Client Dedicated Inventory & Stock Management Section -->
-      <section class="dash-card" id="clientInventorySection" style="display:none; margin-bottom: 24px;">
-        <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h2 class="card-title" style="display:flex; align-items:center; gap:8px;">
-              <span>🏪 Store Catalog & Stock Management</span>
-              <span id="clientProdCountBadge" style="font-size:0.75rem; background:#ede9fe; color:#6d28d9; padding:2px 8px; border-radius:12px; font-weight:700;">0 products</span>
-            </h2>
-            <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
-              Manage your store's stock received, set your custom selling prices, and add new products. Stock is strictly isolated to your shop.
-            </p>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" onclick="openClientStockReceiveModal()" style="background:#0047bb; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,71,187,0.25);">
-              <span>📦 Load / Receive Stock</span>
-            </button>
-            <button type="button" onclick="openClientAddProductModal()" style="background:#16a34a; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              <span>➕ Add Product</span>
-            </button>
-            <button type="button" onclick="openClientSheetImportModal()" style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:0.82rem; padding:8px 14px; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              <span>📄 Import Sheet</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Search / Filter Bar -->
-        <div style="margin: 14px 0 16px; display:flex; gap:10px;">
-          <input type="text" id="clientInvSearchInput" placeholder="🔍 Search your products by name, category or SKU..." oninput="filterClientInventoryTable()" style="flex:1; padding:9px 14px; font-size:0.84rem; border:1.5px solid #e2e8f0; border-radius:8px; outline:none;">
-        </div>
-
-        <div style="overflow-x: auto;">
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th style="min-width: 140px;">My Selling Price (TZS)</th>
-                <th style="text-align: center;">Current Stock</th>
-                <th style="min-width: 180px;">Receive Stock (+Units)</th>
-                <th style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="clientInventoryTableBody">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Bottom Grid: Out of Stock Table + Recent Orders -->
-      <section class="bottom-grid" id="outOfStockSection">
-        <!-- Out of Stock Products Table -->
-        <div class="dash-card">
-          <div class="card-header-row">
-            <h2 class="card-title">Out of Stock Products (<span id="tableOutStockCount">15</span>)</h2>
+          <!-- Search / Filter Bar -->
+          <div style="margin: 14px 0 16px; display:flex; gap:10px;">
+            <input type="text" id="clientInvSearchInput" placeholder="🔍 Search your products by name, category or SKU..." oninput="filterClientInventoryTable()" style="flex:1; padding:9px 14px; font-size:0.84rem; border:1.5px solid #e2e8f0; border-radius:8px; outline:none; box-sizing:border-box;">
           </div>
 
           <div style="overflow-x: auto;">
             <table class="dash-table">
               <thead>
                 <tr>
-                  <th style="width: 25px;">#</th>
                   <th>Product</th>
                   <th>Category</th>
-                  <th style="text-align: center;">Stock Status</th>
-                  <th>Last Updated</th>
+                  <th style="min-width: 140px;">My Selling Price (TZS)</th>
+                  <th style="text-align: center;">Current Stock</th>
+                  <th style="min-width: 180px;">Receive Stock (+Units)</th>
                   <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
-              <tbody id="outOfStockTableBody">
-                <!-- Dynamic rows -->
+              <tbody id="clientInventoryTableBody">
+                <!-- Rendered dynamically -->
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
+      </div>
 
-        <!-- Recent Orders -->
-        <div class="dash-card">
+      <!-- =====================================================================
+           VIEW 5: SUPER ADMIN CLIENT STORES PAGE
+           ===================================================================== -->
+      <div id="viewStores" class="dash-tab-view" style="display: none; flex-direction: column; gap: 20px;">
+        <section class="dash-card" id="storesTableSection">
           <div class="card-header-row">
-            <h2 class="card-title">Recent Orders</h2>
-            <a href="#" style="font-size: 0.8rem; font-weight: 700; color: #0047bb; text-decoration: none;" onclick="fetchLiveDashboardData(true); return false;">Sync Now</a>
+            <div>
+              <h2 class="card-title">Client Stores & WhatsApp Configuration</h2>
+              <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">Multi-client digital storefronts linked to Odoo POS with direct WhatsApp alerts.</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn-restock" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-size:0.8rem; padding:6px 12px;" onclick="cleanupBotStores()">
+                🧹 Clean Bot Stores
+              </button>
+              <button class="btn-create-store-action" onclick="openCreateStoreModal()">+ Add New Client Store</button>
+            </div>
           </div>
 
-          <div class="recent-orders-list" id="recentOrdersList">
-            <!-- Dynamic recent orders -->
+          <div style="overflow-x: auto;">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 35px;">Logo</th>
+                  <th>Client / Shop Name</th>
+                  <th>Storefront Slug</th>
+                  <th>Registered WhatsApp</th>
+                  <th>Odoo POS Link</th>
+                  <th>WhatsApp Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="storesTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
     </main>
-
   </div>
 
   <!-- Client Store Receive Stock Modal -->
@@ -3786,6 +3841,188 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
     window.openChangePinModal = openChangePinModal;
     window.closeChangePinModal = closeChangePinModal;
     window.submitChangePin = submitChangePin;
+
+    // =========================================================================
+    // DEDICATED VIEW TAB ROUTING (Dashboard, Products, Categories, Inventory, Stores)
+    // =========================================================================
+    let currentActiveTab = 'dashboard';
+
+    function switchDashboardTab(tabName) {
+      const validTabs = ['dashboard', 'products', 'categories', 'inventory', 'stores'];
+      const tab = validTabs.includes(tabName) ? tabName : 'dashboard';
+      currentActiveTab = tab;
+
+      // 1. Update active class on nav links
+      const navIds = {
+        'dashboard': 'sidebarDashLink',
+        'products': 'sidebarProductsLink',
+        'categories': 'sidebarCategoriesLink',
+        'inventory': 'sidebarStockLink',
+        'stores': 'sidebarStoresLink'
+      };
+
+      document.querySelectorAll('.dash-nav-item').forEach(el => el.classList.remove('active'));
+      const activeNav = document.getElementById(navIds[tab]);
+      if (activeNav) activeNav.classList.add('active');
+
+      // 2. Hide all tab views and show target view
+      const viewMap = {
+        'dashboard': 'viewDashboard',
+        'products': 'viewProducts',
+        'categories': 'viewCategories',
+        'inventory': 'viewInventory',
+        'stores': 'viewStores'
+      };
+
+      Object.keys(viewMap).forEach(k => {
+        const viewEl = document.getElementById(viewMap[k]);
+        if (viewEl) {
+          viewEl.style.display = (k === tab) ? 'flex' : 'none';
+        }
+      });
+
+      // 3. Update main page title and top bar controls depending on tab
+      const titleEl = document.getElementById('dashPageMainTitle');
+      const periodTabsWrap = document.getElementById('dashPeriodTabsWrap');
+      const dateRangeWrap = document.getElementById('dashDateRangeWrap');
+
+      const storeName = rawDashboardPayload?.store?.name || (currentStoreSlug ? currentStoreSlug.toUpperCase() : 'Executive');
+
+      if (tab === 'dashboard') {
+        if (titleEl) titleEl.textContent = `${storeName} Dashboard`;
+        if (periodTabsWrap) periodTabsWrap.style.display = 'flex';
+        if (dateRangeWrap) dateRangeWrap.style.display = 'flex';
+      } else if (tab === 'products') {
+        if (titleEl) titleEl.textContent = `Product Catalog`;
+        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
+        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
+        renderCatalogProductsTable();
+      } else if (tab === 'categories') {
+        if (titleEl) titleEl.textContent = `Store Categories`;
+        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
+        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
+        renderDedicatedCategoriesPage();
+      } else if (tab === 'inventory') {
+        if (titleEl) titleEl.textContent = `Inventory & Stock Reception`;
+        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
+        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
+        renderClientInventoryTable(currentClientProducts);
+      } else if (tab === 'stores') {
+        if (titleEl) titleEl.textContent = `Client Stores Management`;
+        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
+        if (dateRangeWrap) dateRangeWrap.style.display = 'none';
+        renderStoresTable();
+      }
+
+      // 4. Update URL without page jump or reload
+      if (window.history && window.history.pushState) {
+        const currentPath = window.location.pathname;
+        const newUrl = tab === 'dashboard' ? currentPath : `${currentPath}?tab=${tab}`;
+        window.history.pushState({ tab }, '', newUrl);
+      }
+
+      // 5. Scroll container to top
+      const mainEl = document.querySelector('.dash-main');
+      if (mainEl) mainEl.scrollTop = 0;
+    }
+
+    function renderDedicatedCategoriesPage() {
+      const container = document.getElementById('categoriesCardsGrid');
+      if (!container) return;
+
+      const cats = activeStoreCategories || ['All', 'General'];
+      
+      container.innerHTML = cats.map(cat => {
+        const isAll = cat.toLowerCase() === 'all';
+        const isGen = cat.toLowerCase() === 'general';
+        const count = isAll 
+          ? (catalogProductsList || currentClientProducts || []).length 
+          : (catalogProductsList || currentClientProducts || []).filter(p => (p.category || 'General').toLowerCase() === cat.toLowerCase()).length;
+
+        return `
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); transition: transform 0.15s ease, box-shadow 0.15s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.03)'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: #ede9fe; color: #7433df; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                  🏷️
+                </div>
+                <div>
+                  <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #081735;">${escapeHtml(cat)}</h4>
+                  <span style="font-size: 0.76rem; color: #64748b;">${count} ${count === 1 ? 'product' : 'products'}</span>
+                </div>
+              </div>
+              ${(!isAll && !isGen) ? `
+                <button type="button" onclick="deleteModalCategory('${escapeAttr(cat)}')" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 0.78rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; cursor: pointer;" title="Delete category">
+                  🗑️
+                </button>
+              ` : `
+                <span style="font-size: 0.7rem; background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 10px; font-weight: 600;">System</span>
+              `}
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+              <button type="button" onclick="filterBySpecificCategory('${escapeAttr(cat)}')" style="background: none; border: none; color: #7433df; font-weight: 700; font-size: 0.8rem; cursor: pointer; padding: 0;">
+                View Products &rarr;
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterBySpecificCategory(catName) {
+      switchDashboardTab('products');
+      const catSelect = document.getElementById('catalogCategoryFilter');
+      if (catSelect) {
+        catSelect.value = catName;
+        filterCatalogTable();
+      }
+    }
+
+    async function savePageNewCategory() {
+      const input = document.getElementById('viewNewCategoryInput');
+      const catName = input ? input.value.trim() : '';
+      if (!catName) return;
+
+      const targetStore = getStoreSlugOrIdForApi();
+      try {
+        const res = await fetch(`/api/stores/${targetStore}/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: catName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          activeStoreCategories = data.categories || activeStoreCategories;
+          if (!activeStoreCategories.includes(catName)) activeStoreCategories.push(catName);
+          renderDedicatedCategoriesPage();
+          input.value = '';
+          showDashToast(`✅ Category "${catName}" added!`);
+          updateCatalogCategoryFilterOptions();
+        } else {
+          alert(data.error || 'Failed to add category');
+        }
+      } catch (err) {
+        alert('Error adding category: ' + err.message);
+      }
+    }
+
+    window.switchDashboardTab = switchDashboardTab;
+    window.renderDedicatedCategoriesPage = renderDedicatedCategoriesPage;
+    window.filterBySpecificCategory = filterBySpecificCategory;
+    window.savePageNewCategory = savePageNewCategory;
+
+    // Check URL parameters on initialization (e.g. ?tab=products or #products)
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTab = urlParams.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
+      if (urlTab) {
+        if (urlTab.includes('product')) switchDashboardTab('products');
+        else if (urlTab.includes('categor')) switchDashboardTab('categories');
+        else if (urlTab.includes('invent') || urlTab.includes('stock')) switchDashboardTab('inventory');
+        else if (urlTab.includes('store')) switchDashboardTab('stores');
+      }
+    });
 
     // =========================================================================
     // DEDICATED PRODUCT CATALOG & RIGHT SLIDE-OVER DRAWER (Screenshots 1 & 2)
