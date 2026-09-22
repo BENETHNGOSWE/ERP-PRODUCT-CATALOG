@@ -1784,12 +1784,9 @@
           <div class="card-header-row" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <h2 class="card-title" style="display:flex; align-items:center; gap:8px;">
-                <span>Store Inventory & Stock Management</span>
+                <span>Store Inventory</span>
                 <span id="clientProdCountBadge" style="font-size:0.75rem; background:#ede9fe; color:#6d28d9; padding:2px 8px; border-radius:12px; font-weight:700;">0 products</span>
               </h2>
-              <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
-                Manage your store's stock received, set custom selling prices, and restock delivery inventory.
-              </p>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button type="button" onclick="openClientStockReceiveModal()" style="background:#6d2fe3; color:#ffffff; font-weight:700; font-size:0.82rem; padding:8px 14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(109,47,227,0.25);">
@@ -4051,7 +4048,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           if (titleEl) titleEl.textContent = `Store Categories`;
           renderDedicatedCategoriesPage();
         } else if (tab === 'inventory') {
-          if (titleEl) titleEl.textContent = `Inventory & Stock Reception`;
+          if (titleEl) titleEl.textContent = `Store Inventory`;
           renderClientInventoryTable(currentClientProducts);
         } else if (tab === 'stores') {
           if (titleEl) titleEl.textContent = `Client Stores Management`;
