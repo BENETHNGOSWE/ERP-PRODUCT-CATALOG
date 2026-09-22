@@ -3628,15 +3628,27 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
     }
 
-    function calculateStockStats(products) {
+    function calculateStockStats(products, isSuperAdmin = false) {
       let totalValuation = 0;
-      let totalStockItems = 0;
+      let totalStockUnits = 0;
+      let totalStockItems = (products || []).length;
+
       (products || []).forEach(p => {
+        const qty = Number(p.qty_available !== undefined ? p.qty_available : (p.storeStock || 0)) || 0;
         const price = Number(p.price !== undefined ? p.price : (p.storePrice || 0)) || 0;
-        totalValuation += price;
-        totalStockItems += 1;
+        
+        if (isSuperAdmin) {
+          // Super Admin sees total warehouse & store inventory capital
+          totalValuation += (qty > 0 ? (qty * price) : price);
+          totalStockUnits += (qty > 0 ? qty : 1);
+        } else {
+          // Client Store Mode: catalog price per item
+          totalValuation += price;
+          totalStockUnits += 1;
+        }
       });
-      return { totalValuation, totalStockItems, totalStockUnits: totalStockItems };
+
+      return { totalValuation, totalStockItems, totalStockUnits };
     }
 
     function renderCurrentPeriod() {
@@ -3664,6 +3676,8 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       // 2. Action Cards: Total Stock Valuation & Total Items in Stock
       let storeItems = [];
+      const isSuperAdmin = !currentStoreSlug;
+
       if (currentStoreSlug) {
         // Client Store Mode: strictly isolated to this store's products
         storeItems = currentClientProducts || [];
@@ -3672,7 +3686,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
         storeItems = (catalogProductsList && catalogProductsList.length > 0) ? catalogProductsList : (rawDashboardPayload.products || []);
       }
 
-      const { totalValuation, totalStockItems } = calculateStockStats(storeItems);
+      const { totalValuation, totalStockItems, totalStockUnits } = calculateStockStats(storeItems, isSuperAdmin);
 
       const valEl = document.getElementById('kpiStockValuation');
       if (valEl) valEl.textContent = formatTZS(totalValuation);
@@ -3681,17 +3695,21 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (valSub) {
         valSub.textContent = currentStoreSlug 
           ? `Capital across ${storeItems.length} store items` 
-          : `Capital across ${storeItems.length} total platform items`;
+          : `Total capital across ${storeItems.length} system products`;
       }
 
       const unitsEl = document.getElementById('kpiTotalStockUnits');
-      if (unitsEl) unitsEl.textContent = `${storeItems.length} items`;
+      if (unitsEl) {
+        unitsEl.textContent = currentStoreSlug 
+          ? `${storeItems.length} items` 
+          : `${totalStockUnits.toLocaleString('en-US')} units (${storeItems.length} products)`;
+      }
 
       const unitsSub = document.getElementById('kpiTotalStockUnitsSub');
       if (unitsSub) {
         unitsSub.textContent = currentStoreSlug 
           ? `Active items in store catalog` 
-          : `Total active catalog items`;
+          : `Active inventory units across all stores`;
       }
       
       const sbProd = document.getElementById('sidebarProductsBadge');

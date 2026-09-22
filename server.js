@@ -867,23 +867,36 @@ app.get('/api/odoo/template.csv', (req, res) => {
   }
 });
 
-// 6. Get Products Filtered Strictly for a Client Store (Product Separation)
-app.get(['/api/store/products', '/api/:slug/products', '/api/stores/:slug/products', '/api/odoo/products'], async (req, res) => {
+// 6. Get Products (All ERP Products for Global Admin, or Filtered Strictly for a Client Store)
+app.get(['/api/products', '/api/odoo/products', '/api/store/products', '/api/:slug/products', '/api/stores/:slug/products'], async (req, res) => {
   try {
     const rawParam = req.params.slug;
-    const isGenericSlug = !rawParam || ['store', 'stores', 'odoo', 'achete', 'shop', 'catalog', 'all'].includes(rawParam.toLowerCase());
+    const isGenericSlug = !rawParam || ['products', 'odoo', 'all', 'admin', 'store', 'stores', 'achete', 'shop', 'catalog'].includes(rawParam.toLowerCase());
     const targetSlug = (!isGenericSlug ? rawParam : null) || req.query.store || req.query.slug;
     let store = null;
     if (targetSlug) {
       store = stores.getStoreBySlug(targetSlug) || stores.getStoreById(targetSlug);
     }
-    if (!store) {
-      store = stores.getAllStores()[0];
-    }
 
     const forceRefresh = req.query.refresh === 'true' || req.query.force === 'true';
     const odooResult = await odoo.fetchOdooProducts(forceRefresh);
     const allProducts = odooResult.products || [];
+
+    if (!store) {
+      // Global Admin View: Return ALL system products across all stores
+      const catSet = new Set(['All']);
+      allProducts.forEach(p => {
+        if (p.category) catSet.add(p.category);
+      });
+
+      return res.json({
+        success: true,
+        isGlobal: true,
+        count: allProducts.length,
+        categories: Array.from(catSet),
+        products: allProducts
+      });
+    }
 
     // Filter products strictly for this client store
     const storeProducts = stores.filterProductsForStore(allProducts, store);
