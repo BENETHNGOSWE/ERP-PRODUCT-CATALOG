@@ -1618,6 +1618,44 @@
           </div>
         </section>
 
+        <!-- Registered Client Stores Overview Table (Visible in Super Admin Mode) -->
+        <section class="dash-card-clean" id="adminStoresOverviewCard" style="display: block;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #09090b; margin: 0;">Registered Client Stores</h3>
+              <p style="font-size: 0.78rem; color: #71717a; margin: 3px 0 0;">Active merchant digital storefronts, POS integration, and WhatsApp dispatch</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" onclick="switchDashboardTab('stores')" class="btn-clean-viewall" style="font-size: 0.8rem; padding: 6px 12px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer; color: #18181b; font-weight: 600;">
+                <span>Manage All Stores</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button type="button" onclick="openCreateStoreModal()" style="font-size: 0.8rem; padding: 6px 14px; background: #6d2fe3; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700;">
+                + Add Store
+              </button>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="dash-table-clean">
+              <thead>
+                <tr>
+                  <th style="width: 35px;">LOGO</th>
+                  <th>STORE / MERCHANT</th>
+                  <th>STOREFRONT LINK</th>
+                  <th>WHATSAPP</th>
+                  <th>POS CONFIG</th>
+                  <th>STATUS</th>
+                  <th style="text-align: right;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="adminStoresOverviewBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <!-- Recent Orders Table (Matching Screenshot) -->
         <section class="dash-card-clean">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -2786,33 +2824,28 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       showDashToast(msg);
     }
 
-    // Helper to detect store slug from URL (e.g. /benstore/dashboard -> benstore)
+    // Helper to detect store slug strictly from URL
+    // e.g. /benstore/dashboard -> 'benstore'
+    // e.g. /benstore/admin -> 'benstore'
+    // e.g. /dashboard?store=benstore -> 'benstore'
+    // e.g. /dashboard or /admin -> null (GLOBAL SUPER ADMIN MODE)
     function getActiveStoreSlug() {
       const path = window.location.pathname.replace(/^\/|\/$/g, '');
       const parts = path.split('/');
       if (parts.length >= 2 && (parts[1] === 'dashboard' || parts[1] === 'admin')) {
-        const candidate = parts[0].toLowerCase();
-        if (candidate !== 'public' && candidate !== 'api' && candidate !== 'admin') {
+        const candidate = parts[0].toLowerCase().trim();
+        if (candidate !== 'public' && candidate !== 'api' && candidate !== 'admin' && candidate !== 'dashboard') {
           return candidate;
         }
       }
       const params = new URLSearchParams(window.location.search);
       const queryStore = params.get('store');
-      if (queryStore) return queryStore.toLowerCase();
-
-      // Check stored active store session or last authenticated store
-      const stored = localStorage.getItem('achete_active_store_slug') || sessionStorage.getItem('achete_active_store_slug');
-      if (stored) return stored.toLowerCase();
-
-      // Check if any store is authenticated in sessionStorage
-      const keys = Object.keys(sessionStorage);
-      for (const k of keys) {
-        if (k.startsWith('store_auth_') && sessionStorage.getItem(k) === 'true') {
-          return k.replace('store_auth_', '').toLowerCase();
-        }
+      if (queryStore && queryStore.trim() !== '') {
+        return queryStore.toLowerCase().trim();
       }
 
-      return 'benstore';
+      // Root /dashboard, /admin, /dashboard.html, /admin.html is strictly GLOBAL SUPER ADMIN MODE
+      return null;
     }
 
     function toggleMobileSidebar(forceClose = false) {
@@ -2984,30 +3017,27 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
           applyStoreClientMode(storeData);
         } else {
           // Global Super-Admin Mode
-          const [dashRes, storesRes] = await Promise.all([
+          applySuperAdminMode();
+
+          const [dashRes, storesRes, prodsRes] = await Promise.all([
             fetch('/api/odoo/dashboard'),
-            fetch('/api/stores')
+            fetch('/api/stores'),
+            fetch('/api/odoo/products')
           ]);
 
           rawDashboardPayload = await dashRes.json();
           const storesData = await storesRes.json();
           storesList = storesData.stores || [];
 
+          const prodsData = await prodsRes.json();
+          const allErpProducts = (prodsData && prodsData.products) ? prodsData.products : [];
+
+          catalogProductsList = allErpProducts;
+          currentClientProducts = allErpProducts;
+
           renderCurrentPeriod();
           renderStoresTable();
-
-          // Also load and render products catalog for first store if in admin mode
-          if (storesList.length > 0) {
-            const firstStoreSlug = storesList[0].slug;
-            fetch(`/api/${firstStoreSlug}/dashboard-data`).then(r => r.json()).then(d => {
-              if (d.success && d.products) {
-                currentClientProducts = d.products;
-                if (d.store && Array.isArray(d.store.categories)) activeStoreCategories = d.store.categories;
-                renderCatalogProductsTable(d.products);
-                renderCurrentPeriod();
-              }
-            }).catch(() => {});
-          }
+          renderCatalogProductsTable(allErpProducts);
         }
 
         if (isManual) {
@@ -3022,18 +3052,92 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
     let currentClientProducts = [];
 
+    function applySuperAdminMode() {
+      // 1. Page Title & Header Branding
+      document.title = `Achete Executive Admin Dashboard`;
+      const titleEl = document.getElementById('dashPageMainTitle') || document.querySelector('.dash-page-title');
+      if (titleEl) titleEl.textContent = `Executive Dashboard`;
+
+      const headerStatusText = document.getElementById('headerStatusText');
+      if (headerStatusText) headerStatusText.textContent = `Live Sync • All Client Stores & Odoo 18 ERP`;
+
+      const btnSyncText = document.getElementById('btnSyncOdooText');
+      if (btnSyncText) btnSyncText.textContent = 'Sync Odoo';
+
+      // 2. SHOW Super Admin Sidebar Links & Features
+      const odooLink = document.getElementById('sidebarOdooLink');
+      if (odooLink) odooLink.style.display = 'flex';
+
+      const storesLink = document.getElementById('sidebarStoresLink');
+      if (storesLink) storesLink.style.display = 'flex';
+
+      const storesSec = document.getElementById('storesTableSection');
+      if (storesSec) storesSec.style.display = 'block';
+
+      const adminStoresOverview = document.getElementById('adminStoresOverviewCard');
+      if (adminStoresOverview) adminStoresOverview.style.display = 'block';
+
+      const waBtn = document.getElementById('btnWaGatewayHeader');
+      if (waBtn) waBtn.style.display = 'flex';
+
+      // 3. Reset Sidebar Branding to Achete
+      const brandLink = document.getElementById('sidebarBrandLink');
+      if (brandLink) brandLink.href = `/dashboard`;
+
+      const brandTitle = document.getElementById('sidebarBrandTitle');
+      if (brandTitle) brandTitle.textContent = 'ACHETE.ME';
+
+      const brandSub = document.getElementById('sidebarBrandSub');
+      if (brandSub) brandSub.innerHTML = `<span class="status-dot-green"></span> Super Admin • Active System`;
+
+      const brandLogo = document.getElementById('sidebarBrandLogo');
+      if (brandLogo) {
+        brandLogo.innerHTML = `<img src="/assets/products/logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:6px;" onerror="this.onerror=null; this.src='/assets/products/logo.png'">`;
+      }
+
+      const mobileHeaderTitle = document.getElementById('mobileHeaderTitle');
+      if (mobileHeaderTitle) mobileHeaderTitle.textContent = 'ACHETE Admin';
+
+      const mobileHeaderLogo = document.getElementById('mobileHeaderLogo');
+      if (mobileHeaderLogo) {
+        mobileHeaderLogo.innerHTML = `<img src="/assets/products/logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" onerror="this.onerror=null; this.src='/assets/products/logo.png'">`;
+      }
+
+      const catLink = document.getElementById('sidebarCatalogLink');
+      if (catLink) catLink.href = `/`;
+
+      const sfBtn = document.getElementById('sidebarStorefrontBtn');
+      if (sfBtn) sfBtn.href = `/`;
+
+      const sfTitle = document.getElementById('sidebarStorefrontBtnTitle');
+      if (sfTitle) sfTitle.textContent = `Achete Platform`;
+
+      const sfSub = document.getElementById('sidebarStorefrontBtnSub');
+      if (sfSub) sfSub.textContent = `achete.me`;
+
+      const adminName = document.getElementById('sidebarAdminName');
+      if (adminName) adminName.textContent = 'Super Administrator';
+
+      const adminEmail = document.getElementById('sidebarAdminEmail');
+      if (adminEmail) adminEmail.textContent = 'admin@achete.me';
+
+      const adminAvatar = document.getElementById('sidebarAdminAvatar');
+      if (adminAvatar) adminAvatar.textContent = 'A';
+
+      // 4. Hide Client Specific sections
+      const clientInvSec = document.getElementById('clientInventorySection');
+      if (clientInvSec) clientInvSec.style.display = 'none';
+
+      const outOfStockDashCard = document.querySelector('#outOfStockSection .dash-card:first-child');
+      if (outOfStockDashCard) outOfStockDashCard.style.display = 'block';
+    }
+
     function applyStoreClientMode(data) {
       const store = data.store || {};
       const kpi = data.kpi || {};
       currentClientProducts = data.products || [];
       rawDashboardPayload = data;
 
-      if (store.slug) {
-        try {
-          localStorage.setItem('achete_active_store_slug', store.slug);
-          sessionStorage.setItem('achete_active_store_slug', store.slug);
-        } catch (e) {}
-      }
       if (store.categories && Array.isArray(store.categories) && store.categories.length > 0) {
         activeStoreCategories = [...store.categories];
       } else {
@@ -3046,7 +3150,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       // 1. Page Header & Branding (Remove all Odoo references for Client)
       document.title = `${store.name} — Store Management Portal`;
-      const titleEl = document.querySelector('.dash-page-title');
+      const titleEl = document.getElementById('dashPageMainTitle') || document.querySelector('.dash-page-title');
       if (titleEl) titleEl.textContent = `${store.name} Dashboard`;
       
       const headerStatusText = document.getElementById('headerStatusText');
@@ -3065,12 +3169,15 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const storesSec = document.getElementById('storesTableSection');
       if (storesSec) storesSec.style.display = 'none';
 
+      const adminStoresOverview = document.getElementById('adminStoresOverviewCard');
+      if (adminStoresOverview) adminStoresOverview.style.display = 'none';
+
       const waBtn = document.getElementById('btnWaGatewayHeader');
       if (waBtn) waBtn.style.display = 'none';
 
       // 3. Customize Sidebar for Client Store
       const brandLink = document.getElementById('sidebarBrandLink');
-      if (brandLink) brandLink.href = `/${currentStoreSlug}`;
+      if (brandLink) brandLink.href = `/${store.slug}`;
 
       const brandTitle = document.getElementById('sidebarBrandTitle');
       if (brandTitle) brandTitle.textContent = store.name;
@@ -3092,10 +3199,10 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       }
 
       const catLink = document.getElementById('sidebarCatalogLink');
-      if (catLink) catLink.href = `/${currentStoreSlug}`;
+      if (catLink) catLink.href = `/${store.slug}`;
 
       const sfBtn = document.getElementById('sidebarStorefrontBtn');
-      if (sfBtn) sfBtn.href = `/${currentStoreSlug}`;
+      if (sfBtn) sfBtn.href = `/${store.slug}`;
 
       const sfTitle = document.getElementById('sidebarStorefrontBtnTitle');
       if (sfTitle) sfTitle.textContent = `${store.name} Storefront`;
@@ -3556,14 +3663,13 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (kpiOutStockEl) kpiOutStockEl.textContent = outOfStockCount;
 
       // 2. Action Cards: Total Stock Valuation & Total Items in Stock
-      // Strictly calculate only products belonging to the active client store!
       let storeItems = [];
-      if (currentClientProducts && currentClientProducts.length > 0) {
-        storeItems = currentClientProducts;
-      } else if (rawDashboardPayload && Array.isArray(rawDashboardPayload.products)) {
-        storeItems = rawDashboardPayload.products;
-      } else if (catalogProductsList && catalogProductsList.length > 0) {
-        storeItems = catalogProductsList;
+      if (currentStoreSlug) {
+        // Client Store Mode: strictly isolated to this store's products
+        storeItems = currentClientProducts || [];
+      } else {
+        // Super Admin Mode: all products across all stores in the platform
+        storeItems = (catalogProductsList && catalogProductsList.length > 0) ? catalogProductsList : (rawDashboardPayload.products || []);
       }
 
       const { totalValuation, totalStockItems } = calculateStockStats(storeItems);
@@ -3572,13 +3678,21 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (valEl) valEl.textContent = formatTZS(totalValuation);
 
       const valSub = document.getElementById('kpiStockValuationSub');
-      if (valSub) valSub.textContent = `Capital across ${storeItems.length} store items`;
+      if (valSub) {
+        valSub.textContent = currentStoreSlug 
+          ? `Capital across ${storeItems.length} store items` 
+          : `Capital across ${storeItems.length} total platform items`;
+      }
 
       const unitsEl = document.getElementById('kpiTotalStockUnits');
       if (unitsEl) unitsEl.textContent = `${storeItems.length} items`;
 
       const unitsSub = document.getElementById('kpiTotalStockUnitsSub');
-      if (unitsSub) unitsSub.textContent = `Active items in store catalog`;
+      if (unitsSub) {
+        unitsSub.textContent = currentStoreSlug 
+          ? `Active items in store catalog` 
+          : `Total active catalog items`;
+      }
       
       const sbProd = document.getElementById('sidebarProductsBadge');
       if (sbProd) sbProd.textContent = storeItems.length;
@@ -4017,7 +4131,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const storeName = rawDashboardPayload?.store?.name || (currentStoreSlug ? currentStoreSlug.toUpperCase() : 'Executive');
 
       if (tab === 'dashboard') {
-        if (titleEl) titleEl.textContent = `${storeName} Dashboard`;
+        if (titleEl) titleEl.textContent = currentStoreSlug ? `${storeName} Dashboard` : `Executive Dashboard`;
         if (topbarActions) {
           topbarActions.classList.remove('tab-hidden');
           topbarActions.style.display = 'flex';
@@ -4733,49 +4847,52 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
     function renderStoresTable() {
       const tbody = document.getElementById('storesTableBody');
-      if (!tbody) return;
+      const overviewBody = document.getElementById('adminStoresOverviewBody');
 
-      tbody.innerHTML = storesList.map(s => `
-        <tr>
-          <td><img src="${getSafeLogoSrc(s.logo)}" class="store-table-thumb" alt="${escapeAttr(s.name)}" onerror="this.onerror=null; this.src='/assets/products/logo.png'"></td>
+      const rowsHtml = (storesList || []).map(s => `
+        <tr style="transition: background 0.15s ease;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+          <td><img src="${getSafeLogoSrc(s.logo)}" class="store-table-thumb" alt="${escapeAttr(s.name)}" style="width:36px; height:36px; border-radius:6px; object-fit:contain; border:1px solid #e2e8f0; padding:2px;" onerror="this.onerror=null; this.src='/assets/products/logo.png'"></td>
           <td>
-            <strong style="color:#081735; font-size:0.88rem;">${escapeHtml(s.name)}</strong>
+            <strong style="color:#081735; font-size:0.88rem; display:block;">${escapeHtml(s.name)}</strong>
             <p style="font-size:0.74rem; color:#64748b; margin:0;">${escapeHtml(s.tagline || 'Client Storefront')}</p>
           </td>
           <td>
-            <a href="/${s.slug}" target="_blank" style="color:#7433df; font-weight:700; text-decoration:none;">
+            <a href="/${s.slug}" target="_blank" style="color:#6d2fe3; font-weight:700; text-decoration:none; font-size:0.85rem;">
               achete.me/${s.slug} &nearr;
             </a>
           </td>
-          <td><strong style="color:#081735;">${escapeHtml(s.whatsapp)}</strong></td>
+          <td><strong style="color:#081735; font-size:0.85rem;">${escapeHtml(s.whatsapp || '')}</strong></td>
           <td>
-            <span style="font-size:0.76rem; background:#f1f5f9; padding:2px 6px; border-radius:6px; font-weight:600;">
+            <span style="font-size:0.76rem; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-weight:600; color:#475569;">
               ${escapeHtml(s.posConfigName || 'Website Orders')}
             </span>
           </td>
           <td>
-            <span class="wa-badge-pill" style="${s.status === 'inactive' ? 'background:#fef2f2; color:#ef4444; border-color:#fca5a5;' : ''}">
-              ${s.status === 'inactive' ? 'Inactive' : 'Active & Connected'}
+            <span class="wa-badge-pill" style="${s.status === 'inactive' ? 'background:#fef2f2; color:#ef4444; border-color:#fca5a5;' : 'background:#ecfdf5; color:#059669; border-color:#a7f3d0;'} font-size:0.75rem; padding:3px 8px; border-radius:12px; font-weight:700;">
+              ${s.status === 'inactive' ? 'Inactive' : '● Active'}
             </span>
           </td>
           <td style="text-align:right;">
-            <div style="display:flex; gap:6px; justify-content:flex-end;">
-              <button class="btn-restock" style="background:#7433df; color:#ffffff; font-weight:700;" onclick="openStoreInventoryModal(${s.id})">
-                Load Stock
+            <div style="display:flex; gap:6px; justify-content:flex-end; align-items:center; flex-wrap:wrap;">
+              <a href="/${s.slug}/dashboard" target="_blank" style="background:#ede9fe; color:#6d2fe3; border:1px solid #ddd6fe; padding:4px 10px; border-radius:6px; font-size:0.78rem; font-weight:700; text-decoration:none; cursor:pointer;" title="Open merchant client dashboard">
+                Store Admin &rarr;
+              </a>
+              <button type="button" class="btn-restock" style="background:#6d2fe3; color:#ffffff; font-weight:700; padding:4px 10px; border-radius:6px; font-size:0.78rem; border:none; cursor:pointer;" onclick="openStoreInventoryModal(${s.id})">
+                Stock
               </button>
-              <button class="btn-restock" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" onclick="openEditStoreModal(${s.id})">
+              <button type="button" class="btn-restock" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:4px 8px; border-radius:6px; font-size:0.78rem; cursor:pointer;" onclick="openEditStoreModal(${s.id})">
                 Edit
               </button>
-              <button class="btn-restock" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" onclick="deleteStorePrompt(${s.id}, '${escapeAttr(s.name)}')">
-                Delete
-              </button>
-              <a href="/${s.slug}" target="_blank" class="btn-restock" style="text-decoration:none;">
-                Visit &rarr;
+              <a href="/${s.slug}" target="_blank" class="btn-restock" style="background:#f8fafc; color:#334155; border:1px solid #e2e8f0; padding:4px 8px; border-radius:6px; font-size:0.78rem; text-decoration:none;" title="Open public storefront">
+                Visit &nearr;
               </a>
             </div>
           </td>
         </tr>
       `).join('');
+
+      if (tbody) tbody.innerHTML = rowsHtml;
+      if (overviewBody) overviewBody.innerHTML = rowsHtml;
     }
 
     function renderOutOfStockTable(outOfStock) {
