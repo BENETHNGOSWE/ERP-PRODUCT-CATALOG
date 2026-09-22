@@ -2794,10 +2794,28 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const path = window.location.pathname.replace(/^\/|\/$/g, '');
       const parts = path.split('/');
       if (parts.length >= 2 && (parts[1] === 'dashboard' || parts[1] === 'admin')) {
-        return parts[0];
+        const candidate = parts[0].toLowerCase();
+        if (candidate !== 'public' && candidate !== 'api' && candidate !== 'admin') {
+          return candidate;
+        }
       }
       const params = new URLSearchParams(window.location.search);
-      return params.get('store') || null;
+      const queryStore = params.get('store');
+      if (queryStore) return queryStore.toLowerCase();
+
+      // Check stored active store session or last authenticated store
+      const stored = localStorage.getItem('achete_active_store_slug') || sessionStorage.getItem('achete_active_store_slug');
+      if (stored) return stored.toLowerCase();
+
+      // Check if any store is authenticated in sessionStorage
+      const keys = Object.keys(sessionStorage);
+      for (const k of keys) {
+        if (k.startsWith('store_auth_') && sessionStorage.getItem(k) === 'true') {
+          return k.replace('store_auth_', '').toLowerCase();
+        }
+      }
+
+      return 'benstore';
     }
 
     function toggleMobileSidebar(forceClose = false) {
@@ -3010,6 +3028,13 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       const kpi = data.kpi || {};
       currentClientProducts = data.products || [];
       rawDashboardPayload = data;
+
+      if (store.slug) {
+        try {
+          localStorage.setItem('achete_active_store_slug', store.slug);
+          sessionStorage.setItem('achete_active_store_slug', store.slug);
+        } catch (e) {}
+      }
       if (store.categories && Array.isArray(store.categories) && store.categories.length > 0) {
         activeStoreCategories = [...store.categories];
       } else {

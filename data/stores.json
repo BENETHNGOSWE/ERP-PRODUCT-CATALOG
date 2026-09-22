@@ -1,57 +1,5 @@
 [
   {
-    "id": 9,
-    "name": "Koda Store",
-    "slug": "kodastore",
-    "tagline": "Official Koda Store | Premium Tech & Essentials",
-    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" fill=\"white\" font-size=\"24\" font-weight=\"bold\" text-anchor=\"middle\" dominant-baseline=\"middle\">KODA</text></svg>",
-    "whatsapp": "+255710459064",
-    "status": "active",
-    "themeColor": "#7433df",
-    "currency": "TZS",
-    "address": "Masaki, Dar es Salaam, Tanzania",
-    "posConfigId": 1,
-    "posConfigName": "Website Orders",
-    "categories": [
-      "All",
-      "Smartphones",
-      "Accessories",
-      "Audio"
-    ],
-    "productKeywords": [],
-    "productIds": [
-      148,
-      149,
-      141,
-      140,
-      150,
-      145,
-      146,
-      147,
-      144
-    ],
-    "createdDate": "2026-09-07",
-    "pin": "1234",
-    "inventoryOverrides": {
-      "144": {
-        "qty_available": 30,
-        "updatedAt": "2026-09-10T08:31:49.145Z"
-      },
-      "148": {
-        "qty_available": 0,
-        "updatedAt": "2026-09-10T08:32:02.962Z"
-      },
-      "150": {
-        "price": 75000,
-        "name": "MagSafe Battery Pack",
-        "description": "Snap-on wireless magnetic power bank",
-        "updatedAt": "2026-09-09T11:53:34.073Z"
-      }
-    },
-    "customProducts": [],
-    "banner": "/assets/stores/koda-store-banner.jpg"
-  },
-  {
     "id": 10,
     "name": "Ben Store",
     "slug": "benstore",
@@ -173,13 +121,13 @@
     "pin": "1234",
     "inventoryOverrides": {},
     "customProducts": [],
-    "banner": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1500\" height=\"250\" viewBox=\"0 0 1500 250\"><rect width=\"1500\" height=\"250\" fill=\"%230f172a\"/><defs><linearGradient id=\"bgG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0%25\" stop-color=\"%231e1b4b\"/><stop offset=\"50%25\" stop-color=\"%230f172a\"/><stop offset=\"100%25\" stop-color=\"%23180d2b\"/></linearGradient></defs><rect width=\"1500\" height=\"250\" fill=\"url(%23bgG)\"/><rect x=\"25\" y=\"25\" width=\"1450\" height=\"200\" rx=\"14\" fill=\"%231e293b\" stroke=\"%23334155\" stroke-width=\"2\"/><rect x=\"50\" y=\"45\" width=\"70\" height=\"70\" rx=\"12\" fill=\"%237433df\"/><text x=\"85\" y=\"93\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">QE</text><text x=\"140\" y=\"82\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" letter-spacing=\"1.5\">QUALITY ELECTRONICS TZ</text><text x=\"140\" y=\"116\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"500\" font-size=\"18\" fill=\"%2394a3b8\">Official Quality Electronics TZ Store • Quality Products &amp; Fast Delivery</text><line x1=\"50\" y1=\"160\" x2=\"1450\" y2=\"160\" stroke=\"%23334155\" stroke-width=\"1.5\"/><circle cx=\"70\" cy=\"188\" r=\"5\" fill=\"%2322c55e\"/><text x=\"86\" y=\"193\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"700\" font-size=\"15\" fill=\"%2322c55e\">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>"
+    "banner": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1500\" height=\"250\" viewBox=\"0 0 1500 250\"><rect width=\"1500\" height=\"250\" fill=\"%230f172a\"/><defs><linearGradient id=\"bgG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0%25\" stop-color=\"%231e1b4b\"/><stop offset=\"50%25\" stop-color=\"%230f172a\"/><stop offset=\"100%25\" stop-color=\"%23180d2b\"/></linearGradient></defs><rect width=\"1500\" height=\"250\" fill=\"url(%23bgG)\"/><rect x=\"25\" y=\"25\" width=\"1450\" height=\"200\" rx=\"14\" fill=\"%231e293b\" stroke=\"%23334155\" stroke-width=\"2\"/><rect x=\"50\" y=\"45\" width=\"70\" height=\"70\" rx=\"12\" fill=\"%237433df\"/><text x=\"85\" y=\"93\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">QE</text><text x=\"140\" y=\"82\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" letter-spacing=\"1.5\">QUALITY ELECTRONICS TZ</text><text x=\"140\" y=\"116\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"500\" font-size=\"18\" fill=\"%2394a3b8\">Official Quality Electronics TZ Store \u2022 Quality Products &amp; Fast Delivery</text><line x1=\"50\" y1=\"160\" x2=\"1450\" y2=\"160\" stroke=\"%23334155\" stroke-width=\"1.5\"/><circle cx=\"70\" cy=\"188\" r=\"5\" fill=\"%2322c55e\"/><text x=\"86\" y=\"193\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"700\" font-size=\"15\" fill=\"%2322c55e\">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>"
   },
   {
     "id": 12,
     "name": "Nirushe Chap",
     "slug": "nirushechap",
-    "tagline": "Official Nirushe Chap Store • Fast Orders & Delivery",
+    "tagline": "Official Nirushe Chap Store \u2022 Fast Orders & Delivery",
     "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%237433df\"/><text x=\"50%\" y=\"54%\" font-family=\"Arial, sans-serif\" font-weight=\"900\" font-size=\"26\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">NC</text></svg>",
     "whatsapp": "+255710459064",
     "status": "active",
@@ -200,6 +148,58 @@
     "pin": "1234",
     "inventoryOverrides": {},
     "customProducts": [],
-    "banner": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1500\" height=\"250\" viewBox=\"0 0 1500 250\"><rect width=\"1500\" height=\"250\" fill=\"%230f172a\"/><defs><linearGradient id=\"bgG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0%25\" stop-color=\"%231e1b4b\"/><stop offset=\"50%25\" stop-color=\"%230f172a\"/><stop offset=\"100%25\" stop-color=\"%23180d2b\"/></linearGradient></defs><rect width=\"1500\" height=\"250\" fill=\"url(%23bgG)\"/><rect x=\"25\" y=\"25\" width=\"1450\" height=\"200\" rx=\"14\" fill=\"%231e293b\" stroke=\"%23334155\" stroke-width=\"2\"/><rect x=\"50\" y=\"45\" width=\"70\" height=\"70\" rx=\"12\" fill=\"%237433df\"/><text x=\"85\" y=\"93\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">NC</text><text x=\"140\" y=\"82\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" letter-spacing=\"1.5\">NIRUSHE CHAP</text><text x=\"140\" y=\"116\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"500\" font-size=\"18\" fill=\"%2394a3b8\">Official Nirushe Chap Store • Fast Orders &amp; Delivery</text><line x1=\"50\" y1=\"160\" x2=\"1450\" y2=\"160\" stroke=\"%23334155\" stroke-width=\"1.5\"/><circle cx=\"70\" cy=\"188\" r=\"5\" fill=\"%2322c55e\"/><text x=\"86\" y=\"193\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"700\" font-size=\"15\" fill=\"%2322c55e\">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>"
+    "banner": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1500\" height=\"250\" viewBox=\"0 0 1500 250\"><rect width=\"1500\" height=\"250\" fill=\"%230f172a\"/><defs><linearGradient id=\"bgG\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0%25\" stop-color=\"%231e1b4b\"/><stop offset=\"50%25\" stop-color=\"%230f172a\"/><stop offset=\"100%25\" stop-color=\"%23180d2b\"/></linearGradient></defs><rect width=\"1500\" height=\"250\" fill=\"url(%23bgG)\"/><rect x=\"25\" y=\"25\" width=\"1450\" height=\"200\" rx=\"14\" fill=\"%231e293b\" stroke=\"%23334155\" stroke-width=\"2\"/><rect x=\"50\" y=\"45\" width=\"70\" height=\"70\" rx=\"12\" fill=\"%237433df\"/><text x=\"85\" y=\"93\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" text-anchor=\"middle\" dominant-baseline=\"middle\">NC</text><text x=\"140\" y=\"82\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"%23ffffff\" letter-spacing=\"1.5\">NIRUSHE CHAP</text><text x=\"140\" y=\"116\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"500\" font-size=\"18\" fill=\"%2394a3b8\">Official Nirushe Chap Store \u2022 Fast Orders &amp; Delivery</text><line x1=\"50\" y1=\"160\" x2=\"1450\" y2=\"160\" stroke=\"%23334155\" stroke-width=\"1.5\"/><circle cx=\"70\" cy=\"188\" r=\"5\" fill=\"%2322c55e\"/><text x=\"86\" y=\"193\" font-family=\"-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif\" font-weight=\"700\" font-size=\"15\" fill=\"%2322c55e\">OPEN FOR ORDERS &bull; VERIFIED MERCHANT</text></svg>"
+  },
+  {
+    "id": 9,
+    "name": "Koda Store",
+    "slug": "kodastore",
+    "tagline": "Official Koda Store | Premium Tech & Essentials",
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" rx=\"16\" fill=\"%23081735\"/><text x=\"50%\" y=\"54%\" fill=\"white\" font-size=\"24\" font-weight=\"bold\" text-anchor=\"middle\" dominant-baseline=\"middle\">KODA</text></svg>",
+    "whatsapp": "+255710459064",
+    "status": "active",
+    "themeColor": "#7433df",
+    "currency": "TZS",
+    "address": "Masaki, Dar es Salaam, Tanzania",
+    "posConfigId": 1,
+    "posConfigName": "Website Orders",
+    "categories": [
+      "All",
+      "Smartphones",
+      "Accessories",
+      "Audio"
+    ],
+    "productKeywords": [],
+    "productIds": [
+      148,
+      149,
+      141,
+      140,
+      150,
+      145,
+      146,
+      147,
+      144
+    ],
+    "createdDate": "2026-09-07",
+    "pin": "1234",
+    "inventoryOverrides": {
+      "144": {
+        "qty_available": 30,
+        "updatedAt": "2026-09-10T08:31:49.145Z"
+      },
+      "148": {
+        "qty_available": 0,
+        "updatedAt": "2026-09-10T08:32:02.962Z"
+      },
+      "150": {
+        "price": 75000,
+        "name": "MagSafe Battery Pack",
+        "description": "Snap-on wireless magnetic power bank",
+        "updatedAt": "2026-09-09T11:53:34.073Z"
+      }
+    },
+    "customProducts": [],
+    "banner": "/assets/stores/koda-store-banner.jpg"
   }
 ]
