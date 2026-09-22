@@ -1586,6 +1586,9 @@ function buildStoreIsolatedDashboardPayload(store, storeProducts, storeOrders) {
 // Store-Specific Isolated Dashboard Data
 app.get('/api/:slug/dashboard-data', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     const slug = req.params.slug;
     const store = stores.getStoreBySlug(slug);
     if (!store) return res.status(404).json({ success: false, error: 'Store not found' });
@@ -1619,6 +1622,9 @@ app.get(['/dashboard', '/dashboard.html', '/admin', '/admin.html', '/:slug/dashb
     }
   }
   res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
