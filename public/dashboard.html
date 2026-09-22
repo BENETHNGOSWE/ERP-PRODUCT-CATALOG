@@ -339,6 +339,11 @@
       flex-wrap: wrap;
     }
 
+    .dash-topbar-actions.tab-hidden,
+    .period-tabs.tab-hidden {
+      display: none !important;
+    }
+
     /* Period Filter Tabs */
     .period-tabs {
       display: flex;
@@ -1122,6 +1127,11 @@
         gap: 8px !important;
       }
 
+      .dash-topbar-actions.tab-hidden,
+      .period-tabs.tab-hidden {
+        display: none !important;
+      }
+
       .period-tabs {
         width: 100% !important;
         display: grid !important;
@@ -1520,7 +1530,7 @@
           <h1 class="dash-page-title" id="dashPageMainTitle" style="font-size: 1.25rem; font-weight: 800; color: #09090b; letter-spacing: -0.2px;">Overview</h1>
         </div>
         
-        <div class="dash-topbar-actions" style="display: flex; align-items: center; gap: 10px;">
+        <div class="dash-topbar-actions" id="dashTopbarActions" style="display: flex; align-items: center; gap: 10px;">
           <!-- Period Tabs (Visible in Dashboard overview) -->
           <div class="period-tabs" id="dashPeriodTabsWrap">
             <button class="period-tab-btn active" id="tabToday" onclick="setPeriod('today')">Today</button>
@@ -3522,20 +3532,27 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
       if (kpiOutStockEl) kpiOutStockEl.textContent = outOfStockCount;
 
       // 2. Action Cards: Total Stock Valuation & Total Items in Stock
-      const prods = (currentClientProducts && currentClientProducts.length > 0) ? currentClientProducts : (rawDashboardPayload.products || []);
-      const { totalValuation, totalStockUnits } = calculateStockStats(prods);
+      // Strictly calculate only products belonging to the active client store!
+      let storeItems = [];
+      if (currentClientProducts && currentClientProducts.length > 0) {
+        storeItems = currentClientProducts;
+      } else if (rawDashboardPayload && Array.isArray(rawDashboardPayload.products)) {
+        storeItems = rawDashboardPayload.products;
+      }
+
+      const { totalValuation, totalStockUnits } = calculateStockStats(storeItems);
 
       const valEl = document.getElementById('kpiStockValuation');
       if (valEl) valEl.textContent = formatTZS(totalValuation);
 
       const valSub = document.getElementById('kpiStockValuationSub');
-      if (valSub) valSub.textContent = `Capital across ${prods.length} products`;
+      if (valSub) valSub.textContent = `Capital across ${storeItems.length} store items`;
 
       const unitsEl = document.getElementById('kpiTotalStockUnits');
       if (unitsEl) unitsEl.textContent = `${totalStockUnits.toLocaleString('en-US')} units`;
 
       const unitsSub = document.getElementById('kpiTotalStockUnitsSub');
-      if (unitsSub) unitsSub.textContent = `Active units on hand`;
+      if (unitsSub) unitsSub.textContent = `Active units in store`;
       
       const sbStock = document.getElementById('sidebarStockBadge');
       if (sbStock) sbStock.textContent = outOfStockCount;
@@ -3963,6 +3980,7 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       // 3. Update main page title and top bar controls depending on tab
       const titleEl = document.getElementById('dashPageMainTitle');
+      const topbarActions = document.getElementById('dashTopbarActions');
       const periodTabsWrap = document.getElementById('dashPeriodTabsWrap');
       const dateRangeWrap = document.getElementById('dashDateRangeWrap');
       const refreshBtn = document.getElementById('btnSyncOdoo');
@@ -3971,11 +3989,25 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       if (tab === 'dashboard') {
         if (titleEl) titleEl.textContent = `${storeName} Dashboard`;
-        if (periodTabsWrap) periodTabsWrap.style.display = 'flex';
+        if (topbarActions) {
+          topbarActions.classList.remove('tab-hidden');
+          topbarActions.style.display = 'flex';
+        }
+        if (periodTabsWrap) {
+          periodTabsWrap.classList.remove('tab-hidden');
+          periodTabsWrap.style.display = '';
+        }
         if (dateRangeWrap) dateRangeWrap.style.display = 'flex';
         if (refreshBtn) refreshBtn.style.display = (window.innerWidth > 992) ? 'flex' : 'none';
       } else {
-        if (periodTabsWrap) periodTabsWrap.style.display = 'none';
+        if (topbarActions) {
+          topbarActions.classList.add('tab-hidden');
+          topbarActions.style.display = 'none';
+        }
+        if (periodTabsWrap) {
+          periodTabsWrap.classList.add('tab-hidden');
+          periodTabsWrap.style.display = 'none';
+        }
         if (dateRangeWrap) dateRangeWrap.style.display = 'none';
         if (refreshBtn) refreshBtn.style.display = 'none';
 
