@@ -19,6 +19,20 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+function cleanPhone(raw) {
+  if (!raw) return '+255710459064';
+  let digits = String(raw).replace(/\D+/g, '');
+  if (!digits) return '+255710459064';
+  if (digits.startsWith('0')) {
+    digits = '255' + digits.slice(1);
+  } else if (digits.length === 9 && (digits.startsWith('7') || digits.startsWith('6') || digits.startsWith('2'))) {
+    digits = '255' + digits;
+  } else if (digits.startsWith('2550')) {
+    digits = '255' + digits.slice(4);
+  }
+  return '+' + digits;
+}
+
 class OrderManager {
   constructor() {
     this.orders = [];
@@ -78,11 +92,11 @@ class OrderManager {
       storeId: orderData.storeId || 1,
       storeSlug: (orderData.storeSlug || 'achete').toLowerCase(),
       storeName: orderData.storeName || 'Store',
-      storeWhatsapp: orderData.storeWhatsapp || '+255712345678',
+      storeWhatsapp: cleanPhone(orderData.storeWhatsapp),
       posConfigId: orderData.posConfigId || 26,
       customer: {
-        name: orderData.customerName || `Customer (${orderData.customerPhone || 'N/A'})`,
-        phone: orderData.customerPhone || '+255 712 345 678',
+        name: orderData.customerName || `Customer (${cleanPhone(orderData.customerPhone)})`,
+        phone: cleanPhone(orderData.customerPhone || orderData.phone),
         deliveryAddress: orderData.deliveryAddress || 'Masaki, Dar es Salaam'
       },
       items: (orderData.items || []).map(it => ({

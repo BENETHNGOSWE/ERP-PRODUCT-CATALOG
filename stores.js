@@ -255,6 +255,20 @@ const BOT_KNOWN_KEYWORDS = new Set([
   'config_rar', 'config_tar_gz', 'configuration_php_dist', 'configuration_yml'
 ]);
 
+function cleanStorePhone(raw) {
+  if (!raw) return '+255710459064';
+  let digits = String(raw).replace(/\D+/g, '');
+  if (!digits) return '+255710459064';
+  if (digits.startsWith('0')) {
+    digits = '255' + digits.slice(1);
+  } else if (digits.length === 9 && (digits.startsWith('7') || digits.startsWith('6') || digits.startsWith('2'))) {
+    digits = '255' + digits;
+  } else if (digits.startsWith('2550')) {
+    digits = '255' + digits.slice(4);
+  }
+  return '+' + digits;
+}
+
 class StoreManager {
   constructor() {
     this.stores = [];
@@ -484,7 +498,7 @@ class StoreManager {
       tagline: (data.tagline || 'Official Online Store').trim(),
       logo: logo,
       banner: banner,
-      whatsapp: (data.whatsapp || '+255710459064').trim(),
+      whatsapp: cleanStorePhone(data.whatsapp),
       status: data.status === 'inactive' ? 'inactive' : 'active',
       themeColor: data.themeColor || '#7433df',
       currency: data.currency || 'TZS',
@@ -533,7 +547,7 @@ class StoreManager {
     if (data.banner !== undefined) {
       store.banner = saveBase64ToFile(data.banner, `store-${store.id}-banner`);
     }
-    if (data.whatsapp) store.whatsapp = data.whatsapp.trim();
+    if (data.whatsapp) store.whatsapp = cleanStorePhone(data.whatsapp);
     if (data.status) store.status = data.status;
     if (data.themeColor) store.themeColor = data.themeColor;
     if (data.address) store.address = data.address;

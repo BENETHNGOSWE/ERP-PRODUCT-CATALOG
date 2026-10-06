@@ -332,6 +332,27 @@ const NOVA = (function () {
     }
   }
 
+  // Phone Normalization Utility (E.164 + Concatenated Clean Digits)
+  function normalizePhone(raw) {
+    if (!raw) return '';
+    let digits = String(raw).replace(/\D+/g, '');
+    if (!digits) return '';
+    if (digits.startsWith('0')) {
+      digits = '255' + digits.slice(1);
+    } else if (digits.length === 9 && (digits.startsWith('7') || digits.startsWith('6') || digits.startsWith('2'))) {
+      digits = '255' + digits;
+    } else if (digits.startsWith('2550')) {
+      digits = '255' + digits.slice(4);
+    }
+    return '+' + digits;
+  }
+
+  function savePhone(phone) {
+    const clean = normalizePhone(phone) || phone;
+    localStorage.setItem('achete_phone', clean);
+    return clean;
+  }
+
   // Toast System
   function showToast(message, type = 'info') {
     let container = document.getElementById('toastContainer');
@@ -365,10 +386,16 @@ const NOVA = (function () {
       const slug = getActiveStoreSlug() || 'kodastore';
       orderPayload.storeSlug = slug;
       if (activeStore && activeStore.whatsapp) {
-        orderPayload.storeWhatsapp = activeStore.whatsapp;
+        orderPayload.storeWhatsapp = normalizePhone(activeStore.whatsapp) || activeStore.whatsapp;
       }
       if (activeStore && activeStore.name) {
         orderPayload.storeName = activeStore.name;
+      }
+      if (orderPayload.customerPhone) {
+        orderPayload.customerPhone = normalizePhone(orderPayload.customerPhone) || orderPayload.customerPhone;
+      }
+      if (orderPayload.phone) {
+        orderPayload.phone = normalizePhone(orderPayload.phone) || orderPayload.phone;
       }
 
       let res = await fetch(`/api/${slug}/order`, {
@@ -421,6 +448,7 @@ const NOVA = (function () {
     saveLatestOrder,
     getPhone,
     savePhone,
+    normalizePhone,
     formatTZS,
     calculateTotals,
     updateItemQty,

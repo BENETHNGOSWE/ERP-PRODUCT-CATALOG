@@ -327,15 +327,16 @@ Sent via achete.me Platform`
    */
   async sendTestMessage(targetPhone, customMessage) {
     const cleanPhone = this.normalizePhone(targetPhone);
-    const text = customMessage || `🔔 *WhatsApp Test Notification*\nYour WhatsApp Gateway is connected and delivering messages to ${targetPhone}!`;
+    const cleanTarget = '+' + this.normalizePhone(targetPhone);
+    const text = customMessage || `🔔 *WhatsApp Test Notification*\nYour WhatsApp Gateway is connected and delivering messages to ${cleanTarget}!`;
     
-    const fakeStore = { name: 'Store Gateway Test', whatsapp: targetPhone };
+    const fakeStore = { name: 'Store Gateway Test', whatsapp: cleanTarget };
     const fakeOrder = { orderNumber: `TEST-${Date.now().toString().slice(-4)}`, totalAmount: 0 };
     
     const result = await this.sendOrderNotification(fakeStore, {
       ...fakeOrder,
       items: [{ name: 'Test Connection Item', price: 0, qty: 1 }],
-      customer: { name: 'Gateway Test', phone: targetPhone }
+      customer: { name: 'Gateway Test', phone: cleanTarget }
     });
 
     return result;
@@ -344,6 +345,7 @@ Sent via achete.me Platform`
   // --- Provider 1: Meta WhatsApp Cloud API ---
   sendMetaCloudMessage(phone, text) {
     return new Promise((resolve, reject) => {
+      const cleanPhone = this.normalizePhone(phone);
       const phoneNumberId = this.config.metaPhoneNumberId;
       const token = this.config.metaToken;
       if (!phoneNumberId || !token) return reject(new Error('Meta Cloud API Phone Number ID and Token required.'));
@@ -351,7 +353,7 @@ Sent via achete.me Platform`
       const postData = JSON.stringify({
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
-        to: phone,
+        to: cleanPhone,
         type: 'text',
         text: { preview_url: false, body: text }
       });
@@ -390,13 +392,14 @@ Sent via achete.me Platform`
   // --- Provider 2: UltraMsg API ---
   sendUltraMsg(phone, message) {
     return new Promise((resolve, reject) => {
+      const cleanPhone = this.normalizePhone(phone);
       const instanceId = this.config.ultramsgInstanceId;
       const token = this.config.ultramsgToken;
       if (!instanceId || !token) return reject(new Error('UltraMsg Instance ID and Token required.'));
 
       const postData = new URLSearchParams({
         token: token,
-        to: phone,
+        to: cleanPhone,
         body: message
       }).toString();
 
@@ -433,6 +436,7 @@ Sent via achete.me Platform`
   // --- Provider 3: Evolution API ---
   sendEvolutionMessage(phone, message) {
     return new Promise((resolve, reject) => {
+      const cleanPhone = this.normalizePhone(phone);
       const baseUrl = this.config.evolutionUrl;
       const apiKey = this.config.evolutionApiKey;
       const instance = this.config.evolutionInstance || 'main';
@@ -443,7 +447,7 @@ Sent via achete.me Platform`
       const client = isHttps ? https : http;
 
       const postData = JSON.stringify({
-        number: phone,
+        number: cleanPhone,
         options: { delay: 1200, presence: 'composing' },
         textMessage: { text: message }
       });
@@ -480,6 +484,7 @@ Sent via achete.me Platform`
   // --- Provider 4: Custom Gateway / Webhook ---
   sendCustomWebhook(phone, message, orderRef) {
     return new Promise((resolve, reject) => {
+      const cleanPhone = this.normalizePhone(phone);
       const gatewayUrl = this.config.gatewayUrl;
       const apiKey = this.config.gatewayApiKey;
       if (!gatewayUrl) return reject(new Error('Custom Gateway URL required.'));
@@ -489,7 +494,7 @@ Sent via achete.me Platform`
       const client = isHttps ? https : http;
 
       const postData = JSON.stringify({
-        phone: phone,
+        phone: cleanPhone,
         message: message,
         orderNumber: orderRef,
         timestamp: new Date().toISOString()

@@ -1074,7 +1074,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       discount: orderData.discount || 0,
       totalAmount: finalTotal,
       whatsappStatus: 'Dispatched',
-      waLink: `https://api.whatsapp.com/send?phone=${storeContext.whatsapp.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`*ORDER #${finalOrderId}*\nTotal: TZS ${finalTotal}\nCustomer: ${customerName}`)}`
+      waLink: `https://api.whatsapp.com/send?phone=${whatsapp.normalizePhone(storeContext.whatsapp)}&text=${encodeURIComponent(`*ORDER #${finalOrderId}*\nTotal: TZS ${finalTotal}\nCustomer: ${customerName}`)}`
     });
 
     res.status(201).json({

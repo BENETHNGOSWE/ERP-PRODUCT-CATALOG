@@ -912,7 +912,8 @@
             <span>Processing Order...</span>
           `;
 
-          const phoneVal = phoneInput?.value.trim() || '+255 712 345 678';
+          const rawPhone = phoneInput?.value || '';
+          const phoneVal = NOVA.normalizePhone(rawPhone) || ((NOVA.getStore() && NOVA.getStore().whatsapp) || '+255710459064');
           NOVA.savePhone(phoneVal);
 
           const cart = NOVA.getCart();
