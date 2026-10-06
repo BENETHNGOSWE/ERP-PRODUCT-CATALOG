@@ -624,15 +624,71 @@ Sent via achete.me Platform`
   }
 
   /**
-   * Check Session Status
+   * Check Real Live Session Status
    */
   async checkSessionStatus(store) {
+    if (this.config.provider === 'openwa') {
+      try {
+        const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');
+        const apiKey = this.config.openwaApiKey || '';
+        const sessionId = await this.getActiveOpenwaSessionId(openwaUrl, apiKey, this.config.openwaSession || 'achete-main');
+
+        const res = await fetch(`${openwaUrl}/api/sessions/${encodeURIComponent(sessionId)}`, {
+          headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${apiKey}` }
+        });
+        const sessionData = await res.json().catch(() => null);
+
+        if (sessionData) {
+          const isConnected = sessionData.status === 'WORKING' || sessionData.status === 'CONNECTED' || (Boolean(sessionData.phone) && sessionData.status !== 'qr_ready');
+          return {
+            provider: 'openwa',
+            connected: isConnected,
+            status: sessionData.status || (isConnected ? 'WORKING' : 'DISCONNECTED'),
+            sessionId: sessionData.id,
+            sessionName: sessionData.name,
+            phone: sessionData.phone || (store ? store.whatsapp : null),
+            pushName: sessionData.pushName || null,
+            lastActive: sessionData.lastActive,
+            needsQR: sessionData.status === 'qr_ready' || !isConnected
+          };
+        }
+      } catch (e) {
+        return {
+          provider: 'openwa',
+          connected: false,
+          status: 'ERROR',
+          error: e.message,
+          phone: store ? store.whatsapp : this.config.defaultSender
+        };
+      }
+    }
+
     return {
       provider: this.config.provider,
       connected: true,
       status: 'READY',
       phone: store ? store.whatsapp : this.config.defaultSender
     };
+  }
+
+  /**
+   * Get Live QR Code if session is pending authentication
+   */
+  async getQRCode() {
+    if (this.config.provider !== 'openwa') return null;
+    try {
+      const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');
+      const apiKey = this.config.openwaApiKey || '';
+      const sessionId = await this.getActiveOpenwaSessionId(openwaUrl, apiKey, this.config.openwaSession || 'achete-main');
+      const res = await fetch(`${openwaUrl}/api/sessions/${encodeURIComponent(sessionId)}/qr`, {
+        headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${apiKey}` }
+      });
+      const data = await res.json().catch(() => null);
+      return data && data.qrCode ? data.qrCode : null;
+    } catch (e) {
+      console.warn('[WhatsApp] Error getting QR code:', e.message);
+      return null;
+    }
   }
 
   getLogs(limit = 20) {

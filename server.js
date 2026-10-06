@@ -1230,6 +1230,27 @@ app.post('/api/whatsapp/test-send', async (req, res) => {
   }
 });
 
+app.get('/api/whatsapp/qr', async (req, res) => {
+  try {
+    const qrDataUri = await whatsapp.getQRCode();
+    if (!qrDataUri) {
+      return res.status(404).json({ success: false, message: 'No QR code pending. WhatsApp session may already be connected or inactive.' });
+    }
+    if (req.query.format === 'image' || req.headers.accept?.includes('image/')) {
+      const base64Data = qrDataUri.replace(/^data:image\/\w+;base64,/, '');
+      const imgBuffer = Buffer.from(base64Data, 'base64');
+      res.writeHead(200, {
+        'Content-Type': 'image/png',
+        'Content-Length': imgBuffer.length
+      });
+      return res.end(imgBuffer);
+    }
+    res.json({ success: true, qrCode: qrDataUri });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/whatsapp/status', async (req, res) => {
   try {
     const store = stores.getAllStores()[0];
