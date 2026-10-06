@@ -944,9 +944,10 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       store = stores.getAllStores().find(s => s.slug.toLowerCase() === slug.toLowerCase() || s.name.toLowerCase() === slug.toLowerCase()) || stores.getAllStores()[0];
     }
 
-    const storeWhatsapp = (store && store.whatsapp && !store.whatsapp.includes('12345678'))
+    const rawStoreWhatsapp = (store && store.whatsapp && !store.whatsapp.includes('12345678'))
       ? store.whatsapp
       : ((orderData.storeWhatsapp && !orderData.storeWhatsapp.includes('12345678')) ? orderData.storeWhatsapp : '+255710459064');
+    const storeWhatsapp = '+' + whatsapp.normalizePhone(rawStoreWhatsapp);
     const storeName = orderData.storeName || (store && store.name) || 'Store';
 
     const storeContext = {
@@ -957,8 +958,9 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
       whatsapp: storeWhatsapp
     };
 
-    const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || 'Store Customer';
-    const customerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || storeWhatsapp;
+    const rawCustomerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || storeWhatsapp;
+    const customerPhone = '+' + whatsapp.normalizePhone(rawCustomerPhone);
+    const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || `Customer (${customerPhone})`;
     const deliveryAddress = (orderData.customer && (orderData.customer.address || orderData.customer.deliveryAddress)) || orderData.deliveryAddress || (store && store.address) || 'Dar es Salaam';
 
     const calculatedTotal = (orderData.items || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0);

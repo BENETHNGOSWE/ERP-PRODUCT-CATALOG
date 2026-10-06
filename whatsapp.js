@@ -85,14 +85,18 @@ class WhatsAppService {
 
   /**
    * Normalize Phone Number to E.164 Clean Format (e.g., 255710459064)
+   * Strips all spaces, dashes, brackets, plus signs, and concatenates cleaned digits.
    */
   normalizePhone(phone) {
-    if (!phone) return '255712345678';
-    let clean = String(phone).replace(/[^0-9]/g, '');
+    if (!phone) return '255710459064';
+    let clean = String(phone).replace(/\D+/g, '');
+    if (!clean) return '255710459064';
     if (clean.startsWith('0')) {
       clean = '255' + clean.slice(1);
     } else if (clean.length === 9 && (clean.startsWith('7') || clean.startsWith('6'))) {
       clean = '255' + clean;
+    } else if (clean.startsWith('2550')) {
+      clean = '255' + clean.slice(4);
     }
     return clean;
   }
@@ -594,6 +598,8 @@ Sent via achete.me Platform`
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
+    const cleanDigits = this.normalizePhone(phone);
+
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -602,7 +608,7 @@ Sent via achete.me Platform`
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        chatId: `${phone}@c.us`,
+        chatId: `${cleanDigits}@c.us`,
         text: message
       }),
       signal: controller.signal

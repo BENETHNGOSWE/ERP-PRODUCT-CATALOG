@@ -277,9 +277,10 @@
           btnWhatsAppDirect.href = order.waLink;
         } else {
           const storeWa = order.storeWhatsapp || (NOVA.getStore() && NOVA.getStore().whatsapp) || '+255710459064';
-          let cleanWa = String(storeWa).replace(/[^0-9]/g, '');
+          let cleanWa = String(storeWa).replace(/\D+/g, '');
           if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
-          else if (cleanWa.length === 9) cleanWa = '255' + cleanWa;
+          else if (cleanWa.length === 9 && (cleanWa.startsWith('7') || cleanWa.startsWith('6'))) cleanWa = '255' + cleanWa;
+          else if (cleanWa.startsWith('2550')) cleanWa = '255' + cleanWa.slice(4);
           const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\nTotal: TZS ${NOVA.formatTZS(finalAmount)}\nPhone: ${(order.customer && order.customer.phone) || order.phone || ''}`;
           btnWhatsAppDirect.href = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(msg)}`;
         }
