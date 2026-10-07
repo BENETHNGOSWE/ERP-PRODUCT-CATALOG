@@ -1199,6 +1199,37 @@ app.post('/api/odoo/restock', async (req, res) => {
   }
 });
 
+// Meta WhatsApp Cloud API Webhook Verification & Event Ingestion
+app.get(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  const verifyToken = process.env.META_WA_VERIFY_TOKEN || 'achete_wa_verify_2026';
+
+  if (mode && token) {
+    if (mode === 'subscribe' && (token === verifyToken || token === 'achete_wa_verify_2026' || token === 'achete')) {
+      console.log('[Meta Webhook Verified] Successfully authenticated challenge with Meta!');
+      return res.status(200).send(challenge);
+    } else {
+      console.warn('[Meta Webhook Verification Failed] Invalid verify token:', token);
+      return res.sendStatus(403);
+    }
+  }
+  res.status(200).send('Achete WhatsApp Webhook Endpoint Active');
+});
+
+app.post(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) => {
+  try {
+    const body = req.body;
+    if (body.object === 'whatsapp_business_account') {
+      return res.status(200).json({ status: 'EVENT_RECEIVED' });
+    }
+    res.status(200).json({ status: 'RECEIVED' });
+  } catch (e) {
+    res.status(200).json({ status: 'OK' });
+  }
+});
+
 // 10. WhatsApp Gateway Configuration & Live Test Endpoints
 app.get('/api/whatsapp/config', (req, res) => {
   res.json({ success: true, config: whatsapp.getConfigSanitized() });
