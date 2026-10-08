@@ -1250,52 +1250,111 @@
     .drawer-overlay {
       position: fixed;
       inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100%;
+      height: 100dvh;
       background: rgba(15, 23, 42, 0.6);
       backdrop-filter: blur(4px);
       z-index: 100000;
       display: none;
       justify-content: flex-end;
+      align-items: stretch;
+      overflow: hidden;
+      box-sizing: border-box;
     }
     .drawer-overlay.active {
       display: flex;
     }
     .drawer-panel {
       width: 490px;
-      max-width: 95vw;
-      height: 100vh;
+      max-width: 100vw;
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
       background: #ffffff;
       box-shadow: -10px 0 40px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
       animation: slideDrawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
     }
     @keyframes slideDrawerIn {
       from { transform: translateX(100%); }
       to { transform: translateX(0); }
     }
     .drawer-header {
-      padding: 20px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid #e2e8f0;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       background: #ffffff;
+      flex-shrink: 0;
+      z-index: 2;
     }
     .drawer-body {
-      padding: 24px;
+      padding: 20px;
       overflow-y: auto;
-      flex: 1;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+      min-height: 0; /* Ensures proper scroll calculation in flex */
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
     .drawer-footer {
-      padding: 16px 24px;
+      padding: 14px 20px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
       border-top: 1px solid #e2e8f0;
       background: #ffffff;
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.06);
+    }
+    @media (max-width: 640px) {
+      .drawer-panel {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+      }
+      .drawer-header {
+        padding: 14px 16px !important;
+      }
+      .drawer-body {
+        padding: 16px 16px 24px !important;
+      }
+      .drawer-footer {
+        padding: 12px 16px max(14px, env(safe-area-inset-bottom, 14px)) !important;
+        background: #ffffff !important;
+        display: flex !important;
+        gap: 10px !important;
+      }
+      .drawer-footer .btn-modal-cancel,
+      .drawer-footer .btn-modal-confirm,
+      .drawer-footer button {
+        flex: 1 !important;
+        width: auto !important;
+        padding: 12px 14px !important;
+        font-size: 0.92rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+        display: inline-flex !important;
+        align-items: center !important;
+      }
     }
     .image-dropzone {
       border: 2px dashed #cbd5e1;
@@ -2756,8 +2815,8 @@ Samsung 45W Fast Charger, 45000, 25, Electronics, SAM-45W" style="font-family:mo
 
       <!-- Drawer Footer -->
       <div class="drawer-footer">
-        <button type="button" class="btn-modal-cancel" onclick="closeProductSlideDrawer()" style="padding: 10px 18px; font-weight: 600;">Cancel</button>
-        <button type="button" class="btn-modal-confirm" id="btnSaveDrawerProduct" style="background: #6d2fe3; color: #ffffff; padding: 10px 24px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(109,47,227,0.3);" onclick="submitDrawerProduct()">
+        <button type="button" class="btn-modal-cancel" onclick="closeProductSlideDrawer()">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btnSaveDrawerProduct" onclick="submitDrawerProduct()">
           Save Product
         </button>
       </div>
