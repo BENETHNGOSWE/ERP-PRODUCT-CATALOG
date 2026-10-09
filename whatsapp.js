@@ -360,14 +360,14 @@ Sent via achete.me Platform`
 
       const req = https.request({
         hostname: 'graph.facebook.com',
-        path: `/v19.0/${phoneNumberId}/messages`,
+        path: `/v20.0/${phoneNumberId}/messages`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
           'Content-Length': Buffer.byteLength(postData)
         },
-        timeout: 6000
+        timeout: 8000
       }, (res) => {
         let body = '';
         res.on('data', c => body += c);
@@ -632,6 +632,47 @@ Sent via achete.me Platform`
    * Check Real Live Session Status
    */
   async checkSessionStatus(store) {
+    if (this.config.provider === 'meta') {
+      try {
+        const phoneId = this.config.metaPhoneNumberId;
+        const token = this.config.metaToken;
+        if (!phoneId || !token) {
+          return { provider: 'meta', connected: false, status: 'NOT_CONFIGURED', error: 'Missing Phone ID or Token' };
+        }
+        const res = await fetch(`https://graph.facebook.com/v20.0/${encodeURIComponent(phoneId)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data && data.id) {
+          return {
+            provider: 'meta',
+            connected: true,
+            status: 'CONNECTED',
+            phone: data.display_phone_number || store?.whatsapp || this.config.defaultSender,
+            verifiedName: data.verified_name || 'Achete Platform',
+            qualityRating: data.quality_rating || 'GREEN',
+            phoneId: data.id
+          };
+        } else {
+          return {
+            provider: 'meta',
+            connected: false,
+            status: 'ERROR',
+            error: data?.error?.message || `HTTP ${res.status}`,
+            phone: store ? store.whatsapp : this.config.defaultSender
+          };
+        }
+      } catch (e) {
+        return {
+          provider: 'meta',
+          connected: false,
+          status: 'ERROR',
+          error: e.message,
+          phone: store ? store.whatsapp : this.config.defaultSender
+        };
+      }
+    }
+
     if (this.config.provider === 'openwa') {
       try {
         const openwaUrl = (this.config.openwaUrl || 'https://whatsapp.kodatechnologies.co.tz').replace(/\/+$/, '');

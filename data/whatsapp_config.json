@@ -1,8 +1,11 @@
 {
-  "provider": "openwa",
+  "provider": "meta",
+  "metaPhoneNumberId": "1404492202740743",
+  "metaToken": "EAAPQYWyTxJgBSjoFagaeJZBxpzcILyzl5eflu66GXTDyW8unwTOu5hAyK786aeOzNu4Gaz3INmQVDpJMlEadsnOSfHbcW7Pymf1nqpSwZAsbOAzehysiUs8kdehZABVgUHa7DTZBFyEsx5N0SvfAbdZCNoateUsDIWF8MnOLLssaMZAz3dE4DdO6MxK38rHYCJ6ZA9CuU5cEq9vudQt7XfFO3rd6q0FSOfqwGnWMHASpR1GydMt7fX59Huvn4zl2gDJ7VU0mYP7Y4KwD5iFjeSd",
+  "metaWabaId": "1094994613275360",
+  "defaultSender": "+255752449064",
   "openwaUrl": "https://whatsapp.kodatechnologies.co.tz",
   "openwaApiKey": "owa_k1_1264a938030cd6d59488aeeeb60f5f13e3876549595758e3dc0abfd4e3572845",
   "openwaSession": "achete-main",
-  "openwaSessionId": "815b1f8a-b0e5-4778-9b97-fc9adb727b6a",
-  "defaultSender": "+255757681480"
+  "openwaSessionId": "815b1f8a-b0e5-4778-9b97-fc9adb727b6a"
 }
