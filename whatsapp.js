@@ -210,7 +210,15 @@ Sent via achete.me Platform`
       if (this.config.provider === 'openwa' || this.config.openwaUrl) {
         dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
       } else if (this.config.provider === 'meta') {
-        dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+        const storeName = store ? store.name : 'Store';
+        const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
+        try {
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', [
+            storeName, orderRef, totalFormatted
+          ]);
+        } catch (tErr) {
+          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+        }
       } else if (this.config.provider === 'ultramsg') {
         dispatchResult = await this.sendUltraMsg(cleanPhone, messageText);
       } else if (this.config.gatewayUrl) {
@@ -263,7 +271,27 @@ Sent via achete.me Platform`
       // 1. Meta WhatsApp Cloud API
       if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
         providerUsed = 'Meta Cloud API';
-        dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+        const storeName = store ? store.name : 'Store';
+        const custName = (order.customer && order.customer.name) || order.customerName || 'Customer';
+        const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
+        const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
+        const itemsSummary = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Order Items';
+
+        try {
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_merchant_order_alert', [
+            orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary
+          ]);
+        } catch (templateErr) {
+          console.log(`[Meta Cloud API] Template notice (${templateErr.message}), trying order notification template...`);
+          try {
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', [
+              storeName, orderRef, totalFormatted
+            ]);
+          } catch (t2Err) {
+            console.log(`[Meta Cloud API] Direct fallback: ${t2Err.message}`);
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+          }
+        }
       }
       // 2. UltraMsg Cloud API
       else if (this.config.provider === 'ultramsg' || (this.config.ultramsgInstanceId && this.config.ultramsgToken)) {
@@ -343,6 +371,61 @@ Sent via achete.me Platform`
   }
 
   // --- Provider 1: Meta WhatsApp Cloud API ---
+  sendMetaTemplateMessage(phone, templateName, parameters = [], language = 'en_US') {
+    return new Promise((resolve, reject) => {
+      const cleanPhone = this.normalizePhone(phone);
+      const phoneNumberId = this.config.metaPhoneNumberId;
+      const token = this.config.metaToken;
+      if (!phoneNumberId || !token) return reject(new Error('Meta Cloud API Phone Number ID and Token required.'));
+
+      const postData = JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: cleanPhone,
+        type: 'template',
+        template: {
+          name: templateName,
+          language: { code: language },
+          components: parameters && parameters.length ? [
+            {
+              type: 'body',
+              parameters: parameters.map(val => ({ type: 'text', text: String(val || '') }))
+            }
+          ] : []
+        }
+      });
+
+      const req = https.request({
+        hostname: 'graph.facebook.com',
+        path: `/v20.0/${phoneNumberId}/messages`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Content-Length': Buffer.byteLength(postData)
+        },
+        timeout: 8000
+      }, (res) => {
+        let body = '';
+        res.on('data', c => body += c);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(body || '{}');
+            if (res.statusCode >= 200 && res.statusCode < 300) resolve(parsed);
+            else reject(new Error(parsed.error ? parsed.error.message : `Meta API HTTP ${res.statusCode}: ${body}`));
+          } catch (e) {
+            reject(new Error(`Meta API error: ${body}`));
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('Meta API connection timeout')); });
+      req.write(postData);
+      req.end();
+    });
+  }
+
   sendMetaCloudMessage(phone, text) {
     return new Promise((resolve, reject) => {
       const cleanPhone = this.normalizePhone(phone);
