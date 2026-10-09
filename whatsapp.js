@@ -212,12 +212,15 @@ Sent via achete.me Platform`
       } else if (this.config.provider === 'meta') {
         const storeName = store ? store.name : 'Store';
         const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
+        const params3 = [storeName, orderRef, totalFormatted];
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', [
-            storeName, orderRef, totalFormatted
-          ]);
-        } catch (tErr) {
-          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3);
+        } catch (t1) {
+          try {
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', params3);
+          } catch (t2) {
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+          }
         }
       } else if (this.config.provider === 'ultramsg') {
         dispatchResult = await this.sendUltraMsg(cleanPhone, messageText);
@@ -277,19 +280,26 @@ Sent via achete.me Platform`
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
         const itemsSummary = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Order Items';
 
+        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
+        const params3 = [storeName, orderRef, totalFormatted];
+
+        // Try merchant_order_alert first, then achete_merchant_order_alert, then customer templates, then direct text
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_merchant_order_alert', [
-            orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary
-          ]);
-        } catch (templateErr) {
-          console.log(`[Meta Cloud API] Template notice (${templateErr.message}), trying order notification template...`);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6);
+        } catch (e1) {
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', [
-              storeName, orderRef, totalFormatted
-            ]);
-          } catch (t2Err) {
-            console.log(`[Meta Cloud API] Direct fallback: ${t2Err.message}`);
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_merchant_order_alert', params6);
+          } catch (e2) {
+            try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3);
+            } catch (e3) {
+              try {
+                dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', params3);
+              } catch (e4) {
+                console.log('[Meta Cloud API] Templates pending, falling back to direct text...');
+                dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+              }
+            }
           }
         }
       }
