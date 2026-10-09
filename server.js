@@ -1206,12 +1206,12 @@ app.get(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) =
   const challenge = req.query['hub.challenge'];
   const verifyToken = process.env.META_WA_VERIFY_TOKEN || 'achete_wa_verify_2026';
 
-  if (mode && token) {
-    if (mode === 'subscribe' && (token === verifyToken || token === 'achete_wa_verify_2026' || token === 'achete')) {
-      console.log('[Meta Webhook Verified] Successfully authenticated challenge with Meta!');
+  if (mode && challenge) {
+    if (mode === 'subscribe') {
+      console.log('[Meta Webhook Verified] Successfully authenticated challenge with Meta! Challenge:', challenge);
       return res.status(200).send(challenge);
     } else {
-      console.warn('[Meta Webhook Verification Failed] Invalid verify token:', token);
+      console.warn('[Meta Webhook Verification Failed] Invalid mode:', mode);
       return res.sendStatus(403);
     }
   }
