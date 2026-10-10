@@ -210,16 +210,16 @@ Sent via achete.me Platform`
       if (this.config.provider === 'openwa' || this.config.openwaUrl) {
         dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
       } else if (this.config.provider === 'meta') {
-        const storeName = store ? store.name : 'Store';
-        const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
-        const params3 = [storeName, orderRef, totalFormatted];
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-        } catch (t1) {
+          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+        } catch (cErr) {
+          const storeName = store ? store.name : 'Store';
+          const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
+          const params3 = [storeName, orderRef, totalFormatted];
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en_US');
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
           } catch (t2) {
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            throw cErr;
           }
         }
       } else if (this.config.provider === 'ultramsg') {
@@ -283,16 +283,19 @@ Sent via achete.me Platform`
         const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
-        // 1. Try approved merchant_order_alert (en_US)
+        // 1. Send rich formatted direct order notification
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
-        } catch (e1) {
-          // 2. Try approved order_alert (en)
+          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+        } catch (directErr) {
+          console.log(`[Meta Cloud API] Direct text notice (${directErr.message}), trying merchant template...`);
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-          } catch (e2) {
-            // 3. Fallback to direct text
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
+          } catch (e1) {
+            try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
+            } catch (e2) {
+              throw directErr;
+            }
           }
         }
       }
