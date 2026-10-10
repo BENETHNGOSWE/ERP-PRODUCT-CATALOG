@@ -214,10 +214,10 @@ Sent via achete.me Platform`
         const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
         const params3 = [storeName, orderRef, totalFormatted];
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
         } catch (t1) {
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', params3);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en_US');
           } catch (t2) {
             dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
           }
@@ -283,23 +283,16 @@ Sent via achete.me Platform`
         const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
-        // Try merchant_order_alert first, then achete_merchant_order_alert, then customer templates, then direct text
+        // 1. Try approved merchant_order_alert (en_US)
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
         } catch (e1) {
+          // 2. Try approved order_alert (en)
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_merchant_order_alert', params6);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
           } catch (e2) {
-            try {
-              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3);
-            } catch (e3) {
-              try {
-                dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'achete_order_notification_v1', params3);
-              } catch (e4) {
-                console.log('[Meta Cloud API] Templates pending, falling back to direct text...');
-                dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
-              }
-            }
+            // 3. Fallback to direct text
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
           }
         }
       }
