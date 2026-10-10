@@ -1021,12 +1021,11 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
         const storeRes = await whatsapp.sendOrderNotification(storeContext, orderPayload);
         console.log(`[WhatsApp Auto-Dispatch] Notification sent directly to merchant ${storeContext.whatsapp}!`);
 
-        // If customer phone is provided and differs from store, also send customer receipt
-        const normStore = whatsapp.normalizePhone(storeContext.whatsapp);
+        // Send Customer Receipt
         const normCust = whatsapp.normalizePhone(customerPhone);
-        if (normCust && normCust.length >= 9 && normCust !== '255712345678' && normCust !== normStore) {
+        if (normCust && normCust.length >= 9 && normCust !== '255712345678') {
           whatsapp.sendCustomerReceipt(customerPhone, storeContext, orderPayload)
-            .then(() => console.log(`[WhatsApp Auto-Dispatch] Confirmation sent to customer ${customerPhone}!`))
+            .then(() => console.log(`[WhatsApp Auto-Dispatch] Confirmation receipt sent to customer ${customerPhone}!`))
             .catch(cErr => console.warn('[WhatsApp Customer Receipt Notice]:', cErr.message));
         }
 

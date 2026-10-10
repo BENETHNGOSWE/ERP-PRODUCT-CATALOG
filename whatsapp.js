@@ -207,9 +207,7 @@ Sent via achete.me Platform`
 
     try {
       let dispatchResult = null;
-      if (this.config.provider === 'openwa' || this.config.openwaUrl) {
-        dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
-      } else if (this.config.provider === 'meta') {
+      if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
         try {
           dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
         } catch (cErr) {
@@ -222,6 +220,8 @@ Sent via achete.me Platform`
             throw cErr;
           }
         }
+      } else if (this.config.provider === 'openwa' || this.config.openwaUrl) {
+        dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
       } else if (this.config.provider === 'ultramsg') {
         dispatchResult = await this.sendUltraMsg(cleanPhone, messageText);
       } else if (this.config.gatewayUrl) {
