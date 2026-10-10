@@ -208,18 +208,25 @@ Sent via achete.me Platform`
     try {
       let dispatchResult = null;
       if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
+        const storeName = store ? store.name : 'Store';
+        const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
+        const params3 = [storeName, orderRef, totalFormatted];
+
+        // 1. Send official approved customer template (delivers 24/7 to any new customer worldwide)
         try {
-          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
-        } catch (cErr) {
-          const storeName = store ? store.name : 'Store';
-          const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
-          const params3 = [storeName, orderRef, totalFormatted];
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
+          console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
+        } catch (tErr) {
+          console.log(`[Meta Cloud API] Customer template notice (${tErr.message}), falling back to direct text...`);
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
           } catch (t2) {
-            throw cErr;
+            throw tErr;
           }
         }
+
+        // Also attempt direct rich detailed text in parallel if window is open
+        this.sendMetaCloudMessage(cleanPhone, messageText).catch(() => {});
       } else if (this.config.provider === 'openwa' || this.config.openwaUrl) {
         dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
       } else if (this.config.provider === 'ultramsg') {
@@ -271,7 +278,6 @@ Sent via achete.me Platform`
     let providerUsed = this.config.provider;
 
     try {
-      // 1. Meta WhatsApp Cloud API
       if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
         providerUsed = 'Meta Cloud API';
         const storeName = store ? store.name : 'Store';
@@ -283,21 +289,22 @@ Sent via achete.me Platform`
         const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
-        // 1. Send rich formatted direct order notification
+        // 1. Send official approved merchant template (delivers 24/7 to any phone worldwide)
         try {
-          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
-        } catch (directErr) {
-          console.log(`[Meta Cloud API] Direct text notice (${directErr.message}), trying merchant template...`);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
+          console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
+        } catch (tErr) {
+          console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), trying order_alert template...`);
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
-          } catch (e1) {
-            try {
-              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-            } catch (e2) {
-              throw directErr;
-            }
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
+          } catch (t2Err) {
+            console.log(`[Meta Cloud API] Template fallback to direct text: ${t2Err.message}`);
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
           }
         }
+
+        // Also attempt direct rich detailed text in parallel if window is open
+        this.sendMetaCloudMessage(cleanPhone, messageText).catch(() => {});
       }
       // 2. UltraMsg Cloud API
       else if (this.config.provider === 'ultramsg' || (this.config.ultramsgInstanceId && this.config.ultramsgToken)) {
