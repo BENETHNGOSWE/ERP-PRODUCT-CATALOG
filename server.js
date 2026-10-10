@@ -1218,16 +1218,59 @@ app.get(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) =
   res.status(200).send('Achete WhatsApp Webhook Endpoint Active');
 });
 
+const webhookEvents = [];
+
 app.post(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) => {
   try {
     const body = req.body;
+    console.log('[Meta Webhook Received]:', JSON.stringify(body, null, 2));
+
     if (body.object === 'whatsapp_business_account') {
+      const entry = body.entry?.[0];
+      const change = entry?.changes?.[0]?.value;
+
+      if (change?.statuses) {
+        change.statuses.forEach(st => {
+          const evt = {
+            id: st.id,
+            status: st.status,
+            recipient_id: st.recipient_id,
+            timestamp: st.timestamp,
+            errors: st.errors || null,
+            receivedAt: new Date().toISOString()
+          };
+          webhookEvents.unshift(evt);
+          console.log(`[Meta Status Update] Message ID ${st.id} -> Status: ${st.status.toUpperCase()}`, st.errors ? `Errors: ${JSON.stringify(st.errors)}` : '');
+        });
+      }
+
+      if (change?.messages) {
+        change.messages.forEach(msg => {
+          const incoming = {
+            from: msg.from,
+            id: msg.id,
+            type: msg.type,
+            text: msg.text?.body || null,
+            timestamp: msg.timestamp,
+            receivedAt: new Date().toISOString()
+          };
+          webhookEvents.unshift(incoming);
+          console.log(`[Meta Incoming Message] From: ${msg.from} -> Text: "${msg.text?.body || msg.type}"`);
+        });
+      }
+
       return res.status(200).json({ status: 'EVENT_RECEIVED' });
     }
     res.status(200).json({ status: 'RECEIVED' });
   } catch (e) {
+    console.error('[Meta Webhook Error]:', e);
     res.status(200).json({ status: 'OK' });
   }
+});
+
+// Endpoint to view live webhook events & delivery receipts
+app.get('/api/whatsapp/webhook-logs', (req, res) => {
+  res.json({ success: true, count: webhookEvents.length, events: webhookEvents.slice(0, 50) });
 });
 
 // 10. WhatsApp Gateway Configuration & Live Test Endpoints
