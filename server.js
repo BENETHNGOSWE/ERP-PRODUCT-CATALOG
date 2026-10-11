@@ -960,7 +960,7 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
 
     const rawCustomerPhone = (orderData.customer && orderData.customer.phone) || orderData.customerPhone || storeWhatsapp;
     const customerPhone = '+' + whatsapp.normalizePhone(rawCustomerPhone);
-    const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || `Customer (${customerPhone})`;
+    const customerName = (orderData.customer && orderData.customer.name) || orderData.customerName || 'Customer';
     const deliveryAddress = (orderData.customer && (orderData.customer.address || orderData.customer.deliveryAddress)) || orderData.deliveryAddress || (store && store.address) || 'Dar es Salaam';
 
     const calculatedTotal = (orderData.items || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0);
