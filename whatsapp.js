@@ -292,7 +292,7 @@ Sent via achete.me Platform`
         const storeName = store ? store.name : 'Store';
         const custName = (order.customer && order.customer.name) || order.customerName || 'Customer';
         const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
-        const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam';
+        const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam, Tanzania';
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
         const itemsSummary = (order.items || []).map(i => {
           const qty = i.quantity || i.qty || 1;
@@ -304,28 +304,28 @@ Sent via achete.me Platform`
         const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Items'];
         const params3 = [storeName, orderRef, totalFormatted];
 
-        // 1. Try sending the rich structured merchant layout (v2 template with 7 parameters)
+        // 1. First attempt: Send the rich formatted message directly
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_details_v2', params7, 'en_US');
-          console.log(`[Meta Cloud API] Merchant template 'merchant_order_details_v2' dispatched to ${cleanPhone}`);
-        } catch (v2Err) {
-          // 2. Fallback to approved merchant_order_alert (en_US with 6 parameters)
+          dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+          console.log(`[Meta Cloud API] Direct formatted order message dispatched to ${cleanPhone}`);
+        } catch (directErr) {
+          console.log(`[Meta Cloud API] Direct message notice (${directErr.message}), trying rich template v2...`);
+          // 2. Second attempt: Send structured template v2
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
-            console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
-          } catch (tErr) {
-            console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), trying order_alert template...`);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_details_v2', params7, 'en_US');
+            console.log(`[Meta Cloud API] Merchant template 'merchant_order_details_v2' dispatched to ${cleanPhone}`);
+          } catch (v2Err) {
+            // 3. Third attempt: Fallback to approved merchant_order_alert
             try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
+              console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
+            } catch (tErr) {
+              // 4. Final attempt: order_alert template
               dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-            } catch (t2Err) {
-              console.log(`[Meta Cloud API] Template fallback to direct text: ${t2Err.message}`);
-              dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+              console.log(`[Meta Cloud API] Merchant template 'order_alert' dispatched to ${cleanPhone}`);
             }
           }
         }
-
-        // Also attempt direct rich detailed text in parallel if window is open
-        this.sendMetaCloudMessage(cleanPhone, messageText).catch(() => {});
       }
       // 2. UltraMsg Cloud API
       else if (this.config.provider === 'ultramsg' || (this.config.ultramsgInstanceId && this.config.ultramsgToken)) {
