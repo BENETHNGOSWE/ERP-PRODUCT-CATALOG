@@ -214,12 +214,11 @@ Sent via achete.me Platform`
         const waLink = `https://wa.me/${cleanStoreWa}`;
         const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
         
-        // 1. Try formatted v2 receipt (4 parameters)
+        // Send exactly ONE clean receipt to customer
         try {
           dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt_v2', [storeName, orderRef, totalFormatted, waLink], 'en_US');
           console.log(`[Meta Cloud API] Customer template 'customer_order_receipt_v2' dispatched to ${cleanPhone}`);
         } catch (v2Err) {
-          // 2. Fallback to order_alert (en) or customer_order_receipt (en_US)
           try {
             dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt', [storeName, orderRef, totalFormatted], 'en_US');
             console.log(`[Meta Cloud API] Customer template 'customer_order_receipt' dispatched to ${cleanPhone}`);
@@ -228,14 +227,11 @@ Sent via achete.me Platform`
               dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', [storeName, orderRef, totalFormatted], 'en');
               console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
             } catch (t2Err) {
-              console.log(`[Meta Cloud API] Customer template notice (${t2Err.message}), falling back to direct text...`);
+              console.log(`[Meta Cloud API] Customer template notice (${t2Err.message}), sending formatted direct receipt...`);
               dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
             }
           }
         }
-
-        // Also attempt direct rich detailed text in parallel if window is open
-        this.sendMetaCloudMessage(cleanPhone, messageText).catch(() => {});
       } else if (this.config.provider === 'openwa' || this.config.openwaUrl) {
         dispatchResult = await this.sendOpenWA(cleanPhone, messageText, store ? store.slug : 'default');
       } else if (this.config.provider === 'ultramsg') {
@@ -313,18 +309,10 @@ Sent via achete.me Platform`
             dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
             console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
           } catch (tErr) {
-            try {
-              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-              console.log(`[Meta Cloud API] Merchant template 'order_alert' dispatched to ${cleanPhone}`);
-            } catch (t2Err) {
-              console.log(`[Meta Cloud API] Template fallback to direct text: ${t2Err.message}`);
-              dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
-            }
+            console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), sending formatted direct order alert...`);
+            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
           }
         }
-
-        // Also attempt direct formatted text in parallel for active conversation windows
-        this.sendMetaCloudMessage(cleanPhone, messageText).catch(() => {});
       }
       // 2. UltraMsg Cloud API
       else if (this.config.provider === 'ultramsg' || (this.config.ultramsgInstanceId && this.config.ultramsgToken)) {
