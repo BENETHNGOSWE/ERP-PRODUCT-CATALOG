@@ -209,19 +209,28 @@ Sent via achete.me Platform`
       let dispatchResult = null;
       if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
         const storeName = store ? store.name : 'Store';
+        const rawStoreWa = store ? (store.whatsapp || '+255710459064') : '+255710459064';
+        const cleanStoreWa = this.normalizePhone(rawStoreWa);
+        const waLink = `https://wa.me/${cleanStoreWa}`;
         const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
-        const params3 = [storeName, orderRef, totalFormatted];
-
-        // 1. Send official approved customer template (delivers 24/7 to any new customer worldwide)
+        
+        // 1. Try formatted v2 receipt (4 parameters)
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-          console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
-        } catch (tErr) {
-          console.log(`[Meta Cloud API] Customer template notice (${tErr.message}), falling back to direct text...`);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt_v2', [storeName, orderRef, totalFormatted, waLink], 'en_US');
+          console.log(`[Meta Cloud API] Customer template 'customer_order_receipt_v2' dispatched to ${cleanPhone}`);
+        } catch (v2Err) {
+          // 2. Fallback to order_alert (en) or customer_order_receipt (en_US)
           try {
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
-          } catch (t2) {
-            throw tErr;
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt', [storeName, orderRef, totalFormatted], 'en_US');
+            console.log(`[Meta Cloud API] Customer template 'customer_order_receipt' dispatched to ${cleanPhone}`);
+          } catch (tErr) {
+            try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', [storeName, orderRef, totalFormatted], 'en');
+              console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
+            } catch (t2Err) {
+              console.log(`[Meta Cloud API] Customer template notice (${t2Err.message}), falling back to direct text...`);
+              dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            }
           }
         }
 
@@ -283,23 +292,35 @@ Sent via achete.me Platform`
         const storeName = store ? store.name : 'Store';
         const custName = (order.customer && order.customer.name) || order.customerName || 'Customer';
         const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
+        const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam';
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
-        const itemsSummary = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Order Items';
+        const itemsSummary = (order.items || []).map(i => {
+          const qty = i.quantity || i.qty || 1;
+          const price = Number(i.price) || 0;
+          return `• ${i.name || 'Item'} × ${qty} — TZS ${(price * qty).toLocaleString('en-US')}`;
+        }).join('\n') || '• Order Items';
 
-        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
+        const params7 = [orderRef, storeName, custName, custPhone, delivery, itemsSummary, totalFormatted];
+        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Items'];
         const params3 = [storeName, orderRef, totalFormatted];
 
-        // 1. Send official approved merchant template (delivers 24/7 to any phone worldwide)
+        // 1. Try sending the rich structured merchant layout (v2 template with 7 parameters)
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
-          console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
-        } catch (tErr) {
-          console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), trying order_alert template...`);
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_details_v2', params7, 'en_US');
+          console.log(`[Meta Cloud API] Merchant template 'merchant_order_details_v2' dispatched to ${cleanPhone}`);
+        } catch (v2Err) {
+          // 2. Fallback to approved merchant_order_alert (en_US with 6 parameters)
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
-          } catch (t2Err) {
-            console.log(`[Meta Cloud API] Template fallback to direct text: ${t2Err.message}`);
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
+            console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
+          } catch (tErr) {
+            console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), trying order_alert template...`);
+            try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', params3, 'en');
+            } catch (t2Err) {
+              console.log(`[Meta Cloud API] Template fallback to direct text: ${t2Err.message}`);
+              dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            }
           }
         }
 
