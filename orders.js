@@ -95,9 +95,9 @@ class OrderManager {
       storeWhatsapp: cleanPhone(orderData.storeWhatsapp),
       posConfigId: orderData.posConfigId || 26,
       customer: {
-        name: orderData.customerName || `Customer (${cleanPhone(orderData.customerPhone)})`,
-        phone: cleanPhone(orderData.customerPhone || orderData.phone),
-        deliveryAddress: orderData.deliveryAddress || 'Masaki, Dar es Salaam'
+        name: orderData.customerName || (orderData.customer && orderData.customer.name) || 'Customer',
+        phone: cleanPhone(orderData.customerPhone || (orderData.customer && orderData.customer.phone) || orderData.phone),
+        deliveryAddress: orderData.deliveryAddress || (orderData.customer && orderData.customer.deliveryAddress) || 'Dar es Salaam'
       },
       items: (orderData.items || []).map(it => ({
         id: it.id,

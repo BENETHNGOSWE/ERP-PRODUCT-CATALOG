@@ -19,6 +19,13 @@ const path = require('path');
 const CONFIG_FILE = path.join(__dirname, 'data', 'whatsapp_config.json');
 const messageLogs = [];
 
+function addLog(logEntry) {
+  messageLogs.unshift(logEntry);
+  if (messageLogs.length > 500) {
+    messageLogs.length = 500;
+  }
+}
+
 class WhatsAppService {
   constructor() {
     this.config = {
@@ -242,12 +249,12 @@ Sent via achete.me Platform`
 
       logEntry.status = 'sent';
       logEntry.response = dispatchResult;
-      messageLogs.unshift(logEntry);
+      addLog(logEntry);
       return { success: true, result: dispatchResult };
     } catch (err) {
       logEntry.status = 'failed';
       logEntry.error = err.message;
-      messageLogs.unshift(logEntry);
+      addLog(logEntry);
       throw err;
     }
   }
@@ -338,7 +345,7 @@ Sent via achete.me Platform`
       logEntry.status = 'sent';
       logEntry.gateway = providerUsed;
       logEntry.response = dispatchResult;
-      messageLogs.unshift(logEntry);
+      addLog(logEntry);
 
       console.log(`[WhatsApp Gateway: ${providerUsed}] ✅ Message dispatched successfully to ${recipientPhone}!`);
 
@@ -357,7 +364,7 @@ Sent via achete.me Platform`
       logEntry.status = 'failed';
       logEntry.gateway = providerUsed;
       logEntry.error = apiErr.message;
-      messageLogs.unshift(logEntry);
+      addLog(logEntry);
 
       return {
         success: false,

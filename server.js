@@ -3,6 +3,14 @@
  * Clean, fast, direct order submission & automated WhatsApp notifications
  */
 
+// Global Resilience & Error Handlers (Prevents unhandled crashes for 24/7/365 production uptime)
+process.on('uncaughtException', (err) => {
+  console.error('[PRODUCTION SAFETY - UNCAUGHT EXCEPTION]:', err.stack || err.message || err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[PRODUCTION SAFETY - UNHANDLED REJECTION]:', reason);
+});
+
 try { require('dotenv').config(); } catch (e) {}
 const fs = require('fs');
 const express = require('express');
@@ -1218,6 +1226,10 @@ app.get(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) =
 });
 
 const webhookEvents = [];
+function addWebhookEvent(evt) {
+  webhookEvents.unshift(evt);
+  if (webhookEvents.length > 500) webhookEvents.length = 500;
+}
 
 app.post(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) => {
   try {
@@ -1238,7 +1250,7 @@ app.post(['/api/webhook/whatsapp', '/webhook/whatsapp', '/webhook'], (req, res) 
             errors: st.errors || null,
             receivedAt: new Date().toISOString()
           };
-          webhookEvents.unshift(evt);
+          addWebhookEvent(evt);
           console.log(`[Meta Status Update] Message ID ${st.id} -> Status: ${st.status.toUpperCase()}`, st.errors ? `Errors: ${JSON.stringify(st.errors)}` : '');
         });
       }
