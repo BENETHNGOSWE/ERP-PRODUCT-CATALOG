@@ -300,11 +300,12 @@ Sent via achete.me Platform`
         const itemsSummary = (order.items || []).map(i => {
           const qty = i.quantity || i.qty || 1;
           const price = Number(i.price) || 0;
-          return `• ${i.name || 'Item'} × ${qty} — TZS ${(price * qty).toLocaleString('en-US')}`;
+          const subtotal = price * qty;
+          return `• ${i.name || 'Item'} (${qty}x) — TZS ${subtotal.toLocaleString('en-US')}`;
         }).join('\n') || '• Order Items';
 
         const params7 = [orderRef, storeName, custName, custPhone, delivery, itemsSummary, totalFormatted];
-        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || 1}x)`).join(', ') || 'Items'];
+        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
         // 1. Guaranteed Delivery: Send Approved Merchant Template first
