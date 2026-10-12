@@ -168,6 +168,7 @@ Action Required: Please process and confirm this order.`
     const cleanStoreWa = this.normalizePhone(rawStoreWa);
     const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
     const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US');
+    const itemsList = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || i.quantity || 1}x)`).join(', ') || 'Order Items';
 
     return (
 `🧾 ACHETE NOTIFICATIONS
@@ -177,6 +178,7 @@ Hello, your order on achete.me has been received!
 
 🏪 Merchant: ${storeName}
 📦 Order #: ${orderRef}
+🛍️ Items: ${itemsList}
 💰 Total: TZS ${totalFormatted}
 
 ----------------------------------------
@@ -220,21 +222,23 @@ Sent via achete.me Platform`
         const cleanStoreWa = this.normalizePhone(rawStoreWa);
         const waLink = `https://wa.me/${cleanStoreWa}`;
         const totalFormatted = (Number(order.totalAmount || order.totalPaid || order.total || 0)).toLocaleString('en-US') + ' TZS';
+        const itemsList = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || i.quantity || 1}x)`).join(', ') || 'Order Items';
         
-        // Send exactly ONE clean branded receipt to customer
+        // 1. Try formatted v3 receipt with itemized breakdown
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt_v2', [storeName, orderRef, totalFormatted, waLink], 'en_US');
-          console.log(`[Meta Cloud API] Customer template 'customer_order_receipt_v2' dispatched to ${cleanPhone}`);
-        } catch (v2Err) {
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt_v3', [storeName, orderRef, itemsList, totalFormatted, waLink], 'en_US');
+          console.log(`[Meta Cloud API] Customer template 'customer_order_receipt_v3' dispatched to ${cleanPhone}`);
+        } catch (v3Err) {
+          // 2. Fallback to v2 receipt
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', [storeName, orderRef, totalFormatted, waLink], 'en');
-            console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
-          } catch (tErr) {
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt_v2', [storeName, orderRef, totalFormatted, waLink], 'en_US');
+            console.log(`[Meta Cloud API] Customer template 'customer_order_receipt_v2' dispatched to ${cleanPhone}`);
+          } catch (v2Err) {
             try {
-              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'customer_order_receipt', [storeName, orderRef, totalFormatted], 'en_US');
-              console.log(`[Meta Cloud API] Customer template 'customer_order_receipt' dispatched to ${cleanPhone}`);
-            } catch (t2Err) {
-              console.log(`[Meta Cloud API] Customer template notice (${t2Err.message}), sending formatted direct receipt...`);
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'order_alert', [storeName, orderRef, totalFormatted, waLink], 'en');
+              console.log(`[Meta Cloud API] Customer template 'order_alert' dispatched to ${cleanPhone}`);
+            } catch (tErr) {
+              console.log(`[Meta Cloud API] Customer template notice (${tErr.message}), sending formatted direct receipt...`);
               dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
             }
           }
