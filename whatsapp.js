@@ -298,29 +298,43 @@ Sent via achete.me Platform`
         const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam, Tanzania';
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
         
-        // Single-line sanitized item summary for Meta Cloud API template variable compatibility (no raw newlines)
-        const templateItemsSummary = (order.items || []).map(i => {
+        // Multi-line item list with linebreaks
+        const multilineItemsSummary = (order.items || []).map(i => {
           const qty = i.quantity || i.qty || 1;
           const price = Number(i.price) || 0;
           const subtotal = price * qty;
-          return `${i.name || 'Item'} (${qty}x: TZS ${subtotal.toLocaleString('en-US')})`;
-        }).join(' • ') || 'Order Items';
+          return `• ${i.name || 'Item'} (${qty}x: TZS ${subtotal.toLocaleString('en-US')})`;
+        }).join('\n') || '• Order Items';
 
-        const params7 = [orderRef, storeName, custName, custPhone, delivery, templateItemsSummary, totalFormatted];
-        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, templateItemsSummary];
+        // Single-line sanitized item summary for Meta Cloud API template variable compatibility (no raw newlines)
+        const singlelineItemsSummary = (order.items || []).map(i => {
+          const qty = i.quantity || i.qty || 1;
+          const price = Number(i.price) || 0;
+          const subtotal = price * qty;
+          return `• ${i.name || 'Item'} (${qty}x: TZS ${subtotal.toLocaleString('en-US')})`;
+        }).join('  |  ') || 'Order Items';
+
+        const paramsMultiline = [orderRef, storeName, custName, custPhone, totalFormatted, multilineItemsSummary];
+        const params7 = [orderRef, storeName, custName, custPhone, delivery, singlelineItemsSummary, totalFormatted];
+        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, singlelineItemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
         // 1. Guaranteed Delivery: Send Approved Merchant Template first
         try {
-          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_details_v2', params7, 'en_US');
-          console.log(`[Meta Cloud API] Merchant template 'merchant_order_details_v2' dispatched to ${cleanPhone}`);
-        } catch (v2Err) {
+          dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_multiline', paramsMultiline, 'en_US');
+          console.log(`[Meta Cloud API] Merchant template 'merchant_order_multiline' dispatched to ${cleanPhone}`);
+        } catch (multiErr) {
           try {
-            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
-            console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
-          } catch (tErr) {
-            console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), sending formatted direct order alert...`);
-            dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_details_v2', params7, 'en_US');
+            console.log(`[Meta Cloud API] Merchant template 'merchant_order_details_v2' dispatched to ${cleanPhone}`);
+          } catch (v2Err) {
+            try {
+              dispatchResult = await this.sendMetaTemplateMessage(cleanPhone, 'merchant_order_alert', params6, 'en_US');
+              console.log(`[Meta Cloud API] Merchant template 'merchant_order_alert' dispatched to ${cleanPhone}`);
+            } catch (tErr) {
+              console.log(`[Meta Cloud API] Merchant template notice (${tErr.message}), sending formatted direct order alert...`);
+              dispatchResult = await this.sendMetaCloudMessage(cleanPhone, messageText);
+            }
           }
         }
       }
