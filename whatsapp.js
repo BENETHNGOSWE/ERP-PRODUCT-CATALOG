@@ -297,15 +297,17 @@ Sent via achete.me Platform`
         const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
         const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam, Tanzania';
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
-        const itemsSummary = (order.items || []).map(i => {
+        
+        // Single-line sanitized item summary for Meta Cloud API template variable compatibility (no raw newlines)
+        const templateItemsSummary = (order.items || []).map(i => {
           const qty = i.quantity || i.qty || 1;
           const price = Number(i.price) || 0;
           const subtotal = price * qty;
-          return `• ${i.name || 'Item'} (${qty}x) — TZS ${subtotal.toLocaleString('en-US')}`;
-        }).join('\n') || '• Order Items';
+          return `${i.name || 'Item'} (${qty}x: TZS ${subtotal.toLocaleString('en-US')})`;
+        }).join(' • ') || 'Order Items';
 
-        const params7 = [orderRef, storeName, custName, custPhone, delivery, itemsSummary, totalFormatted];
-        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, itemsSummary];
+        const params7 = [orderRef, storeName, custName, custPhone, delivery, templateItemsSummary, totalFormatted];
+        const params6 = [orderRef, storeName, custName, custPhone, totalFormatted, templateItemsSummary];
         const params3 = [storeName, orderRef, totalFormatted];
 
         // 1. Guaranteed Delivery: Send Approved Merchant Template first
