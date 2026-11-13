@@ -181,12 +181,19 @@ class SmsService {
     const recipientPhone = (store && store.whatsapp) ? store.whatsapp : '255757681480';
     const storeName = store ? store.name : 'Store';
     const orderRef = order.orderNumber || order.orderId || order.receiptNumber || `ORD-${Date.now().toString().slice(-4)}`;
-    const custName = (order.customer && order.customer.name) || order.customerName || 'Customer';
+    
+    let rawCustName = (order.customer && order.customer.name) || order.customerName || '';
     const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
+    
+    let custDisplay = `Customer (${custPhone})`;
+    if (rawCustName && !rawCustName.includes('(') && !rawCustName.includes(custPhone) && rawCustName.trim().toLowerCase() !== 'customer') {
+      custDisplay = `${rawCustName.trim()} (${custPhone})`;
+    }
+
     const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US');
     const itemsList = (order.items || []).map(i => `${i.name || 'Item'} (${i.qty || i.quantity || 1}x)`).join(', ') || 'Items';
 
-    const message = `NEW ORDER #${orderRef} for ${storeName}! Customer: ${custName} (${custPhone}). Items: ${itemsList}. Total: TZS ${totalFormatted}. Fulfill at achete.me/${store ? store.slug : 'dashboard'}`;
+    const message = `NEW ORDER #${orderRef} for ${storeName}! Customer: ${custDisplay}. Items: ${itemsList}. Total: TZS ${totalFormatted}. Fulfill at achete.me/${store ? store.slug : 'dashboard'}`;
 
     return this.sendSms(recipientPhone, message);
   }

@@ -297,8 +297,12 @@ Sent via achete.me Platform`
       if (this.config.provider === 'meta' || (this.config.metaToken && this.config.metaPhoneNumberId)) {
         providerUsed = 'Meta Cloud API';
         const storeName = store ? store.name : 'Store';
-        const custName = (order.customer && order.customer.name) || order.customerName || 'Customer';
+        let rawCustName = (order.customer && order.customer.name) || order.customerName || '';
         const custPhone = (order.customer && order.customer.phone) || order.customerPhone || 'N/A';
+        let custName = 'Customer';
+        if (rawCustName && !rawCustName.includes('(') && !rawCustName.includes(custPhone) && rawCustName.trim().toLowerCase() !== 'customer') {
+          custName = rawCustName.trim();
+        }
         const delivery = (order.customer && (order.customer.address || order.customer.deliveryAddress)) || order.deliveryAddress || (store && store.address) || 'Dar es Salaam, Tanzania';
         const totalFormatted = (Number(order.totalAmount || order.total || 0)).toLocaleString('en-US') + ' TZS';
         
