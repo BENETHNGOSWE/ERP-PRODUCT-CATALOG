@@ -274,17 +274,21 @@
 
       const btnWhatsAppDirect = document.getElementById('btnWhatsAppDirect');
       if (btnWhatsAppDirect) {
-        if (order && order.waLink) {
-          btnWhatsAppDirect.href = order.waLink;
+        const storeWa = order.storeWhatsapp || (NOVA.getStore() && NOVA.getStore().whatsapp) || '+255757681480';
+        let cleanWa = String(storeWa).replace(/\D+/g, '');
+        if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
+        else if (cleanWa.length === 9 && (cleanWa.startsWith('7') || cleanWa.startsWith('6'))) cleanWa = '255' + cleanWa;
+        else if (cleanWa.startsWith('2550')) cleanWa = '255' + cleanWa.slice(4);
+
+        let itemsList = '';
+        if (order.items && order.items.length > 0) {
+          itemsList = order.items.map(it => `• ${it.name} (${it.qty || 1}x) — TZS ${((Number(it.price) || 0) * (Number(it.qty) || 1)).toLocaleString('en-US')}`).join('\n');
         } else {
-          const storeWa = order.storeWhatsapp || (NOVA.getStore() && NOVA.getStore().whatsapp) || '+255710459064';
-          let cleanWa = String(storeWa).replace(/\D+/g, '');
-          if (cleanWa.startsWith('0')) cleanWa = '255' + cleanWa.slice(1);
-          else if (cleanWa.length === 9 && (cleanWa.startsWith('7') || cleanWa.startsWith('6'))) cleanWa = '255' + cleanWa;
-          else if (cleanWa.startsWith('2550')) cleanWa = '255' + cleanWa.slice(4);
-          const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\nTotal: TZS ${NOVA.formatTZS(finalAmount)}\nPhone: ${(order.customer && order.customer.phone) || order.phone || ''}`;
-          btnWhatsAppDirect.href = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(msg)}`;
+          itemsList = '• General Order Items';
         }
+
+        const msg = `*NEW ORDER #${order.orderId || 'NEW'}*\n*Store:* ${order.storeName || (NOVA.getStore() && NOVA.getStore().name) || 'BEN STORE'}\n*Customer:* ${(order.customer && order.customer.name) || 'Customer'}\n*Phone:* ${(order.customer && order.customer.phone) || order.phone || ''}\n\n*Items Ordered:*\n${itemsList}\n\n*TOTAL: TZS ${NOVA.formatTZS(finalAmount)}*\n\nPlease confirm and fulfill my order.`;
+        btnWhatsAppDirect.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
       }
 
       const btnContinue = document.getElementById('btnContinueShopping');

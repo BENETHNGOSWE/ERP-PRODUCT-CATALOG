@@ -20,6 +20,7 @@ const path = require('path');
 const odoo = require('./odoo');
 const stores = require('./stores');
 const whatsapp = require('./whatsapp');
+const sms = require('./sms');
 const orders = require('./orders');
 
 const app = express();
@@ -1037,6 +1038,23 @@ app.post(['/api/odoo/order', '/api/orders', '/api/:slug/order'], async (req, res
             .catch(cErr => console.warn('[WhatsApp Customer Receipt Notice]:', cErr.message));
         }
 
+        // 2b. Dispatch Kilakona SMS (Sender ID: KODATECH) to Merchant & Customer
+        try {
+          // Merchant SMS
+          sms.sendOrderNotification(storeContext, orderPayload)
+            .then(() => console.log(`[Kilakona SMS] Merchant alert sent to ${storeContext.whatsapp} (Sender: KODATECH)!`))
+            .catch(smErr => console.warn('[Kilakona SMS Merchant Notice]:', smErr.message));
+
+          // Customer SMS
+          if (normCust && normCust.length >= 9 && normCust !== '255712345678') {
+            sms.sendCustomerReceipt(customerPhone, storeContext, orderPayload)
+              .then(() => console.log(`[Kilakona SMS] Customer receipt sent to ${customerPhone} (Sender: KODATECH)!`))
+              .catch(scErr => console.warn('[Kilakona SMS Customer Notice]:', scErr.message));
+          }
+        } catch (smsErr) {
+          console.warn('[Kilakona SMS Gateway Warning]:', smsErr.message);
+        }
+
         return storeRes;
       } catch (waErr) {
         console.warn('[WhatsApp Gateway Warning]:', waErr.message);
@@ -1355,6 +1373,47 @@ app.get('/api/whatsapp/logs', (req, res) => {
     success: true,
     logs: whatsapp.getLogs(50)
   });
+});
+
+// =========================================================================
+// KILAKONA SMS GATEWAY ENDPOINTS (Sender ID: KODATECH)
+// =========================================================================
+
+app.get('/api/sms/config', (req, res) => {
+  res.json({
+    success: true,
+    config: {
+      enabled: sms.config.enabled,
+      senderId: sms.config.senderId,
+      hasApiKey: Boolean(sms.config.apiKey),
+      hasApiSecret: Boolean(sms.config.apiSecret),
+      deliveryReportUrl: sms.config.deliveryReportUrl
+    }
+  });
+});
+
+app.post('/api/sms/send-test', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+    if (!phone) return res.status(400).json({ success: false, error: 'Phone number is required' });
+    const msg = message || 'Test SMS from KODATECH via Kilakona SMS Gateway on Achete Platform!';
+    const result = await sms.sendSms(phone, msg);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/sms/logs', (req, res) => {
+  res.json({
+    success: true,
+    logs: sms.getLogs(50)
+  });
+});
+
+app.post(['/api/webhook/sms', '/webhook/sms'], (req, res) => {
+  console.log('[Kilakona SMS Delivery Callback Received]:', JSON.stringify(req.body));
+  res.status(200).json({ success: true, message: 'Delivery report recorded' });
 });
 
 // =========================================================================

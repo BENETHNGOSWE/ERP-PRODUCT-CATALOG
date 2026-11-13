@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "apiKey": "developerbeneth",
+  "apiSecret": "CCSognh9JtfTL7v8NcXi",
+  "senderId": "KODATECH",
+  "deliveryReportUrl": "https://achete.me/api/webhook/sms"
+}
